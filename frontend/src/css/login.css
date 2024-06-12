@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    background-image: url(../assets/uni_bg.png);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+}
+
+.content{
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    height: 60%;
+    width: 60%;
+    border-radius: 0.7rem;
+    box-shadow: 0 1rem 25px rgba(0, 0, 0, 0.5);
+}
+
+.logo{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 50%;
+    overflow: hidden;
+}
+
+.logo img{
+    border: red 1px solid;
+    width: 40rem;
+}
+
+form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    width: 50%;
+    font-family: 'Poppins', serif;
+}
+
+.title{
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.icon{
+    position: absolute;
+    color: rgb(148, 147, 147);
+    margin-top: 0.8rem;
+    margin-left: 1.2rem;
+}
+
+form input{
+    padding-left: 3rem;
+    height: 2.8rem;
+    width: 19rem;
+    border-radius: 1.3rem;
+    border: 0.5px solid rgb(209, 209, 209);
+}
+
+form input:focus{
+    outline: 0.1rem solid rgb(19, 94, 19);
+}
+
+form button{
+    height: 2.8rem;
+    width: 19rem;
+    color: white;
+    background-color: rgb(10, 102, 10);
+    border-radius: 1.3rem;
+    border: none;
+    cursor: pointer;
+}
+
+form button:hover{
+    background-color: rgb(3, 66, 3);
+}
+
+form a{
+    color: black;
+    font-size: 0.8rem;
+    margin-top: -1rem;
+    cursor: pointer;
+}
+
+form a:hover{
+    color: rgb(136, 136, 136);
+}
