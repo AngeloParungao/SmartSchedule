@@ -43,7 +43,7 @@
     width: 40rem;
 }
 
-form{
+.login-form{
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -64,7 +64,7 @@ form{
     margin-left: 1.2rem;
 }
 
-form input{
+.login-form input{
     padding-left: 3rem;
     height: 2.8rem;
     width: 19rem;
@@ -72,11 +72,11 @@ form input{
     border: 0.5px solid rgb(209, 209, 209);
 }
 
-form input:focus{
+.login-form input:focus{
     outline: 0.1rem solid rgb(19, 94, 19);
 }
 
-form button{
+.login-form button{
     height: 2.8rem;
     width: 19rem;
     color: white;
@@ -86,17 +86,17 @@ form button{
     cursor: pointer;
 }
 
-form button:hover{
+.login-form button:hover{
     background-color: rgb(3, 66, 3);
 }
 
-form a{
+.login-form a{
     color: black;
     font-size: 0.8rem;
     margin-top: -1rem;
     cursor: pointer;
 }
 
-form a:hover{
+.login-form a:hover{
     color: rgb(136, 136, 136);
 }

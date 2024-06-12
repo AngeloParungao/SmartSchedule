@@ -35,7 +35,7 @@ function Login(){
                 <div className='logo'>
                     <img src= {logo}  alt="" />
                 </div>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className='login-form'>
                     <span className='title'>BulSU SmartSchedule</span>
                     <div>
                         <FontAwesomeIcon icon={faEnvelope} className='icon'/>

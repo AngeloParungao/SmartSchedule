@@ -1,5 +1,5 @@
 .scheduling-container{
-    height: 100vh;
+    height: calc(100vh - 5rem);
     width: calc(100vw - 6rem);
     background-color: blue;
     margin-left: 6rem;

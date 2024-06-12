@@ -7,7 +7,7 @@ function Navbar(){
         <div className='navbar'>
             <span>Scheduling</span>
             <div className='navigation'>
-                <NavLink exact to="/schedule">
+                <NavLink exact to="/scheduling">
                     Schedule
                 </NavLink> 
                 <NavLink to="/instructors">
