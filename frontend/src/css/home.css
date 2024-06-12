@@ -1,0 +1,6 @@
+.home-container{
+    height: 100vh;
+    width: calc(100vw - 6rem);
+    background-color: red;
+    margin-left: 6rem;
+}

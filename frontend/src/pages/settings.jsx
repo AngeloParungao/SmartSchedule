@@ -1,17 +1,16 @@
 import React from 'react';
 import Sidebar from '../assets/components/sidebar';
-import '../css/home.css';
+import '../css/settings.css'
 
-function Home() {
-   
-    return (
+function Settings(){
+    return(
         <div>
             <Sidebar/>
-            <div className='home-container'>
-                HOME
+            <div className='settings-container'>
+                SETTINGS
             </div>
         </div>
     )
 }
 
-export default Home;
+export default Settings
