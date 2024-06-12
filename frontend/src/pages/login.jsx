@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Navigate from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../css/login.css';
 import logo from '../assets/smartsched_logo.png';
@@ -12,17 +12,18 @@ function Login(){
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-    useEffect(() => {
-        setIsLoggedIn(true);
-    }, []); 
+    const navigate = useNavigate();
 
     function handleSubmit(event){
         event.preventDefault();
         axios.post("http://localhost:8082/login", {email, password})
-        .then(res => toast.success("Login Successful!"))
-        .catch(err => toast.error("Invalid Information!"));
+            .then(res => {
+                toast.success("Login Successful!");
+                setTimeout(() => {
+                    navigate('/home');
+                }, 2000);
+            })
+            .catch(err => toast.error("Invalid Information!"));
     }
 
     return(
