@@ -15,7 +15,7 @@ function Login(){
 
     function handleSubmit(event){
         event.preventDefault();
-        axios.post("http://localhost:8082/login", {email, password})
+        axios.post("http://localhost:8082/api/auth/login", {email, password})
             .then(res => {
                 toast.success("Login Successful!");
                 setTimeout(() => {
