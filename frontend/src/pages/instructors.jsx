@@ -36,6 +36,15 @@ function Instructors() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        // Check if the email already exists
+        const emailExists = instructors.some(instructor => instructor.email === email);
+        if (emailExists) {
+            toast.error('Email Already Exists!');
+            return;
+        }
+
+
         const instructorData = {
             email,
             firstName,
@@ -64,8 +73,8 @@ function Instructors() {
                     resetForm(); // Reset form fields
                 })
                 .catch(err => {
-                    console.error('Error in adding instructor:', err);
-                    toast.error("Error in adding");
+                    console.error('Error in Adding Instructor:', err);
+                    toast.error("Error in Adding");
                 });
         }
     };
@@ -91,11 +100,11 @@ function Instructors() {
             data: { instructorIds: selectedInstructorIds }
         })
         .then(res => {
-            toast.success("Instructors deleted successfully!");
+            toast.success("Deleted Successfully!");
             fetchInstructors(); // Refresh instructors list after deletion
             setSelectedInstructorIds([]); // Clear selected ids after deletion
         })
-        .catch(err => toast.error("Error deleting instructors"));
+        .catch(err => toast.error("Error Deleting Instructors"));
     };
 
     const handleUpdateClick = (instructor) => {
