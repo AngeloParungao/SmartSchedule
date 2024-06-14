@@ -2,7 +2,8 @@
 
 .instructors-container{
     display: flex;
-    gap: 2rem;
+    justify-content: space-between;
+    gap: 1rem;
     height: calc(100vh - 5rem);
     width: calc(100vw - 6rem);
     margin-left: 6rem;
@@ -21,10 +22,10 @@ h2{
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    gap: 1.3rem;
+    gap: 1rem;
     width: 30%;
-    height: 30rem;
-    padding: 1rem;
+    height: fit-content;
+    padding: 1.5rem;
     background-color: rgb(233, 233, 233);
     border-radius: 0.5rem;
 }
@@ -33,6 +34,7 @@ h2{
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 19rem;
 }
 
 .instructor-form div label{
@@ -55,26 +57,60 @@ h2{
     border-radius: 0.5rem;
 }
 
-.instructors-table, tr, td{
+.upper-table{
+    display: flex;
+}
+
+.table-wrapper{
+    height: 90%;
+    overflow-y: auto;
+}
+
+.instructors-table {
+    width: 100%;
+    table-layout: fixed; /* Fixed table layout */
+}
+
+.instructors-table th,
+.instructors-table td {
     padding: 0.5rem 1rem;
     text-align: center;
     border: 0.1rem solid rgb(201, 200, 200);
     border-collapse: collapse;
+    min-width: 150px;
+    word-wrap: break-word; /* Ensure content wraps to a new line */
 }
 
-.instructors-table th{
-    padding: 0.5rem 2rem;
+.instructors-table th:nth-child(1),
+.instructors-table th:nth-child(5) {
+    width: 3rem; /* Fixed width for small cells */
+}
+
+
+.instructors-table th {
     background-color: rgb(216, 216, 216);
 }
 
-.btns{
+.btns {
     display: flex;
     justify-content: end;
+    gap: 0.5rem;
     width: 100%;
     padding: 0.5rem;
 }
 
-#delete-btn{
+#select-all-btn {
+    font-weight: 600;
+    height: 2rem;
+    padding: 0.5rem;
+    color: rgb(252, 129, 85);
+    background-color: transparent;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+#delete-btn {
     font-weight: 600;
     height: 2rem;
     padding: 0.5rem;
@@ -82,4 +118,13 @@ h2{
     background-color: #f13c3c;
     border: none;
     border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+#select-all-btn:hover {
+    color: rgb(248, 172, 145);
+}
+
+#delete-btn:hover {
+    background-color: #e76f6f;
 }

@@ -16,6 +16,7 @@ function Instructors() {
     const [selectedInstructorIds, setSelectedInstructorIds] = useState([]);
     const [isUpdating, setIsUpdating] = useState(false);
     const [instructorIdToUpdate, setInstructorIdToUpdate] = useState(null);
+    const [searchTerm, setSearchTerm] = useState(''); // New state for search term
 
     useEffect(() => {
         fetchInstructors();
@@ -67,6 +68,14 @@ function Instructors() {
         }
     };
 
+    const handleSelectAll = () => {
+        if (selectedInstructorIds.length === filteredInstructors.length) {
+            setSelectedInstructorIds([]);
+        } else {
+            setSelectedInstructorIds(filteredInstructors.map(instructor => instructor.instructor_id));
+        }
+    };
+
     const handleCheckboxChange = (e, instructorId) => {
         if (e.target.checked) {
             setSelectedInstructorIds([...selectedInstructorIds, instructorId]);
@@ -108,6 +117,15 @@ function Instructors() {
         setIsUpdating(false);
         setInstructorIdToUpdate(null);
     };
+
+    // Filter instructors based on search term
+    const filteredInstructors = instructors.filter(instructor => 
+        instructor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        instructor.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        instructor.middlename.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        instructor.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        instructor.tags.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div>
@@ -184,38 +202,49 @@ function Instructors() {
                         ></textarea>
                     </div>
                     <button type='submit' id='addData'>{isUpdating ? 'UPDATE INSTRUCTOR' : 'ADD INSTRUCTOR'}</button>
-                    {isUpdating && <button type='button' onClick={resetForm}>Cancel Update</button>}
+                    {isUpdating && <button type='button' onClick={resetForm}>CANCEL</button>}
                 </form>
                 <div>
-                    <table className='instructors-table'>
-                        <thead>
-                            <tr>
-                                <th>Action</th>
-                                <th>Instructor Email</th>
-                                <th>Instructor Name</th>
-                                <th>Labels/Tags</th>
-                                <th>Update</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {instructors.map((instructor) => (
-                                <tr key={instructor.instructor_id}>
-                                    <td><input 
-                                            type="checkbox" 
-                                            checked={selectedInstructorIds.includes(instructor.instructor_id)}
-                                            onChange={(e) => handleCheckboxChange(e, instructor.instructor_id)} 
-                                        />
-                                    </td>
-                                    <td>{instructor.email}</td>
-                                    <td>{`${instructor.firstname} ${instructor.middlename} ${instructor.lastname}`}</td>
-                                    <td>{instructor.tags}</td>
-                                    <td><button onClick={() => handleUpdateClick(instructor)}>Update</button></td>
+                    <div className='upper-table'>
+                        <input 
+                            type="text" 
+                            placeholder='Search' 
+                            value={searchTerm} 
+                            onChange={(e) => setSearchTerm(e.target.value)} // Update search term on input change
+                        />
+                        <div className='btns'>
+                            <button id="select-all-btn" onClick={handleSelectAll}>Select All</button>
+                            <button id="delete-btn" onClick={handleDeleteSelected}>Remove Instructor/s</button>
+                        </div>
+                    </div>
+                    <div className='table-wrapper'>
+                        <table className='instructors-table'>
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Instructor Email</th>
+                                    <th>Instructor</th>
+                                    <th>Labels/Tags</th>
+                                    <th></th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    <div className='btns'>
-                        <button id="delete-btn" onClick={handleDeleteSelected}>Remove Instructor/s</button>
+                            </thead>
+                            <tbody>
+                                {filteredInstructors.map((instructor) => (
+                                    <tr key={instructor.instructor_id}>
+                                        <td><input 
+                                                type="checkbox" 
+                                                checked={selectedInstructorIds.includes(instructor.instructor_id)}
+                                                onChange={(e) => handleCheckboxChange(e, instructor.instructor_id)} 
+                                            />
+                                        </td>
+                                        <td>{instructor.email}</td>
+                                        <td>{`${instructor.firstname} ${instructor.middlename} ${instructor.lastname}`}</td>
+                                        <td>{instructor.tags}</td>
+                                        <td><button onClick={() => handleUpdateClick(instructor)}></button></td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
