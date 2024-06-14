@@ -3,6 +3,8 @@ import Sidebar from '../assets/components/sidebar';
 import Navbar from '../assets/components/scheduling-navbar';
 import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPenToSquare , faSearch} from '@fortawesome/free-solid-svg-icons';
 import '../css/instructors.css';
 
 function Instructors() {
@@ -192,21 +194,24 @@ function Instructors() {
                             <option value="part-timer">Part Time</option>
                         </select>
                     </div>
-                    <div>
+                    <div id='text-area'>
                         <label htmlFor="tags">Labels/Tags:</label>
                         <textarea 
                             name="tags" 
                             id="tags"
+                            placeholder='ex: Specialized in Mobile App Development'
                             value={tags}
                             onChange={(e) => setTags(e.target.value)}
                         ></textarea>
                     </div>
                     <button type='submit' id='addData'>{isUpdating ? 'UPDATE INSTRUCTOR' : 'ADD INSTRUCTOR'}</button>
-                    {isUpdating && <button type='button' onClick={resetForm}>CANCEL</button>}
+                    {isUpdating && <button type='button' id='cancel' onClick={resetForm}>CANCEL</button>}
                 </form>
                 <div>
                     <div className='upper-table'>
+                        <FontAwesomeIcon icon={faSearch} className='search-icon'/>
                         <input 
+                            id='search'
                             type="text" 
                             placeholder='Search' 
                             value={searchTerm} 
@@ -240,7 +245,9 @@ function Instructors() {
                                         <td>{instructor.email}</td>
                                         <td>{`${instructor.firstname} ${instructor.middlename} ${instructor.lastname}`}</td>
                                         <td>{instructor.tags}</td>
-                                        <td><button onClick={() => handleUpdateClick(instructor)}></button></td>
+                                        <td><button id='update-btn' onClick={() => handleUpdateClick(instructor)}>
+                                            <FontAwesomeIcon icon={faPenToSquare} className='update-icon'/>
+                                        </button></td>
                                     </tr>
                                 ))}
                             </tbody>
