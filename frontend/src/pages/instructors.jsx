@@ -12,14 +12,16 @@ function Instructors() {
     const [firstName, setFirstName] = useState('');
     const [middleName, setMiddleName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [workType, setWorkType] = useState('regular');
+    const [workType, setWorkType] = useState('Regular');
     const [tags, setTags] = useState('');
     const [instructors, setInstructors] = useState([]);
     const [selectedInstructorIds, setSelectedInstructorIds] = useState([]);
     const [isUpdating, setIsUpdating] = useState(false);
     const [instructorIdToUpdate, setInstructorIdToUpdate] = useState(null);
-    const [searchTerm, setSearchTerm] = useState(''); // New state for search term
+    const [searchTerm, setSearchTerm] = useState('');
 
+
+    //FETCHING OF INSTRUCTORS DATA
     useEffect(() => {
         fetchInstructors();
     }, []);
@@ -34,16 +36,10 @@ function Instructors() {
         }
     };
 
+
+    //HANDLE SUBMISSION OF FORM 
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        // Check if the email already exists
-        const emailExists = instructors.some(instructor => instructor.email === email);
-        if (emailExists) {
-            toast.error('Email Already Exists!');
-            return;
-        }
-
 
         const instructorData = {
             email,
@@ -54,6 +50,7 @@ function Instructors() {
             tags,
         };
 
+        //FOR UPDATING
         if (isUpdating) {
             axios.put(`http://localhost:8082/api/instructors/update/${instructorIdToUpdate}`, instructorData)
                 .then(res => {
@@ -66,6 +63,14 @@ function Instructors() {
                     toast.error("Error in updating");
                 });
         } else {
+
+            // Check if the email already exists
+            const emailExists = instructors.some(instructor => instructor.email === email);
+            if (emailExists) {
+                toast.error('Email Already Exists!');
+                return;
+            }
+            //FOR ADDING
             axios.post("http://localhost:8082/api/instructors/adding", instructorData)
                 .then(res => {
                     toast.success("Added Successfully!");
@@ -79,6 +84,8 @@ function Instructors() {
         }
     };
 
+
+    //HANDLE THE CHECKBOX SELECTION
     const handleSelectAll = () => {
         if (selectedInstructorIds.length === filteredInstructors.length) {
             setSelectedInstructorIds([]);
@@ -95,6 +102,9 @@ function Instructors() {
         }
     };
 
+
+
+    //HANDLE THE DELETION
     const handleDeleteSelected = () => {
         axios.delete("http://localhost:8082/api/instructors/delete", {
             data: { instructorIds: selectedInstructorIds }
@@ -107,6 +117,7 @@ function Instructors() {
         .catch(err => toast.error("Error Deleting Instructors"));
     };
 
+    //POPULATE THE FORMS WHEN UPDATING
     const handleUpdateClick = (instructor) => {
         setEmail(instructor.email);
         setFirstName(instructor.firstname);
@@ -129,7 +140,7 @@ function Instructors() {
         setInstructorIdToUpdate(null);
     };
 
-    // Filter instructors based on search term
+    // FILTER INSTRUCTORS BASED ON SEARCH TERM
     const filteredInstructors = instructors.filter(instructor => 
         instructor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         instructor.firstname.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -178,7 +189,6 @@ function Instructors() {
                             placeholder="Middle Name" 
                             value={middleName}
                             onChange={(e) => setMiddleName(e.target.value)}
-                            required
                         />
                     </div>
                     <div>
@@ -199,8 +209,8 @@ function Instructors() {
                             value={workType}
                             onChange={(e) => setWorkType(e.target.value)}
                         >
-                            <option value="regular">Regular</option>
-                            <option value="part-timer">Part Time</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Part-timer">Part Time</option>
                         </select>
                     </div>
                     <div id='text-area'>
