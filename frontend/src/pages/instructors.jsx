@@ -208,6 +208,7 @@ function Instructors() {
                             name="workType"
                             value={workType}
                             onChange={(e) => setWorkType(e.target.value)}
+                            required
                         >
                             <option value="Regular">Regular</option>
                             <option value="Part-timer">Part Time</option>

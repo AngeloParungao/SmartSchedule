@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 15, 2024 at 03:26 PM
+-- Generation Time: Jun 16, 2024 at 02:25 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -44,7 +44,6 @@ CREATE TABLE `instructors` (
 INSERT INTO `instructors` (`instructor_id`, `email`, `firstname`, `middlename`, `lastname`, `worktype`, `tags`) VALUES
 (20, 'angeloparungao.ap@gmail.com', 'Angelo Miguel', 'Lapuz', 'Parungao', 'regular', 'Web and Mobile Development'),
 (23, 'clyde@gmail.com', 'Clyde', '', 'Mondero', 'Part-timer', 'Web and Mobile Development'),
-(24, 'angelshane@gmail.com', 'Angel Shane', '', 'Mangrobang', 'part-timer', 'Business Administration'),
 (25, 'danrick@gmail.com', 'Danrick Salamat', 'Conception', 'Macatanong', 'Part-timer', 'Web and Mobile Development'),
 (26, 'albert@gmail.com', 'Albert', '', 'Junio', 'Part-timer', 'Business Analytics'),
 (27, 'erick@gmail.com', 'Erick', '', 'Caleja', 'part-timer', 'Business Analytics'),
@@ -71,8 +70,31 @@ CREATE TABLE `rooms` (
 --
 
 INSERT INTO `rooms` (`room_id`, `room_type`, `room_name`, `room_tags`) VALUES
-(28, 'Lecture', '201', 'Second Floor'),
+(28, 'Lecture', 'RM201', 'Second Floor'),
 (29, 'Laboratory', 'MML', 'Multi Media Laboratory');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `subjects`
+--
+
+CREATE TABLE `subjects` (
+  `subject_id` int(11) NOT NULL,
+  `subject_name` varchar(50) NOT NULL,
+  `subject_code` varchar(20) NOT NULL,
+  `year_lvl` varchar(10) NOT NULL,
+  `subject_type` varchar(10) NOT NULL,
+  `subject_units` int(5) NOT NULL,
+  `subject_tags` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `subjects`
+--
+
+INSERT INTO `subjects` (`subject_id`, `subject_name`, `subject_code`, `year_lvl`, `subject_type`, `subject_units`, `subject_tags`) VALUES
+(7, 'Quality Assurance', 'IT309', '3rd Year', 'Major', 3, 'sample');
 
 -- --------------------------------------------------------
 
@@ -110,6 +132,12 @@ ALTER TABLE `rooms`
   ADD PRIMARY KEY (`room_id`);
 
 --
+-- Indexes for table `subjects`
+--
+ALTER TABLE `subjects`
+  ADD PRIMARY KEY (`subject_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -130,6 +158,12 @@ ALTER TABLE `instructors`
 --
 ALTER TABLE `rooms`
   MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+
+--
+-- AUTO_INCREMENT for table `subjects`
+--
+ALTER TABLE `subjects`
+  MODIFY `subject_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `users`

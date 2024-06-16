@@ -23,7 +23,7 @@ h2{
     flex-direction: column;
     justify-content: flex-start;
     gap: 0.8rem;
-    width: 30%;
+    width: fit-content;
     height: fit-content;
     padding: 1rem;
     background-color: rgb(233, 233, 233);

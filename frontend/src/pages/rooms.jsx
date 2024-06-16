@@ -147,6 +147,7 @@ function Rooms() {
                             name="roomType"
                             value={roomType}
                             onChange={(e) => setRoomType(e.target.value)}
+                            required
                         >
                             <option value="Lecture">Lecture</option>
                             <option value="Laboratory">Laboratory</option>
@@ -157,7 +158,7 @@ function Rooms() {
                         <textarea 
                             name="roomTags" 
                             id="roomTags"
-                            placeholder='ex: Specialized in Mobile App Development'
+                            placeholder='Labels and Tags'
                             value={roomTags}
                             onChange={(e) => setRoomTags(e.target.value)}
                         ></textarea>
