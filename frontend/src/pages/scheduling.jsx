@@ -45,7 +45,7 @@ function Scheduling() {
             </select>
           </div>
           <div>
-            <button className="add-item-btn" onClick={openModal}>Add Item</button>
+            <button className="add-item-btn">Add Item</button>
             <button className="edit-item-btn">Edit Item</button>
             <button className="delete-item-btn">Delete Item</button>
           </div>
