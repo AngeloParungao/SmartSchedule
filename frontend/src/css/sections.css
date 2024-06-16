@@ -1,0 +1,218 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
+
+.sections-container{
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    height: calc(100vh - 5rem);
+    width: calc(100vw - 6rem);
+    margin-left: 6rem;
+    padding: 1rem;
+    font-family: 'Poppins' , serif;
+}
+
+h2{
+    font-size: 1.7rem;
+    font-weight: 500;
+    color: rgb(97, 96, 96);
+    align-self: center;
+}
+
+.section-form{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.8rem;
+    width: fit-content;
+    height: fit-content;
+    padding: 1rem;
+    background-color: rgb(233, 233, 233);
+    border-radius: 0.5rem;
+}
+
+.section-form div{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 19rem;
+}
+
+.section-form div label{
+    font-size: 0.8rem;
+    width: 100%;
+}
+
+.section-form input{
+    width: 15rem;
+    height: 2rem;
+    padding: 1rem;
+    border-radius: 0.3rem;
+    border: 0.1rem solid rgb(156, 156, 156);
+}
+
+.section-form input::placeholder{
+    font-size: 0.75rem;
+    color: rgb(150, 150, 150);
+}
+
+.section-form select{
+    width: 6rem;
+    height: 2rem;
+    border-radius: 0.3rem;
+    border: 0.1rem solid rgb(156, 156, 156);
+    margin: 0.5rem;
+}
+
+.section-form select option{
+    font-size: 0.8rem;
+}
+
+#text-area{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+}
+
+#text-area textarea{
+    width: 100%;
+    height: 5rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    resize: none;
+}
+
+#text-area textarea::placeholder{
+    font-size: 0.7rem;
+    text-align: center;
+    font-style: italic;
+}
+
+.section-form button{
+    height: 2.5rem;
+    color: white;
+    background-color: rgb(98, 98, 194);
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.section-form button:hover{
+    background-color: rgb(117, 117, 228);
+
+}
+
+.upper-table{
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.table-wrapper{
+    height: 90%;
+    overflow-y: auto;
+}
+
+.table-wrapper::-webkit-scrollbar{
+    width: 0.5rem; /* Set the width of the scrollbar */
+    background-color: rgb(161, 161, 161);
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background-color: #343B46; /* Set the background color of the scrollbar thumb */
+    border-radius: 2rem; /* Set the border radius of the scrollbar thumb */
+}
+
+.sections-table {
+    width: 100%;
+    table-layout: fixed; /* Fixed table layout */
+}
+
+.sections-table th,
+.sections-table td {
+    padding: 0.5rem 1rem;
+    text-align: center;
+    border: 0.1rem solid rgb(201, 200, 200);
+    border-collapse: collapse;
+    min-width: 150px;
+    word-wrap: break-word; /* Ensure content wraps to a new line */
+}
+
+.sections-table th:nth-child(1),
+.sections-table th:nth-child(7) {
+    width: 3rem; /* Fixed width for small cells */
+}
+
+
+.sections-table th {
+    background-color: rgb(216, 216, 216);
+}
+
+.btns {
+    display: flex;
+    justify-content: end;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.5rem;
+}
+
+#search{
+    height: 2.5rem;
+    width: 20rem;
+    padding-left: 2.5rem;
+    border: 0.02rem solid rgb(148, 148, 148);
+    border-radius: 1.5rem;
+}
+
+#search::placeholder{
+    color: rgb(148, 148, 148);
+}
+
+.search-icon{
+    position: absolute;
+    margin-left: 1rem;
+    font-size: 1rem;
+    color: rgb(148, 148, 148);
+    cursor: pointer;;
+}
+
+#select-all-btn {
+    font-weight: 600;
+    height: 2rem;
+    padding: 0.5rem;
+    color: rgb(252, 129, 85);
+    background-color: transparent;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+#delete-btn {
+    font-weight: 600;
+    height: 2rem;
+    padding: 0.5rem;
+    color: white;
+    background-color: #f13c3c;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+#update-btn{
+    font-size: 1rem;
+    background-color: transparent;
+    border: none;
+    color: orange;
+    cursor: pointer;;
+}
+
+#update-btn:hover{
+    color: rgb(253, 194, 85);
+}
+
+#select-all-btn:hover {
+    color: rgb(248, 172, 145);
+}
+
+#delete-btn:hover {
+    background-color: #e76f6f;
+}
