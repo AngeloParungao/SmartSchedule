@@ -108,5 +108,82 @@
     background-color: #d4edda;
     color: #155724;
   }
+
+
+
+  /* Modal styling */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+  font-family: 'Poppins', serif;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  height: 95%;
+  width: 95%;
+}
+
+.upper{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.lists {
+  display: flex;
+  justify-content: space-between;
+}
+
+.list-container {
+  width: 30%;
+}
+
+.list-container h3 {
+  margin-bottom: 10px;
+}
+
+.list-container ul {
+  list-style: none;
+  padding: 0;
+}
+
+.list-container ul li {
+  background: #f1f1f1;
+  padding: 10px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+form div {
+  margin-bottom: 10px;
+}
+
+.days-checkboxes label {
+  margin-right: 10px;
+}
       
       
