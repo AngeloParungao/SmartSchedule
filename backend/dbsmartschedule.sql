@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 16, 2024 at 02:25 AM
+-- Generation Time: Jun 17, 2024 at 11:36 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -76,6 +76,29 @@ INSERT INTO `rooms` (`room_id`, `room_type`, `room_name`, `room_tags`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `sections`
+--
+
+CREATE TABLE `sections` (
+  `section_id` int(11) NOT NULL,
+  `section_name` varchar(15) NOT NULL,
+  `section_group` varchar(15) NOT NULL,
+  `year_lvl` varchar(20) NOT NULL,
+  `number_of_students` int(100) NOT NULL,
+  `section_tags` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `sections`
+--
+
+INSERT INTO `sections` (`section_id`, `section_name`, `section_group`, `year_lvl`, `number_of_students`, `section_tags`) VALUES
+(4, 'BSIT 3D', 'Group 2', '3rd Year', 23, 'masaya dito'),
+(11, 'BSIT 3D', 'Group 1', '3rd Year', 17, '');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `subjects`
 --
 
@@ -132,6 +155,12 @@ ALTER TABLE `rooms`
   ADD PRIMARY KEY (`room_id`);
 
 --
+-- Indexes for table `sections`
+--
+ALTER TABLE `sections`
+  ADD PRIMARY KEY (`section_id`);
+
+--
 -- Indexes for table `subjects`
 --
 ALTER TABLE `subjects`
@@ -158,6 +187,12 @@ ALTER TABLE `instructors`
 --
 ALTER TABLE `rooms`
   MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+
+--
+-- AUTO_INCREMENT for table `sections`
+--
+ALTER TABLE `sections`
+  MODIFY `section_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `subjects`
