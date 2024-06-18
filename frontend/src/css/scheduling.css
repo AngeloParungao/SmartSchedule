@@ -114,25 +114,32 @@
   /* Modal styling */
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.5);
   font-family: 'Poppins', serif;
+  animation: slide-up 0.5s ease-in-out forwards;
+}
+
+@keyframes slide-up {
+  0%{
+    top:50rem;
+  }
+  100%{
+    top: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
 }
 
 .modal-content {
   display: flex;
   flex-direction: column;
   background: white;
-  padding: 1rem;
   border-radius: 0.5rem;
-  height: 95%;
-  width: 95%;
+  height: 98%;
+  width: 98%;
 }
 
 .upper{
@@ -148,9 +155,63 @@
   cursor: pointer;
 }
 
-.lists {
+
+.schedule-form {
+  display: flex;
+  justify-content: space-around;
+  height: 50%;
+  gap: 0.5rem;
+}
+
+.recommendation{
+  flex: 1;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: space-around;
+  gap: 0.5rem;
+}
+
+.left div{
   display: flex;
   justify-content: space-between;
+  padding: 0 1rem;
+}
+
+.left div input{
+  padding: 0 1rem;
+  width: 50%;
+}
+
+.days-checkboxes{
+  display: flex;
+  justify-content: space-between;
+  width: 70%;
+}
+
+.days-checkboxes label{
+  display: flex;
+  width: 100%;
+  gap: 0.3rem;
+}
+
+.days-checkboxes label input{
+
+}
+
+.right{ 
+  flex: 1;
+}
+
+
+
+.lists {
+  display: flex;
+  justify-content: space-around;
+  padding: 1.5rem;
 }
 
 .list-container {
@@ -158,32 +219,44 @@
 }
 
 .list-container h3 {
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .list-container ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   list-style: none;
-  padding: 0;
+  height: 14rem;
 }
 
 .list-container ul li {
   background: #f1f1f1;
-  padding: 10px;
-  margin-bottom: 5px;
+  font-size: 0.85rem;
+  padding: 0.5rem;
   border-radius: 5px;
+  cursor: pointer;
 }
 
-form {
-  display: flex;
-  flex-direction: column;
-}
-
-form div {
-  margin-bottom: 10px;
-}
-
-.days-checkboxes label {
-  margin-right: 10px;
+.list-container ul li:hover{
+  background: #e6e6e6;
 }
       
+.list-container .pagination{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 500;
+  gap: 0.4rem;
+  height: 3rem;
+  cursor: pointer;
+}
+
+.list-container .active-page{
+  color: white;
+  background-color: blue;
+  transition: all 0.5s ease-out;
+}
       

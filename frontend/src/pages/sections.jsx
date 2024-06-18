@@ -58,8 +58,8 @@ function Sections(){
                     toast.error("Error in updating");
                 });
         } else {
-            const sectionExists = sections.some(section => section.section_name == sectionName);
-            const groupExists = sections.some(section => section.section_group == sectionGroup);
+            const sectionExists = sections.some(section => section.section_name === sectionName);
+            const groupExists = sections.some(section => section.section_group === sectionGroup);
 
             if (sectionExists) {
                 if(groupExists){

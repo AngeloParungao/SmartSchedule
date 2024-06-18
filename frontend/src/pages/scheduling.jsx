@@ -3,6 +3,9 @@ import Sidebar from '../assets/components/sidebar';
 import Navbar from '../assets/components/scheduling-navbar';
 import axios from 'axios';
 import { Toaster, toast } from 'react-hot-toast';
+import ReactPaginate from 'react-paginate';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAngleLeft , faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import '../css/scheduling.css';
 
 function Scheduling() {
@@ -136,10 +139,12 @@ function Scheduling() {
 function AddItemModal({ onClose, instructors, subjects, rooms }) {
   const [subjectName, setSubjectName] = useState('');
   const [instructorName, setInstructorName] = useState('');
+  const [roomName, setRoomName] = useState('');
+  const [selectedColor, setSelectedColor] = useState('#ffffff');
 
-  const [currentInstructorPage, setCurrentInstructorPage] = useState(1);
-  const [currentSubjectPage, setCurrentSubjectPage] = useState(1);
-  const [currentRoomPage, setCurrentRoomPage] = useState(1);
+  const [currentInstructorPage, setCurrentInstructorPage] = useState(0);
+  const [currentSubjectPage, setCurrentSubjectPage] = useState(0);
+  const [currentRoomPage, setCurrentRoomPage] = useState(0);
   const itemsPerPage = 5;
 
   const handleClickSubject = (subjectName) => {  
@@ -150,140 +155,174 @@ function AddItemModal({ onClose, instructors, subjects, rooms }) {
     setInstructorName(instructorName);
   };
 
-  const paginate = (array, pageNumber) => {
-    const start = (pageNumber - 1) * itemsPerPage;
-    return array.slice(start, start + itemsPerPage);
-  };
-
-  const handleNextPage = (setter, currentPage, itemsArray) => {
-    if (currentPage * itemsPerPage < itemsArray.length) {
-      setter(currentPage + 1);
-    }
-  };
-
-  const handlePreviousPage = (setter, currentPage) => {
-    if (currentPage > 1) {
-      setter(currentPage - 1);
-    }
-  };
-
-  const pageCount = (array) => {
-    return Math.ceil(array.length / itemsPerPage);
+  const handleClickRoom = (roomName) => {  
+    setRoomName(roomName);
   };
 
   return (
     <div className="modal">
       <div className="modal-content">
         <div className='upper'>
-          <h2>Add Item</h2>
+          <h3>Add Item</h3>
           <button className="close-btn" onClick={onClose}>X</button>
         </div>
+        <form className='schedule-form'>
+          <div className='recommendation'>
+
+          </div>
+          <div className='left'>
+            <div>
+              <label>Course Title</label>
+              <input
+                type="text"
+                name="subjectName"
+                placeholder="Subject Name"
+                value={subjectName}
+                onChange={(e) => setSubjectName(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label>Instructor</label>
+              <input
+                type="text"
+                name="instructorName"
+                placeholder="Instructor Name"
+                value={instructorName}
+                onChange={(e) => setInstructorName(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label>Room #</label>
+              <input
+                type="text"
+                name="roomrName"
+                placeholder="Room"
+                value={roomName}
+                onChange={(e) => setRoomName(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label>Course Type</label>
+              <select>
+                <option>Lecture</option>
+                <option>Laboratory</option>
+              </select>
+            </div>
+            <div>
+              <label>Color</label>
+              <input 
+                type="color"
+                value={selectedColor}
+                onChange={(e) => setSelectedColor(e.target.value)}
+              />
+            </div>
+            <div>
+              <label>Meeting Day</label>
+              <div className="days-checkboxes">
+                <label>M<input type="radio" value="M" name='day'/></label>
+                <label>T<input type="radio" value="T" name='day'/></label>
+                <label>W<input type="radio" value="W" name='day'/></label>
+                <label>Th<input type="radio" value="TH" name='day'/></label>
+                <label>F<input type="radio" value="F" name='day'/></label>
+                <label>S<input type="radio" value="S" name='day'/></label>
+              </div>
+            </div>
+            <div>
+              <label>Start time</label>
+              <input type="time" />
+            </div>
+            <div>
+              <label>End time</label>
+              <input type="time" />
+            </div>
+          </div>
+          <div className='right'>
+            <div className='preview'style={{ backgroundColor: selectedColor, height: '100px', width: '100px' }}>
+                <h6>{subjectName}</h6>
+                <h6>{instructorName}</h6>
+                <h6>{roomName}</h6>
+            </div>
+            <button type="submit">Add Item</button>
+          </div>
+        </form>
         <div className="lists">
           <div className="list-container">
             <h3>Instructors</h3>
             <ul>
-              {paginate(instructors, currentInstructorPage).map(instructor => (
+              {instructors.slice(currentInstructorPage * itemsPerPage, (currentInstructorPage + 1) * itemsPerPage).map(instructor => (
                 <li key={instructor.id} onClick={() => handleClickInstructor(instructor.firstname + ' ' + instructor.middlename + ' ' + instructor.lastname)}>
                   {instructor.firstname + ' ' + instructor.lastname}
                 </li>
               ))}
             </ul>
-            <button onClick={() => handlePreviousPage(setCurrentInstructorPage, currentInstructorPage)}>Previous</button>
-            <p>Page {currentInstructorPage} of {pageCount(instructors)}</p>
-            <button onClick={() => handleNextPage(setCurrentInstructorPage, currentInstructorPage, instructors)}>Next</button>
+            <ReactPaginate
+              previousLabel={
+                <FontAwesomeIcon icon={faAngleLeft} className='previous-icon' />
+              }
+              nextLabel={
+                <FontAwesomeIcon icon={faAngleRight} className='previous-icon' />
+              }
+              breakLabel={'...'}
+              breakClassName={'break-me'}
+              pageCount={Math.ceil(instructors.length / itemsPerPage)}
+              onPageChange={({ selected }) => setCurrentInstructorPage(selected)}
+              containerClassName={'pagination'}
+              activeClassName={'active-page'}
+            />
           </div>
           <div className="list-container">
             <h3>Subjects</h3>
             <ul>
-              {paginate(subjects, currentSubjectPage).map(subject => (
+              {subjects.slice(currentSubjectPage * itemsPerPage, (currentSubjectPage + 1) * itemsPerPage).map(subject => (
                 <li key={subject.id} onClick={() => handleClickSubject(subject.subject_name)}>
                   {subject.subject_name}
                 </li>
               ))}
             </ul>
-            <button onClick={() => handlePreviousPage(setCurrentSubjectPage, currentSubjectPage)}>Previous</button>
-            <p>Page {currentSubjectPage} of {pageCount(subjects)}</p>
-            <button onClick={() => handleNextPage(setCurrentSubjectPage, currentSubjectPage, subjects)}>Next</button>
+            <ReactPaginate
+              previousLabel={
+                <FontAwesomeIcon icon={faAngleLeft} className='previous-icon' />
+              }
+              nextLabel={
+                <FontAwesomeIcon icon={faAngleRight} className='previous-icon' />
+              }
+              breakLabel={'...'}
+              breakClassName={'break-me'}
+              pageCount={Math.ceil(subjects.length / itemsPerPage)}
+              onPageChange={({ selected }) => setCurrentSubjectPage(selected)}
+              containerClassName={'pagination'}
+              activeClassName={'active-page'}
+            />
           </div>
           <div className="list-container">
             <h3>Rooms</h3>
             <ul>
-              {paginate(rooms, currentRoomPage).map(room => (
-                <li key={room.id}>{room.room_name}</li>
+              {rooms.slice(currentRoomPage * itemsPerPage, (currentRoomPage + 1) * itemsPerPage).map(room => (
+                <li key={room.id} onClick={() => handleClickRoom(room.room_name)}>{room.room_name}</li>
               ))}
             </ul>
-            <button onClick={() => handlePreviousPage(setCurrentRoomPage, currentRoomPage)}>Previous</button>
-            <p>Page {currentRoomPage} of {pageCount(rooms)}</p>
-            <button onClick={() => handleNextPage(setCurrentRoomPage, currentRoomPage, rooms)}>Next</button>
+            <ReactPaginate
+              previousLabel={
+                <FontAwesomeIcon icon={faAngleLeft} className='previous-icon' />
+              }
+              nextLabel={
+                <FontAwesomeIcon icon={faAngleRight} className='previous-icon' />
+              }
+              breakLabel={'...'}
+              breakClassName={'break-me'}
+              pageCount={Math.ceil(rooms.length / itemsPerPage)}
+              onPageChange={({ selected }) => setCurrentRoomPage(selected)}
+              containerClassName={'pagination'}
+              activeClassName={'active-page'}
+            />
           </div>
         </div>
-        <form>
-          <div>
-            <label>Course Title</label>
-            <input
-              type="text"
-              name="subjectName"
-              placeholder="Subject Name"
-              value={subjectName}
-              onChange={(e) => setSubjectName(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label>Instructor</label>
-            <input
-              type="text"
-              name="instructorName"
-              placeholder="Instructor Name"
-              value={instructorName}
-              onChange={(e) => setInstructorName(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label>Room #</label>
-            <select>
-              {rooms.map(room => (
-                <option key={room.id}>{room.room_name}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label>Course Type</label>
-            <select>
-              <option>Lecture</option>
-              <option>Laboratory</option>
-            </select>
-          </div>
-          <div>
-            <label>Color</label>
-            <input type="color" />
-          </div>
-          <div>
-            <label>Meeting Day</label>
-            <div className="days-checkboxes">
-              <label><input type="checkbox" value="M" /> M</label>
-              <label><input type="checkbox" value="T" /> T</label>
-              <label><input type="checkbox" value="W" /> W</label>
-              <label><input type="checkbox" value="TH" /> TH</label>
-              <label><input type="checkbox" value="F" /> F</label>
-              <label><input type="checkbox" value="S" /> S</label>
-            </div>
-          </div>
-          <div>
-            <label>Start time</label>
-            <input type="time" />
-          </div>
-          <div>
-            <label>End time</label>
-            <input type="time" />
-          </div>
-          <button type="submit">Add Item</button>
-        </form>
       </div>
     </div>
   );
 }
-
 
 export default Scheduling;
