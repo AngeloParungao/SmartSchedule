@@ -10,11 +10,29 @@ import '../css/scheduling.css';
 
 function Scheduling() {
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const timesOfDay = ['7:00 - 8:00', '8:00 - 9:00', '9:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00', '12:00 - 13:00', '13:00 - 14:00', '14:00 - 15:00', '15:00 - 16:00', '16:00 - 17:00', '17:00 - 18:00', '18:00 - 19:00', '19:00 - 20:00'];
+  const timesOfDay = [
+    { startTime: '07:00:00', endTime: '08:00:00' },
+    { startTime: '08:00:00', endTime: '09:00:00' },
+    { startTime: '09:00:00', endTime: '10:00:00' },
+    { startTime: '10:00:00', endTime: '11:00:00' },
+    { startTime: '11:00:00', endTime: '12:00:00' },
+    { startTime: '12:00:00', endTime: '13:00:00' },
+    { startTime: '13:00:00', endTime: '14:00:00' },
+    { startTime: '14:00:00', endTime: '15:00:00' },
+    { startTime: '15:00:00', endTime: '16:00:00' },
+    { startTime: '16:00:00', endTime: '17:00:00' },
+    { startTime: '17:00:00', endTime: '18:00:00' },
+    { startTime: '18:00:00', endTime: '19:00:00' },
+    { startTime: '19:00:00', endTime: '20:00:00' },
+  ];
+
+  const [schedules, setSchedules] = useState([]);
   const [sections, setSections] = useState([]);
   const [instructors, setInstructors] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [rooms, setRooms] = useState([]);
+  const [selectedSection, setSelectedSection] = useState('');
+  const [selectedGroup, setSelectedGroup] = useState('');
   const [showAddItemModal, setShowAddItemModal] = useState(false);
 
   useEffect(() => {
@@ -22,12 +40,21 @@ function Scheduling() {
     fetchInstructors();
     fetchSubjects();
     fetchRooms();
+    fetchSchedules();
   }, []);
 
   const fetchSections = async () => {
     try {
       const response = await axios.get('http://localhost:8082/api/sections/fetch');
       setSections(response.data);
+
+      // Set selectedSection and selectedGroup to the first item in sections
+      if (response.data.length > 0) {
+        setSelectedSection(response.data[0].section_name.toString());
+        setSelectedGroup(response.data[0].section_group.toString());
+      }
+
+
     } catch (error) {
       console.error('Error fetching sections:', error);
       toast.error('Failed to fetch sections');
@@ -64,6 +91,16 @@ function Scheduling() {
     }
   };
 
+  const fetchSchedules = async () => {
+    try {
+      const response = await axios.get('http://localhost:8082/api/schedule/fetch');
+      setSchedules(response.data);
+    } catch (error) {
+      console.error('Error fetching schedules:', error);
+      toast.error('Failed to fetch schedules');
+    }
+  };
+
   const handleAddItemClick = () => {
     setShowAddItemModal(true);
   };
@@ -71,6 +108,14 @@ function Scheduling() {
   const handleCloseModal = () => {
     setShowAddItemModal(false);
   };
+
+  const calculateRowSpan = (startTime, endTime) => {
+    const startHour = parseInt(startTime.split(':')[0], 10);
+    const endHour = parseInt(endTime.split(':')[0], 10);
+    return endHour - startHour;
+  };
+  
+
 
   return (
     <div>
@@ -83,10 +128,17 @@ function Scheduling() {
         <div className="controls">
           <div>
             <label htmlFor="">Year & Section</label>
-            <select className="section-dropdown">
+            <select className="section-dropdown" onChange={(e) => setSelectedSection(e.target.value)}>
               {sections.map(section => (
-                <option key={section.section_id}>
-                  {section.section_name} - {section.section_group}
+                <option key={section.section_id} value={section.section_name}>
+                  {section.section_name}
+                </option>
+              ))}
+            </select>
+            <select className="group-dropdown" onChange={(e) => setSelectedGroup(e.target.value)}>
+              {sections.map(section => (
+                <option key={section.section_id} value={section.section_group}>
+                  {section.section_group}
                 </option>
               ))}
             </select>
@@ -108,12 +160,45 @@ function Scheduling() {
               </tr>
             </thead>
             <tbody>
-              {timesOfDay.map(time => (
-                <tr key={time}>
-                  <td>{time}</td>
-                  {daysOfWeek.map(day => (
-                    <td key={`${day}-${time}`}></td>
-                  ))}
+              {timesOfDay.map((time, timeIndex) => (
+                <tr key={time.startTime}>
+                  {/* Render the time slot in the first column */}
+                  <td>
+                    {time.startTime} - {time.endTime}
+                  </td>
+                  {/* Loop through each day of the week */}
+                  {daysOfWeek.map((day, dayIndex) => {
+                    // Find the schedule item for the current time and day
+                    const scheduleItem = schedules.find(item =>
+                      item.start_time === time.startTime &&
+                      item.day === day &&
+                      item.section_name === selectedSection &&
+                      item.section_group === selectedGroup
+                    );
+
+                    // Calculate rowSpan if there's a schedule item
+                    let rowSpan = 1;
+                    if (scheduleItem) {
+                      rowSpan = calculateRowSpan(scheduleItem.start_time, scheduleItem.end_time);
+                    }
+
+                    // Render cell with rowspan and schedule details only in the first row it spans
+                    if (timeIndex === 0 || (scheduleItem && dayIndex === 0)) {
+                      return (
+                        <td key={`${time.startTime}-${day}`} rowSpan={rowSpan} style={{ backgroundColor: scheduleItem?.background_color }}>
+                          {scheduleItem && (
+                            <>
+                              <div>{scheduleItem.subject}</div>
+                              <div>{scheduleItem.instructor}</div>
+                              <div>{scheduleItem.room}</div>
+                            </>
+                          )}
+                        </td>
+                      );
+                    } else {
+                      return null; // Return null for subsequent rows to avoid extra columns
+                    }
+                  })}
                 </tr>
               ))}
             </tbody>
@@ -130,17 +215,23 @@ function Scheduling() {
           instructors={instructors}
           subjects={subjects}
           rooms={rooms}
-        />
+          section={selectedSection}
+          group={selectedGroup}
+        />        
       )}
     </div>
   );
 }
 
-function AddItemModal({ onClose, instructors, subjects, rooms }) {
+function AddItemModal({ onClose, instructors, subjects, rooms, section , group}) {
   const [subjectName, setSubjectName] = useState('');
   const [instructorName, setInstructorName] = useState('');
   const [roomName, setRoomName] = useState('');
   const [selectedColor, setSelectedColor] = useState('#ffffff');
+  const [meetingDay, setMeetingDay] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [courseType, setCourseType] = useState('Lecture');
 
   const [currentInstructorPage, setCurrentInstructorPage] = useState(0);
   const [currentSubjectPage, setCurrentSubjectPage] = useState(0);
@@ -159,6 +250,36 @@ function AddItemModal({ onClose, instructors, subjects, rooms }) {
     setRoomName(roomName);
   };
 
+// Form submission handling
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const newItem = {
+    subjectName,
+    instructorName,
+    roomName,
+    selectedColor,
+    meetingDay,
+    startTime,
+    endTime,
+    courseType,
+    section,
+    group,
+  };
+
+    try {
+      const response = await axios.post('http://localhost:8082/api/schedule/adding', newItem);
+      if (response.status === 200) {
+        toast.success('Item added successfully!');
+        onClose();
+      } else {
+        toast.error('Failed to add item');
+      }
+    } catch (error) {
+      console.error('Error adding item:', error);
+      toast.error('Failed to add item');
+    }
+  };
+
   return (
     <div className="modal">
       <div className="modal-content">
@@ -166,10 +287,7 @@ function AddItemModal({ onClose, instructors, subjects, rooms }) {
           <h3>Add Item</h3>
           <button className="close-btn" onClick={onClose}>X</button>
         </div>
-        <form className='schedule-form'>
-          <div className='recommendation'>
-
-          </div>
+        <form className='schedule-form' onSubmit={handleSubmit}>
           <div className='left'>
             <div>
               <label>Course Title</label>
@@ -197,7 +315,7 @@ function AddItemModal({ onClose, instructors, subjects, rooms }) {
               <label>Room #</label>
               <input
                 type="text"
-                name="roomrName"
+                name="roomName"
                 placeholder="Room"
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
@@ -206,7 +324,7 @@ function AddItemModal({ onClose, instructors, subjects, rooms }) {
             </div>
             <div>
               <label>Course Type</label>
-              <select>
+              <select value={courseType} onChange={(e) => setCourseType(e.target.value)}>
                 <option>Lecture</option>
                 <option>Laboratory</option>
               </select>
@@ -222,25 +340,25 @@ function AddItemModal({ onClose, instructors, subjects, rooms }) {
             <div>
               <label>Meeting Day</label>
               <div className="days-checkboxes">
-                <label>M<input type="radio" value="M" name='day'/></label>
-                <label>T<input type="radio" value="T" name='day'/></label>
-                <label>W<input type="radio" value="W" name='day'/></label>
-                <label>Th<input type="radio" value="TH" name='day'/></label>
-                <label>F<input type="radio" value="F" name='day'/></label>
-                <label>S<input type="radio" value="S" name='day'/></label>
+                <label>M<input type="radio" value="Monday" name='day' onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                <label>T<input type="radio" value="Tuesday" name='day' onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                <label>W<input type="radio" value="Wednesday" name='day' onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                <label>Th<input type="radio" value="Thursday" name='day' onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                <label>F<input type="radio" value="Friday" name='day' onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                <label>S<input type="radio" value="Saturday" name='day' onChange={(e) => setMeetingDay(e.target.value)} /></label>
               </div>
             </div>
             <div>
               <label>Start time</label>
-              <input type="time" />
+              <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
             </div>
             <div>
               <label>End time</label>
-              <input type="time" />
+              <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
             </div>
           </div>
           <div className='right'>
-            <div className='preview'style={{ backgroundColor: selectedColor, height: '100px', width: '100px' }}>
+            <div className='preview' style={{ backgroundColor: selectedColor, height: '100px', width: '100px' }}>
                 <h6>{subjectName}</h6>
                 <h6>{instructorName}</h6>
                 <h6>{roomName}</h6>
