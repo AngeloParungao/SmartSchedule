@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 17, 2024 at 11:36 AM
+-- Generation Time: Jun 28, 2024 at 05:32 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -76,6 +76,35 @@ INSERT INTO `rooms` (`room_id`, `room_type`, `room_name`, `room_tags`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `schedules`
+--
+
+CREATE TABLE `schedules` (
+  `schedule_id` int(11) NOT NULL,
+  `instructor` varchar(50) NOT NULL,
+  `subject` varchar(50) NOT NULL,
+  `section_name` varchar(20) NOT NULL,
+  `section_group` varchar(20) NOT NULL,
+  `class_type` varchar(15) NOT NULL,
+  `room` varchar(10) NOT NULL,
+  `background_color` varchar(20) NOT NULL,
+  `day` varchar(20) NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `schedules`
+--
+
+INSERT INTO `schedules` (`schedule_id`, `instructor`, `subject`, `section_name`, `section_group`, `class_type`, `room`, `background_color`, `day`, `start_time`, `end_time`) VALUES
+(7, 'Clyde  Mondero', 'System Analysis and Design', 'BSIT 3D', 'Group 1', 'Laboratory', 'MML', '#fdafaf', 'Monday', '07:00:00', '10:00:00'),
+(8, 'Albert  Junio', 'Quality Assurance', 'BSIT 3D', 'Group 1', 'Lecture', 'RM201', '#cba3e1', 'Wednesday', '08:00:00', '10:00:00'),
+(9, 'Erick  Caleja', 'Quality Assurance', 'BSIT 3D', 'Group 1', 'Lecture', 'MML', '#bafdd1', 'Friday', '10:00:00', '12:00:00');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `sections`
 --
 
@@ -117,7 +146,8 @@ CREATE TABLE `subjects` (
 --
 
 INSERT INTO `subjects` (`subject_id`, `subject_name`, `subject_code`, `year_lvl`, `subject_type`, `subject_units`, `subject_tags`) VALUES
-(7, 'Quality Assurance', 'IT309', '3rd Year', 'Major', 3, 'sample');
+(7, 'Quality Assurance', 'IT309', '3rd Year', 'Major', 3, 'sample'),
+(8, 'System Analysis and Design', 'SAD', '3rd Year', 'Major', 3, 'hard');
 
 -- --------------------------------------------------------
 
@@ -155,6 +185,12 @@ ALTER TABLE `rooms`
   ADD PRIMARY KEY (`room_id`);
 
 --
+-- Indexes for table `schedules`
+--
+ALTER TABLE `schedules`
+  ADD PRIMARY KEY (`schedule_id`);
+
+--
 -- Indexes for table `sections`
 --
 ALTER TABLE `sections`
@@ -189,6 +225,12 @@ ALTER TABLE `rooms`
   MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
+-- AUTO_INCREMENT for table `schedules`
+--
+ALTER TABLE `schedules`
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
 -- AUTO_INCREMENT for table `sections`
 --
 ALTER TABLE `sections`
@@ -198,7 +240,7 @@ ALTER TABLE `sections`
 -- AUTO_INCREMENT for table `subjects`
 --
 ALTER TABLE `subjects`
-  MODIFY `subject_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `subject_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `users`
