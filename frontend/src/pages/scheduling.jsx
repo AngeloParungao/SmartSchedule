@@ -10,6 +10,7 @@ import '../css/scheduling.css';
 
 function Scheduling() {
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const rowSpans = Array(daysOfWeek.length).fill(0);
   const timesOfDay = [
     { startTime: '07:00:00', endTime: '08:00:00' },
     { startTime: '08:00:00', endTime: '09:00:00' },
@@ -25,7 +26,7 @@ function Scheduling() {
     { startTime: '18:00:00', endTime: '19:00:00' },
     { startTime: '19:00:00', endTime: '20:00:00' },
   ];
-
+  
   const [schedules, setSchedules] = useState([]);
   const [sections, setSections] = useState([]);
   const [instructors, setInstructors] = useState([]);
@@ -109,6 +110,16 @@ function Scheduling() {
     setShowAddItemModal(false);
   };
 
+  const handleItemAdded = async (newItem) => {
+    // Fetch schedules again after adding a new item
+    await fetchSchedules();
+
+    // Check if the new item's section and group match the currently selected ones
+    if (newItem.section_name === selectedSection && newItem.section_group === selectedGroup) {
+      setSchedules((prevSchedules) => [...prevSchedules, newItem]);
+    }
+  };
+
   const calculateRowSpan = (startTime, endTime) => {
     const startHour = parseInt(startTime.split(':')[0], 10);
     const endHour = parseInt(endTime.split(':')[0], 10);
@@ -162,42 +173,43 @@ function Scheduling() {
             <tbody>
               {timesOfDay.map((time, timeIndex) => (
                 <tr key={time.startTime}>
-                  {/* Render the time slot in the first column */}
                   <td>
-                    {time.startTime} - {time.endTime}
+                    {time.startTime.slice(0, -6)<12 ? time.startTime.slice(0, -3)+" AM" : time.startTime.slice(0, -3)+" PM"}
                   </td>
-                  {/* Loop through each day of the week */}
                   {daysOfWeek.map((day, dayIndex) => {
+                    // Decrease the remaining rowSpan count for each column
+                    if (rowSpans[dayIndex] > 0) {
+                      rowSpans[dayIndex]--;
+                      return null;
+                    }
+
                     // Find the schedule item for the current time and day
-                    const scheduleItem = schedules.find(item =>
-                      item.start_time === time.startTime &&
-                      item.day === day &&
-                      item.section_name === selectedSection &&
-                      item.section_group === selectedGroup
+                    const scheduleItem = schedules.find(
+                      (item) =>
+                        item.start_time === time.startTime &&
+                        item.day === day &&
+                        item.section_name === selectedSection &&
+                        item.section_group === selectedGroup
                     );
 
                     // Calculate rowSpan if there's a schedule item
                     let rowSpan = 1;
                     if (scheduleItem) {
                       rowSpan = calculateRowSpan(scheduleItem.start_time, scheduleItem.end_time);
+                      rowSpans[dayIndex] = rowSpan - 1; // Set the remaining rowSpan for this column
                     }
 
-                    // Render cell with rowspan and schedule details only in the first row it spans
-                    if (timeIndex === 0 || (scheduleItem && dayIndex === 0)) {
-                      return (
-                        <td key={`${time.startTime}-${day}`} rowSpan={rowSpan} style={{ backgroundColor: scheduleItem?.background_color }}>
-                          {scheduleItem && (
-                            <>
-                              <div>{scheduleItem.subject}</div>
-                              <div>{scheduleItem.instructor}</div>
-                              <div>{scheduleItem.room}</div>
-                            </>
-                          )}
-                        </td>
-                      );
-                    } else {
-                      return null; // Return null for subsequent rows to avoid extra columns
-                    }
+                    return (
+                      <td key={`${time.startTime}-${day}`} rowSpan={rowSpan} style={{ backgroundColor: scheduleItem?.background_color }} className='sched'>
+                        {scheduleItem && (
+                          <>
+                            <div className='instructor-name'>{scheduleItem.instructor}</div>
+                            <div className='subject-name'>{scheduleItem.subject}</div>
+                            <div className='room-name'>({scheduleItem.room})</div>
+                          </>
+                        )}
+                      </td>
+                    );
                   })}
                 </tr>
               ))}
@@ -217,13 +229,15 @@ function Scheduling() {
           rooms={rooms}
           section={selectedSection}
           group={selectedGroup}
+          onItemAdded={handleItemAdded}
         />        
       )}
     </div>
   );
 }
 
-function AddItemModal({ onClose, instructors, subjects, rooms, section , group}) {
+function AddItemModal({ onClose ,instructors, subjects, rooms, section , group , onItemAdded}) {
+  const [schedules, setSchedules] = useState([]);
   const [subjectName, setSubjectName] = useState('');
   const [instructorName, setInstructorName] = useState('');
   const [roomName, setRoomName] = useState('');
@@ -238,6 +252,23 @@ function AddItemModal({ onClose, instructors, subjects, rooms, section , group})
   const [currentRoomPage, setCurrentRoomPage] = useState(0);
   const itemsPerPage = 5;
 
+  const [instructorError, setInstructorError] = useState(false);
+  const [roomError, setRoomError] = useState(false);
+
+  useEffect(() => {
+    fetchSchedules();
+  }, []);
+
+  const fetchSchedules = async () => {
+    try {
+      const response = await axios.get('http://localhost:8082/api/schedule/fetch');
+      setSchedules(response.data);
+    } catch (error) {
+      console.error('Error fetching schedules:', error);
+      toast.error('Failed to fetch schedules');
+    }
+  };
+
   const handleClickSubject = (subjectName) => {  
     setSubjectName(subjectName);
   };
@@ -251,25 +282,66 @@ function AddItemModal({ onClose, instructors, subjects, rooms, section , group})
   };
 
 // Form submission handling
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  const newItem = {
-    subjectName,
-    instructorName,
-    roomName,
-    selectedColor,
-    meetingDay,
-    startTime,
-    endTime,
-    courseType,
-    section,
-    group,
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Check if the instructor is available
+    const instructorAvailability = schedules.some(schedule =>
+      schedule.instructor === instructorName &&
+      schedule.day === meetingDay &&
+      (
+        (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
+        (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
+        (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
+      )
+    );
+
+    if (instructorAvailability) {
+      toast.error('The selected instructor is not available during this time slot.');
+      setInstructorError(true); 
+      return;
+    }
+    else {
+      setInstructorError(false);
+    }
+
+    // Check if the room is available
+    const roomAvailability = schedules.some(
+      (schedule) =>
+        schedule.room === roomName &&
+        schedule.day === meetingDay &&
+        ((startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
+          (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
+          (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3)))
+    );
+
+    if (roomAvailability) {
+      toast.error('The selected room is not available during this time slot.');
+      setRoomError(true); 
+      return;
+    } 
+    else {
+      setRoomError(false);
+    }
+
+    const newItem = {
+      subjectName,
+      instructorName,
+      roomName,
+      selectedColor,
+      meetingDay,
+      startTime,
+      endTime,
+      courseType,
+      section,
+      group,
+    };
 
     try {
       const response = await axios.post('http://localhost:8082/api/schedule/adding', newItem);
       if (response.status === 200) {
         toast.success('Item added successfully!');
+        onItemAdded(newItem);
         onClose();
       } else {
         toast.error('Failed to add item');
@@ -308,8 +380,10 @@ const handleSubmit = async (e) => {
                 placeholder="Instructor Name"
                 value={instructorName}
                 onChange={(e) => setInstructorName(e.target.value)}
+                className={instructorError ? 'error-border' : ''}
                 required
               />
+              {instructorError && <p className="error-message">The selected instructor is not available during this time slot.</p>}
             </div>
             <div>
               <label>Room #</label>
@@ -319,8 +393,10 @@ const handleSubmit = async (e) => {
                 placeholder="Room"
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
+                className={roomError ? 'error-border' : ''}
                 required
               />
+              {roomError && <p className="error-message">The selected room is not available during this time slot.</p>}
             </div>
             <div>
               <label>Course Type</label>
