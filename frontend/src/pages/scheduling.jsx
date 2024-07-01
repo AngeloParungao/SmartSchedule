@@ -254,10 +254,17 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
 
   const [instructorError, setInstructorError] = useState(false);
   const [roomError, setRoomError] = useState(false);
+  const [recommendations, setRecommendations] = useState([]);
 
   useEffect(() => {
     fetchSchedules();
   }, []);
+
+  useEffect(() => {
+    if (instructorName && subjectName && courseType) {
+      generateRecommendations(schedules);
+    }
+  }, [instructorName, subjectName, courseType]);
 
   const fetchSchedules = async () => {
     try {
@@ -279,6 +286,58 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
 
   const handleClickRoom = (roomName) => {  
     setRoomName(roomName);
+  };
+
+  const generateRecommendations = (schedules) => {
+    if (!instructorName || !roomName) return;
+
+    const duration = courseType === 'Lecture' ? 2 : 3;
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const availableSlots = [];
+
+    days.forEach(day => {
+      for (let hour = 7; hour <= 20 - duration; hour++) {
+        const start = `${hour.toString().padStart(2, '0')}:00:00`;
+        const end = `${(hour + duration).toString().padStart(2, '0')}:00:00`;
+
+        const instructorAvailable = !schedules.some(schedule =>
+          schedule.instructor === instructorName &&
+          schedule.day === day &&
+          (
+            (start >= schedule.start_time && start < schedule.end_time) ||
+            (end > schedule.start_time && end <= schedule.end_time) ||
+            (start <= schedule.start_time && end >= schedule.end_time)
+          )
+        );
+
+        const roomAvailable = !schedules.some(schedule =>
+          schedule.room === roomName &&
+          schedule.day === day &&
+          (
+            (start >= schedule.start_time && start < schedule.end_time) ||
+            (end > schedule.start_time && end <= schedule.end_time) ||
+            (start <= schedule.start_time && end >= schedule.end_time)
+          )
+        );
+
+        const sectionAvailable = !schedules.some(schedule =>
+          schedule.section_name === section &&
+          schedule.section_group === group &&
+          schedule.day === day &&
+          (
+            (start >= schedule.start_time && start < schedule.end_time) ||
+            (end > schedule.start_time && end <= schedule.end_time) ||
+            (start <= schedule.start_time && end >= schedule.end_time)
+          )
+        );
+
+        if (instructorAvailable && roomAvailable && sectionAvailable) {
+          availableSlots.push({ day, start, end });
+        }
+      }
+    });
+
+    setRecommendations(availableSlots);
   };
 
 // Form submission handling
@@ -356,22 +415,28 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
     <div className="modal">
       <div className="modal-content">
         <div className='upper'>
-          <h3>Add Item</h3>
           <button className="close-btn" onClick={onClose}>X</button>
         </div>
         <form className='schedule-form' onSubmit={handleSubmit}>
-          <div className='left'>
-            <div>
-              <label>Course Title</label>
-              <input
-                type="text"
-                name="subjectName"
-                placeholder="Subject Name"
-                value={subjectName}
-                onChange={(e) => setSubjectName(e.target.value)}
-                required
-              />
+          <div className='recommendation'>
+            <h5>Recommendation</h5>
+            <div className='recommended'>
+              {recommendations.length > 0 ? (
+                recommendations.map((rec, index) => (
+                  <div key={index} onClick={() => {
+                    setMeetingDay(rec.day);
+                    setStartTime(rec.start);
+                    setEndTime(rec.end);
+                  }}>
+                    {rec.day}: {rec.start} - {rec.end}
+                  </div>
+                ))
+              ) : (
+                <p>No recommendations available</p>
+              )}
             </div>
+          </div>
+          <div className='left'>
             <div>
               <label>Instructor</label>
               <input
@@ -386,17 +451,15 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
               {instructorError && <p className="error-message">The selected instructor is not available during this time slot.</p>}
             </div>
             <div>
-              <label>Room #</label>
+              <label>Course Title</label>
               <input
                 type="text"
-                name="roomName"
-                placeholder="Room"
-                value={roomName}
-                onChange={(e) => setRoomName(e.target.value)}
-                className={roomError ? 'error-border' : ''}
+                name="subjectName"
+                placeholder="Subject Name"
+                value={subjectName}
+                onChange={(e) => setSubjectName(e.target.value)}
                 required
               />
-              {roomError && <p className="error-message">The selected room is not available during this time slot.</p>}
             </div>
             <div>
               <label>Course Type</label>
@@ -414,14 +477,27 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
               />
             </div>
             <div>
+              <label>Room #</label>
+              <input
+                type="text"
+                name="roomName"
+                placeholder="Room"
+                value={roomName}
+                onChange={(e) => setRoomName(e.target.value)}
+                className={roomError ? 'error-border' : ''}
+                required
+              />
+              {roomError && <p className="error-message">The selected room is not available during this time slot.</p>}
+            </div>
+            <div>
               <label>Meeting Day</label>
               <div className="days-checkboxes">
-                <label>M<input type="radio" value="Monday" name='day' onChange={(e) => setMeetingDay(e.target.value)} /></label>
-                <label>T<input type="radio" value="Tuesday" name='day' onChange={(e) => setMeetingDay(e.target.value)} /></label>
-                <label>W<input type="radio" value="Wednesday" name='day' onChange={(e) => setMeetingDay(e.target.value)} /></label>
-                <label>Th<input type="radio" value="Thursday" name='day' onChange={(e) => setMeetingDay(e.target.value)} /></label>
-                <label>F<input type="radio" value="Friday" name='day' onChange={(e) => setMeetingDay(e.target.value)} /></label>
-                <label>S<input type="radio" value="Saturday" name='day' onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                <label>M<input type="radio" value="Monday" name='day' checked={meetingDay === 'Monday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                <label>T<input type="radio" value="Tuesday" name='day' checked={meetingDay === 'Tuesday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                <label>W<input type="radio" value="Wednesday" name='day' checked={meetingDay === 'Wednesday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                <label>Th<input type="radio" value="Thursday" name='day' checked={meetingDay === 'Thursday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                <label>F<input type="radio" value="Friday" name='day' checked={meetingDay === 'Friday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                <label>S<input type="radio" value="Saturday" name='day' checked={meetingDay === 'Saturday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
               </div>
             </div>
             <div>
