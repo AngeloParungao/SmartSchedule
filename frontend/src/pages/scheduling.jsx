@@ -261,10 +261,10 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
   }, []);
 
   useEffect(() => {
-    if (instructorName && subjectName && courseType) {
+    if (instructorName && subjectName && roomName && courseType) {
       generateRecommendations(schedules);
     }
-  }, [instructorName, subjectName, courseType]);
+  }, [instructorName, subjectName, roomName, courseType]);
 
   const fetchSchedules = async () => {
     try {
@@ -382,6 +382,7 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
     else {
       setRoomError(false);
     }
+    
 
     const newItem = {
       subjectName,
@@ -410,6 +411,12 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
       toast.error('Failed to add item');
     }
   };
+
+
+  //----filtering list
+  const filteredRooms = rooms.filter(room => room.room_type === courseType);
+
+
 
   return (
     <div className="modal">
@@ -570,7 +577,7 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
           <div className="list-container">
             <h3>Rooms</h3>
             <ul>
-              {rooms.slice(currentRoomPage * itemsPerPage, (currentRoomPage + 1) * itemsPerPage).map(room => (
+              {filteredRooms.slice(currentRoomPage * itemsPerPage, (currentRoomPage + 1) * itemsPerPage).map(room => (
                 <li key={room.id} onClick={() => handleClickRoom(room.room_name)}>{room.room_name}</li>
               ))}
             </ul>
@@ -583,7 +590,7 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
               }
               breakLabel={'...'}
               breakClassName={'break-me'}
-              pageCount={Math.ceil(rooms.length / itemsPerPage)}
+              pageCount={Math.ceil(filteredRooms.length / itemsPerPage)}
               onPageChange={({ selected }) => setCurrentRoomPage(selected)}
               containerClassName={'pagination'}
               activeClassName={'active-page'}

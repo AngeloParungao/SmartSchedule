@@ -162,6 +162,7 @@
   border-radius: 0.5rem;
   height: 98%;
   width: 98%;
+  overflow: hidden;
 }
 
 .upper{
@@ -172,6 +173,7 @@
 }
 
 .close-btn {
+  position: absolute;
   background: none;
   border: none;
   font-size: 1rem;
@@ -183,12 +185,32 @@
 .schedule-form {
   display: flex;
   justify-content: space-around;
-  height: 50%;
+  align-items: center;
+  height: 45%;
   gap: 0.5rem;
 }
 
 .recommendation{
   flex: 1;
+  height: 100%;
+  overflow: auto;
+}
+
+.recommended{
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.recommended div{
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.4rem;
+  background-color: rgb(233, 233, 233);
+}
+
+.recommended div:hover{
+  background-color: rgb(214, 213, 213);
 }
 
 .left {
@@ -234,7 +256,9 @@
 .lists {
   display: flex;
   justify-content: space-around;
+  align-items: center;
   padding: 1.5rem;
+  flex: 1;
 }
 
 .list-container {
@@ -250,7 +274,7 @@
   flex-direction: column;
   gap: 0.5rem;
   list-style: none;
-  height: 14rem;
+  height: 13.5rem;
 }
 
 .list-container ul li {
