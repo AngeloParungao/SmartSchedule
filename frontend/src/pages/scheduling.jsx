@@ -236,7 +236,7 @@ function Scheduling() {
   );
 }
 
-function AddItemModal({ onClose ,instructors, subjects, rooms, section , group , onItemAdded}) {
+function AddItemModal({ onClose, instructors, subjects, rooms, section, group, onItemAdded }) {
   const [schedules, setSchedules] = useState([]);
   const [subjectName, setSubjectName] = useState('');
   const [instructorName, setInstructorName] = useState('');
@@ -254,6 +254,7 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
 
   const [instructorError, setInstructorError] = useState(false);
   const [roomError, setRoomError] = useState(false);
+  const [subjectError, setSubjectError] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
 
   useEffect(() => {
@@ -266,6 +267,10 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
     }
   }, [instructorName, subjectName, roomName, courseType]);
 
+  useEffect(() => {
+    checkRealTimeErrors();
+  }, [instructorName, subjectName, roomName, meetingDay, startTime, endTime, courseType]);
+
   const fetchSchedules = async () => {
     try {
       const response = await axios.get('http://localhost:8082/api/schedule/fetch');
@@ -276,15 +281,15 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
     }
   };
 
-  const handleClickSubject = (subjectName) => {  
+  const handleClickSubject = (subjectName) => {
     setSubjectName(subjectName);
   };
 
-  const handleClickInstructor = (instructorName) => {  
+  const handleClickInstructor = (instructorName) => {
     setInstructorName(instructorName);
   };
 
-  const handleClickRoom = (roomName) => {  
+  const handleClickRoom = (roomName) => {
     setRoomName(roomName);
   };
 
@@ -340,11 +345,7 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
     setRecommendations(availableSlots);
   };
 
-// Form submission handling
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Check if the instructor is available
+  const checkRealTimeErrors = () => {
     const instructorAvailability = schedules.some(schedule =>
       schedule.instructor === instructorName &&
       schedule.day === meetingDay &&
@@ -354,35 +355,51 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
         (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
       )
     );
+    setInstructorError(instructorAvailability);
 
-    if (instructorAvailability) {
-      toast.error('The selected instructor is not available during this time slot.');
-      setInstructorError(true); 
-      return;
-    }
-    else {
-      setInstructorError(false);
-    }
+    const roomAvailability = schedules.some(schedule =>
+      schedule.room === roomName &&
+      schedule.day === meetingDay &&
+      (
+        (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
+        (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
+        (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
+      )
+    );
+    setRoomError(roomAvailability);
 
-    // Check if the room is available
-    const roomAvailability = schedules.some(
-      (schedule) =>
-        schedule.room === roomName &&
-        schedule.day === meetingDay &&
-        ((startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
-          (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
-          (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3)))
+    const startTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
+    const endTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
+    const newDuration = (endTimeInMinutes - startTimeInMinutes) / 60;
+
+    const subjectSectionSchedules = schedules.filter(schedule =>
+      schedule.subject === subjectName &&
+      schedule.section_name === section &&
+      schedule.section_group === group
     );
 
-    if (roomAvailability) {
-      toast.error('The selected room is not available during this time slot.');
-      setRoomError(true); 
-      return;
-    } 
-    else {
-      setRoomError(false);
-    }
-    
+    const totalHours = subjectSectionSchedules.reduce((sum, schedule) => {
+      const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
+      const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
+      return sum + (end - start) / 60;
+    }, 0);
+
+    const numberOfMeetings = subjectSectionSchedules.length;
+
+    const exceedsLimits = totalHours + newDuration > 5 || numberOfMeetings >= 2;
+    setSubjectError(exceedsLimits);
+
+    const hasLecture = subjectSectionSchedules.some(schedule => schedule.class_type === 'Lecture');
+    const hasLaboratory = subjectSectionSchedules.some(schedule => schedule.class_type === 'Laboratory');
+
+    const alreadyExists = (courseType === 'Lecture' && hasLecture) || (courseType === 'Laboratory' && hasLaboratory);
+    setSubjectError(alreadyExists);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (instructorError || roomError || subjectError) return;
 
     const newItem = {
       subjectName,
@@ -412,11 +429,7 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
     }
   };
 
-
-  //----filtering list
   const filteredRooms = rooms.filter(room => room.room_type === courseType);
-
-
 
   return (
     <div className="modal">
@@ -443,87 +456,117 @@ function AddItemModal({ onClose ,instructors, subjects, rooms, section , group ,
               )}
             </div>
           </div>
-          <div className='left'>
-            <div>
-              <label>Instructor</label>
-              <input
-                type="text"
-                name="instructorName"
-                placeholder="Instructor Name"
-                value={instructorName}
-                onChange={(e) => setInstructorName(e.target.value)}
-                className={instructorError ? 'error-border' : ''}
-                required
-              />
-              {instructorError && <p className="error-message">The selected instructor is not available during this time slot.</p>}
-            </div>
-            <div>
-              <label>Course Title</label>
-              <input
-                type="text"
-                name="subjectName"
-                placeholder="Subject Name"
-                value={subjectName}
-                onChange={(e) => setSubjectName(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label>Course Type</label>
-              <select value={courseType} onChange={(e) => setCourseType(e.target.value)}>
-                <option>Lecture</option>
-                <option>Laboratory</option>
-              </select>
-            </div>
-            <div>
-              <label>Color</label>
-              <input 
-                type="color"
-                value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value)}
-              />
-            </div>
-            <div>
-              <label>Room #</label>
-              <input
-                type="text"
-                name="roomName"
-                placeholder="Room"
-                value={roomName}
-                onChange={(e) => setRoomName(e.target.value)}
-                className={roomError ? 'error-border' : ''}
-                required
-              />
-              {roomError && <p className="error-message">The selected room is not available during this time slot.</p>}
-            </div>
-            <div>
-              <label>Meeting Day</label>
-              <div className="days-checkboxes">
-                <label>M<input type="radio" value="Monday" name='day' checked={meetingDay === 'Monday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
-                <label>T<input type="radio" value="Tuesday" name='day' checked={meetingDay === 'Tuesday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
-                <label>W<input type="radio" value="Wednesday" name='day' checked={meetingDay === 'Wednesday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
-                <label>Th<input type="radio" value="Thursday" name='day' checked={meetingDay === 'Thursday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
-                <label>F<input type="radio" value="Friday" name='day' checked={meetingDay === 'Friday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
-                <label>S<input type="radio" value="Saturday" name='day' checked={meetingDay === 'Saturday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+          <div className='form'>
+            <div className='form-content'>
+              <div>
+                <label>Instructor</label>
+                <input
+                  type="text"
+                  name="instructorName"
+                  placeholder="Instructor Name"
+                  value={instructorName}
+                  onChange={(e) => setInstructorName(e.target.value)}
+                  className={instructorError ? 'error-border' : ''}
+                  required
+                />
+              </div>
+              <div>
+                {instructorError && <p className="error-message">The selected instructor is not available during this time slot.</p>}
               </div>
             </div>
-            <div>
-              <label>Start time</label>
-              <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+            <div className='form-content'>
+              <div>
+                <label>Course Title</label>
+                <input
+                  type="text"
+                  name="subjectName"
+                  placeholder="Subject Name"
+                  value={subjectName}
+                  onChange={(e) => setSubjectName(e.target.value)}
+                  required
+                />
+              </div>
+              <div></div>
             </div>
-            <div>
-              <label>End time</label>
-              <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+            <div className='form-content'>
+              <div>
+                <label>Course Type</label>
+                <select value={courseType} onChange={(e) => setCourseType(e.target.value)}>
+                  <option>Lecture</option>
+                  <option>Laboratory</option>
+                </select>
+              </div>
+              <div>
+                {subjectError && <p className="error-message">The selected is already </p>}
+              </div>
             </div>
+            <div className='form-content'>
+              <div>
+                <label>Color</label>
+                <input 
+                  type="color"
+                  value={selectedColor}
+                  onChange={(e) => setSelectedColor(e.target.value)}
+                />
+              </div>
+              <div></div>
+            </div>
+            <div className='form-content'>
+              <div>
+                <label>Room #</label>
+                <input
+                  type="text"
+                  name="roomName"
+                  placeholder="Room"
+                  value={roomName}
+                  onChange={(e) => setRoomName(e.target.value)}
+                  className={roomError ? 'error-border' : ''}
+                  required
+                />
+              </div>
+              <div>
+                {roomError && <p className="error-message">The selected room is not available during this time slot.</p>}
+              </div>
+            </div>
+            <div className='form-content'>
+              <div>
+                <label>Meeting Day</label>
+                <div className="days-checkboxes">
+                  <label>M<input type="radio" value="Monday" name='day' checked={meetingDay === 'Monday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                  <label>T<input type="radio" value="Tuesday" name='day' checked={meetingDay === 'Tuesday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                  <label>W<input type="radio" value="Wednesday" name='day' checked={meetingDay === 'Wednesday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                  <label>Th<input type="radio" value="Thursday" name='day' checked={meetingDay === 'Thursday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                  <label>F<input type="radio" value="Friday" name='day' checked={meetingDay === 'Friday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                  <label>S<input type="radio" value="Saturday" name='day' checked={meetingDay === 'Saturday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                </div>
+              </div>
+              <div></div>
+            </div>
+            <div className='form-content'>
+              <div>
+                <label>Start time</label>
+                <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+              </div>
+              <div></div>
+            </div>
+            <div className='form-content'>
+              <div>
+                <label>End time</label>
+                <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+              </div>
+              <div></div>
+            </div>
+            <button className="add-sched" type="submit">Add Item</button>
           </div>
-          <div className='right'>
+          {/*<div className='right'>
+            {instructorError && <p className="error-message">The selected instructor is not available during this time slot.</p>}
+            {roomError && <p className="error-message">The selected room is not available during this time slot.</p>}
             <div className='preview' style={{ backgroundColor: selectedColor, height: '100px', width: '100px' }}>
                 <h6>{subjectName}</h6>
                 <h6>{instructorName}</h6>
                 <h6>{roomName}</h6>
             </div>
-            <button type="submit">Add Item</button>
-          </div>
+          </div>*/}
         </form>
         <div className="lists">
           <div className="list-container">
