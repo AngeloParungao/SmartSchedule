@@ -5,7 +5,7 @@ import axios from 'axios';
 import { Toaster, toast } from 'react-hot-toast';
 import ReactPaginate from 'react-paginate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleLeft , faAngleRight } from '@fortawesome/free-solid-svg-icons';
+import { faAngleLeft , faAngleRight , faWarning} from '@fortawesome/free-solid-svg-icons';
 import '../css/scheduling.css';
 
 function Scheduling() {
@@ -35,6 +35,7 @@ function Scheduling() {
   const [selectedSection, setSelectedSection] = useState('');
   const [selectedGroup, setSelectedGroup] = useState('');
   const [showAddItemModal, setShowAddItemModal] = useState(false);
+  
 
   useEffect(() => {
     fetchSections();
@@ -254,7 +255,9 @@ function AddItemModal({ onClose, instructors, subjects, rooms, section, group, o
 
   const [instructorError, setInstructorError] = useState(false);
   const [roomError, setRoomError] = useState(false);
+  const [courseError, setCourseError] = useState(false);
   const [subjectError, setSubjectError] = useState(false);
+  const [timeError, setTimeError] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
 
   useEffect(() => {
@@ -346,6 +349,26 @@ function AddItemModal({ onClose, instructors, subjects, rooms, section, group, o
   };
 
   const checkRealTimeErrors = () => {
+    
+    const timeConflict = (schedule) => {
+      const newStartTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
+      const newEndTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
+      const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
+      const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
+      return (
+        (newStartTimeInMinutes >= start && newStartTimeInMinutes < end) ||
+        (newEndTimeInMinutes > start && newEndTimeInMinutes <= end) ||
+        (newStartTimeInMinutes <= start && newEndTimeInMinutes >= end)
+      );
+    };
+
+    const hasTimeConflict = schedules.some(schedule =>
+      schedule.day === meetingDay && timeConflict(schedule)
+    );
+    setTimeError(hasTimeConflict);
+
+
+
     const instructorAvailability = schedules.some(schedule =>
       schedule.instructor === instructorName &&
       schedule.day === meetingDay &&
@@ -393,13 +416,13 @@ function AddItemModal({ onClose, instructors, subjects, rooms, section, group, o
     const hasLaboratory = subjectSectionSchedules.some(schedule => schedule.class_type === 'Laboratory');
 
     const alreadyExists = (courseType === 'Lecture' && hasLecture) || (courseType === 'Laboratory' && hasLaboratory);
-    setSubjectError(alreadyExists);
+    setCourseError(alreadyExists);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (instructorError || roomError || subjectError) return;
+    if (instructorError || roomError || subjectError || courseError || timeError) toast.error("Error in adding"); return;
 
     const newItem = {
       subjectName,
@@ -471,7 +494,9 @@ function AddItemModal({ onClose, instructors, subjects, rooms, section, group, o
                 />
               </div>
               <div>
-                {instructorError && <p className="error-message">The selected instructor is not available during this time slot.</p>}
+                {instructorError && <p className="error-message">
+                  <FontAwesomeIcon icon={faWarning} className='warning-icon' />
+                  Instructor is not available during this time slot.</p>}
               </div>
             </div>
             <div className='form-content'>
@@ -483,33 +508,29 @@ function AddItemModal({ onClose, instructors, subjects, rooms, section, group, o
                   placeholder="Subject Name"
                   value={subjectName}
                   onChange={(e) => setSubjectName(e.target.value)}
+                  className={subjectError ? 'error-border' : ''}
                   required
                 />
               </div>
-              <div></div>
+              <div>
+                {subjectError && <p className="error-message">
+                  <FontAwesomeIcon icon={faWarning} className='warning-icon' />
+                  Subject has reached meeting quota</p>}
+              </div>
             </div>
             <div className='form-content'>
               <div>
                 <label>Course Type</label>
-                <select value={courseType} onChange={(e) => setCourseType(e.target.value)}>
+                <select value={courseType} className={courseError ? 'error-border' : ''} onChange={(e) => setCourseType(e.target.value)} >
                   <option>Lecture</option>
                   <option>Laboratory</option>
                 </select>
               </div>
               <div>
-                {subjectError && <p className="error-message">The selected is already </p>}
+                {courseError && <p className="error-message">
+                  <FontAwesomeIcon icon={faWarning} className='warning-icon' />
+                  This course type is already created</p>}
               </div>
-            </div>
-            <div className='form-content'>
-              <div>
-                <label>Color</label>
-                <input 
-                  type="color"
-                  value={selectedColor}
-                  onChange={(e) => setSelectedColor(e.target.value)}
-                />
-              </div>
-              <div></div>
             </div>
             <div className='form-content'>
               <div>
@@ -525,8 +546,21 @@ function AddItemModal({ onClose, instructors, subjects, rooms, section, group, o
                 />
               </div>
               <div>
-                {roomError && <p className="error-message">The selected room is not available during this time slot.</p>}
+                {roomError && <p className="error-message">
+                  <FontAwesomeIcon icon={faWarning} className='warning-icon' />
+                  Room is not available during this time slot.</p>}
               </div>
+            </div>
+            <div className='form-content'>
+              <div>
+                <label>Color</label>
+                <input 
+                  type="color"
+                  value={selectedColor}
+                  onChange={(e) => setSelectedColor(e.target.value)}
+                />
+              </div>
+              <div></div>
             </div>
             <div className='form-content'>
               <div>
@@ -545,14 +579,26 @@ function AddItemModal({ onClose, instructors, subjects, rooms, section, group, o
             <div className='form-content'>
               <div>
                 <label>Start time</label>
-                <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+                <input 
+                  type="time" 
+                  value={startTime} 
+                  className={timeError ? 'error-border' : ''}
+                  onChange={(e) => setStartTime(e.target.value)} />
               </div>
-              <div></div>
+              <div>
+                {timeError && <p className="error-message">
+                  <FontAwesomeIcon icon={faWarning} className='warning-icon' />
+                  Time not available for this section</p>}
+              </div>
             </div>
             <div className='form-content'>
               <div>
                 <label>End time</label>
-                <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+                <input 
+                  type="time" 
+                  value={endTime} 
+                  className={timeError ? 'error-border' : ''}
+                  onChange={(e) => setEndTime(e.target.value)} />
               </div>
               <div></div>
             </div>
