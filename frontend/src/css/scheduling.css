@@ -94,6 +94,10 @@
     padding: 0.1rem 0.3rem;
   }
 
+  .time{
+    font-size: 0.8rem;
+  }
+
   .instructor-name{
     font-size: 1rem;
   }
