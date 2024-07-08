@@ -4,6 +4,19 @@ import '../css/scheduling.css'; // Import any necessary styles
 
 function DeleteItemModal({ onClose, schedules, onDeleteItem }) {
   const [selectedItems, setSelectedItems] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+
+
+  const toggleSelectAll = () => {
+    if (selectAll) {
+      setSelectedItems([]);
+    } else {
+      const allScheduleIds = schedules.map(schedule => schedule.schedule_id);
+      setSelectedItems(allScheduleIds);
+    }
+    setSelectAll(prev => !prev);
+  };
+
 
   const handleSelectItem = (scheduleId) => {
     setSelectedItems(prevSelected => 
@@ -23,6 +36,12 @@ function DeleteItemModal({ onClose, schedules, onDeleteItem }) {
     <div className="delete-screen">
       <div className="delete-container">
         <div className="delete-header">
+        <input
+            type="checkbox"
+            className='checkAll'
+            checked={selectAll}
+            onChange={toggleSelectAll}
+          />
           <span>Select Item to Delete</span>
           <button onClick={onClose} className="delete-close-btn">X</button>
         </div>

@@ -384,6 +384,12 @@
   font-size: 0.9rem;
 }
 
+.checkAll{
+  position: absolute;
+  left: 1rem;
+  top: 0.85rem;
+}
+
 .delete-close-btn {
   position: absolute;
   right: 1rem;
@@ -395,7 +401,6 @@
   cursor: pointer;
 }
 
-/* Modal Body */
 .delete-body {
   display: flex;
   flex-direction: column;
