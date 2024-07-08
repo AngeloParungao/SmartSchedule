@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Toaster, toast } from 'react-hot-toast';
 import '../css/scheduling.css';
 import AddItemModal from './AddItemModal';
+import DeleteItemModal from './DeleteItemModal';
 
 function Scheduling() {
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -122,6 +123,32 @@ function Scheduling() {
     return endHour - startHour;
   };
 
+
+  //---------DELETE----------//
+  const [showDeleteItemModal, setShowDeleteItemModal] = useState(false); // State for delete modal
+
+  const handleDeleteItemClick = () => {
+    setShowDeleteItemModal(true);
+  };
+
+  const handleCloseDeleteModal = () => {
+    setShowDeleteItemModal(false);
+  };
+
+  const handleDeleteItem = async (itemIds) => {
+    try {
+      for (const id of itemIds) {
+        await axios.delete(`http://localhost:8082/api/schedule/delete/${id}`);
+      }
+      toast.success('Items deleted successfully');
+      fetchSchedules(); // Refresh the schedules
+      handleCloseDeleteModal(); // Close the modal
+    } catch (error) {
+      console.error('Error deleting items:', error);
+      toast.error('Failed to delete items');
+    }
+  };
+
   return (
     <div>
       <div>
@@ -148,7 +175,7 @@ function Scheduling() {
           <div>
             <button className="add-item-btn" onClick={handleAddItemClick}>Add Item</button>
             <button className="edit-item-btn">Edit Item</button>
-            <button className="delete-item-btn">Delete Item</button>
+            <button className="delete-item-btn" onClick={handleDeleteItemClick}>Delete Item</button>
           </div>
         </div>
         <div className="timetable">
@@ -224,6 +251,13 @@ function Scheduling() {
           group={selectedGroup}
           onItemAdded={handleItemAdded}
         />        
+      )}
+      {showDeleteItemModal && (
+        <DeleteItemModal
+          onClose={handleCloseDeleteModal}
+          schedules={schedules.filter(schedule => schedule.section_name === selectedSection && schedule.section_group === selectedGroup)}
+          onDeleteItem={handleDeleteItem}
+        />
       )}
     </div>
   );

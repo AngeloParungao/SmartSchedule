@@ -30,4 +30,17 @@ router.get('/fetch', (req, res) => {
     });
 });
 
+router.delete('/delete/:id', (req, res) => {
+    const { id } = req.params;
+    const sql = "DELETE FROM schedules WHERE schedule_id = ?";
+
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error('Error deleting data:', err);
+            return res.status(500).json({ error: 'Failed to delete schedule' });
+        }
+        res.status(200).json({ message: 'Schedule deleted successfully' });
+    });
+});
+
 module.exports = router;

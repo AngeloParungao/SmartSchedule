@@ -137,7 +137,7 @@
 
 
 
-  /* Modal styling */
+  /* Add Modal styling */
 .modal {
   position: fixed;
   width: 100%;
@@ -344,4 +344,93 @@
   background-color: blue;
   transition: all 0.5s ease-out;
 }
+
+
+ /* Delete Modal styling */
+
+.delete-screen {
+  font-family: 'Poppins', serif;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal */
+.delete-container {
+  background: white;
+  border-radius: 8px;
+  width: 40%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+/* Modal Header */
+.delete-header {
+  background: #f44336;
+  padding: 0.5rem;
+  text-align: center;
+  color: white;
+  position: relative;
+}
+
+.delete-header span {
+  font-size: 0.9rem;
+}
+
+.delete-close-btn {
+  position: absolute;
+  right: 1rem;
+  top: 0.7rem;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Modal Body */
+.delete-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.schedule-item span:nth-child(2){
+  font-size: 1rem;
+}
+
+.schedule-item input{
+  cursor: pointer;
+}
+
+.schedule-item span:nth-child(3){
+  font-size: 0.8rem;
+}
+
+.schedule-item span:nth-child(4){
+  font-size: 0.6rem;
+  color: rgb(63, 63, 63);
+}
+
+.schedule-item span:nth-child(5){
+  font-size: 0.8rem;
+}
+
       
