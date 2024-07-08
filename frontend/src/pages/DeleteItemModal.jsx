@@ -1,5 +1,6 @@
 // DeleteItemModal.jsx
 import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import '../css/scheduling.css'; // Import any necessary styles
 
 function DeleteItemModal({ onClose, schedules, onDeleteItem }) {
@@ -27,7 +28,10 @@ function DeleteItemModal({ onClose, schedules, onDeleteItem }) {
   };
 
   const handleDelete = () => {
-    if(window.confirm("Are you sure you want to delete selected items?")){
+    if(selectedItems == 0){
+      toast.error("None is selected");
+    }
+    else if(window.confirm("Are you sure you want to delete selected items?")){
       onDeleteItem(selectedItems);
     }
   };
@@ -59,7 +63,7 @@ function DeleteItemModal({ onClose, schedules, onDeleteItem }) {
             </div>
           ))}
         </div>
-        <button onClick={handleDelete}>Delete</button>
+        <button onClick={handleDelete}className='delete'>Delete</button>
       </div>
     </div>
   );
