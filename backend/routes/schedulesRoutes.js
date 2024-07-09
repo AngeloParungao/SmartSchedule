@@ -30,6 +30,25 @@ router.get('/fetch', (req, res) => {
     });
 });
 
+router.put('/update/:id', (req, res) => {
+    const { id } = req.params;
+    const { instructorName, subjectName, courseType, roomName, selectedColor, meetingDay, startTime, endTime } = req.body;
+
+    const sql = `
+        UPDATE schedules 
+        SET instructor = ?, subject = ?, class_type = ?, room = ?, background_color = ?, day = ?, start_time = ?, end_time = ?
+        WHERE schedule_id = ?
+    `;
+
+    db.query(sql, [instructorName, subjectName, courseType, roomName, selectedColor, meetingDay, startTime, endTime, id], (err, result) => {
+        if (err) {
+            console.error('Error updating data:', err);
+            return res.status(500).json({ error: 'Failed to update schedule' });
+        }
+        res.status(200).json({ message: 'Schedule updated successfully' });
+    });
+});
+
 router.delete('/delete/:id', (req, res) => {
     const { id } = req.params;
     const sql = "DELETE FROM schedules WHERE schedule_id = ?";

@@ -6,195 +6,220 @@ import '../css/scheduling.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft, faAngleRight, faWarning } from '@fortawesome/free-solid-svg-icons';
 
-function AddItemModal({ onClose, instructors, subjects, rooms, section, group, onItemAdded }) {
-    const [schedules, setSchedules] = useState([]);
-    const [subjectName, setSubjectName] = useState('');
-    const [instructorName, setInstructorName] = useState('');
-    const [roomName, setRoomName] = useState('');
-    const [selectedColor, setSelectedColor] = useState('#ffffff');
-    const [meetingDay, setMeetingDay] = useState('');
-    const [startTime, setStartTime] = useState('');
-    const [endTime, setEndTime] = useState('');
-    const [courseType, setCourseType] = useState('Lecture');
-  
-    const [currentInstructorPage, setCurrentInstructorPage] = useState(0);
-    const [currentSubjectPage, setCurrentSubjectPage] = useState(0);
-    const [currentRoomPage, setCurrentRoomPage] = useState(0);
-    const itemsPerPage = 5;
-  
-    const [instructorError, setInstructorError] = useState(false);
-    const [roomError, setRoomError] = useState(false);
-    const [courseError, setCourseError] = useState(false);
-    const [subjectError, setSubjectError] = useState(false);
-    const [timeError, setTimeError] = useState(false);
-    const [recommendations, setRecommendations] = useState([]);
-  
-    useEffect(() => {
-      fetchSchedules();
-    }, []);
-  
-    useEffect(() => {
-      if (instructorName && subjectName && roomName && courseType) {
-        generateRecommendations(schedules);
+function AddItemModal({ onClose, section, group, onItemAdded }) {
+  const [schedules, setSchedules] = useState([]);
+  const [instructors, setInstructors] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [rooms, setRooms] = useState([]);
+
+  const [subjectName, setSubjectName] = useState('');
+  const [instructorName, setInstructorName] = useState('');
+  const [roomName, setRoomName] = useState('');
+  const [selectedColor, setSelectedColor] = useState('#ffffff');
+  const [meetingDay, setMeetingDay] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [courseType, setCourseType] = useState('Lecture');
+
+  const [currentInstructorPage, setCurrentInstructorPage] = useState(0);
+  const [currentSubjectPage, setCurrentSubjectPage] = useState(0);
+  const [currentRoomPage, setCurrentRoomPage] = useState(0);
+  const itemsPerPage = 5;
+
+  const [instructorError, setInstructorError] = useState(false);
+  const [roomError, setRoomError] = useState(false);
+  const [courseError, setCourseError] = useState(false);
+  const [subjectError, setSubjectError] = useState(false);
+  const [timeError, setTimeError] = useState(false);
+  const [recommendations, setRecommendations] = useState([]);
+
+  useEffect(() => {
+    fetchSchedules();
+    fetchInstructors();
+    fetchSubjects();
+    fetchRooms();
+  }, []);
+
+  useEffect(() => {
+    if (instructorName && subjectName && roomName && courseType) {
+      generateRecommendations(schedules);
+    }
+  }, [instructorName, subjectName, roomName, courseType]);
+
+  useEffect(() => {
+    checkRealTimeErrors();
+  }, [instructorName, subjectName, roomName, meetingDay, startTime, endTime, courseType]);
+
+  const fetchSchedules = async () => {
+    try {
+      const response = await axios.get('http://localhost:8082/api/schedule/fetch');
+      setSchedules(response.data);
+    } catch (error) {
+      console.error('Error fetching schedules:', error);
+      toast.error('Failed to fetch schedules');
+    }
+  };
+
+  const fetchInstructors = async () => {
+    try {
+      const response = await axios.get('http://localhost:8082/api/instructors/fetch');
+      setInstructors(response.data);
+    } catch (error) {
+      console.error('Error fetching instructors:', error);
+      toast.error('Failed to fetch instructors');
+    }
+  };
+
+  const fetchSubjects = async () => {
+    try {
+      const response = await axios.get('http://localhost:8082/api/subjects/fetch');
+      setSubjects(response.data);
+    } catch (error) {
+      console.error('Error fetching subjects:', error);
+      toast.error('Failed to fetch subjects');
+    }
+  };
+
+  const fetchRooms = async () => {
+    try {
+      const response = await axios.get('http://localhost:8082/api/rooms/fetch');
+      setRooms(response.data);
+    } catch (error) {
+      console.error('Error fetching rooms:', error);
+      toast.error('Failed to fetch rooms');
+    }
+  };
+
+  const generateRecommendations = (schedules) => {
+      if (!instructorName || !roomName) {
+        setRecommendations([]); // Clear recommendations if instructor or room is not selected
+        return;
       }
-    }, [instructorName, subjectName, roomName, courseType]);
-  
-    useEffect(() => {
-      checkRealTimeErrors();
-    }, [instructorName, subjectName, roomName, meetingDay, startTime, endTime, courseType]);
-  
-    const fetchSchedules = async () => {
-      try {
-        const response = await axios.get('http://localhost:8082/api/schedule/fetch');
-        setSchedules(response.data);
-      } catch (error) {
-        console.error('Error fetching schedules:', error);
-        toast.error('Failed to fetch schedules');
-      }
-    };
-  
-    const handleClickSubject = (subjectName) => {
-      setSubjectName(subjectName);
-    };
-  
-    const handleClickInstructor = (instructorName) => {
-      setInstructorName(instructorName);
-    };
-  
-    const handleClickRoom = (roomName) => {
-      setRoomName(roomName);
-    };
-  
-    const generateRecommendations = (schedules) => {
-        if (!instructorName || !roomName) {
-          setRecommendations([]); // Clear recommendations if instructor or room is not selected
-          return;
-        }
-      
-        const duration = courseType === 'Lecture' ? 2 : 3;
-        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        const availableSlots = [];
-      
-        days.forEach(day => {
-          for (let hour = 7; hour <= 20 - duration; hour++) {
-            const start = `${hour.toString().padStart(2, '0')}:00:00`;
-            const end = `${(hour + duration).toString().padStart(2, '0')}:00:00`;
-      
-            const instructorAvailable = !schedules.some(schedule =>
-              schedule.instructor === instructorName &&
-              schedule.day === day &&
-              (
-                (start >= schedule.start_time && start < schedule.end_time) ||
-                (end > schedule.start_time && end <= schedule.end_time) ||
-                (start <= schedule.start_time && end >= schedule.end_time)
-              )
-            );
-      
-            const roomAvailable = !schedules.some(schedule =>
-              schedule.room === roomName &&
-              schedule.day === day &&
-              (
-                (start >= schedule.start_time && start < schedule.end_time) ||
-                (end > schedule.start_time && end <= schedule.end_time) ||
-                (start <= schedule.start_time && end >= schedule.end_time)
-              )
-            );
-      
-            const sectionAvailable = !schedules.some(schedule =>
-              schedule.section_name === section &&
-              schedule.section_group === group &&
-              schedule.day === day &&
-              (
-                (start >= schedule.start_time && start < schedule.end_time) ||
-                (end > schedule.start_time && end <= schedule.end_time) ||
-                (start <= schedule.start_time && end >= schedule.end_time)
-              )
-            );
-      
-            if (instructorAvailable && roomAvailable && sectionAvailable) {
-              availableSlots.push({ day, start, end });
-            }
-          }
-        });
-      
-        setRecommendations(availableSlots);
-      };
-      
-  
-      const checkRealTimeErrors = () => {
-        const timeConflict = (schedule) => {
-          const newStartTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
-          const newEndTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
-          const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
-          const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
-      
-          // Check if the schedule matches the selected section and group
-          if (
+    
+      const duration = courseType === 'Lecture' ? 2 : 3;
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const availableSlots = [];
+    
+      days.forEach(day => {
+        for (let hour = 7; hour <= 20 - duration; hour++) {
+          const start = `${hour.toString().padStart(2, '0')}:00:00`;
+          const end = `${(hour + duration).toString().padStart(2, '0')}:00:00`;
+    
+          const instructorAvailable = !schedules.some(schedule =>
+            schedule.instructor === instructorName &&
+            schedule.day === day &&
+            (
+              (start >= schedule.start_time && start < schedule.end_time) ||
+              (end > schedule.start_time && end <= schedule.end_time) ||
+              (start <= schedule.start_time && end >= schedule.end_time)
+            )
+          );
+    
+          const roomAvailable = !schedules.some(schedule =>
+            schedule.room === roomName &&
+            schedule.day === day &&
+            (
+              (start >= schedule.start_time && start < schedule.end_time) ||
+              (end > schedule.start_time && end <= schedule.end_time) ||
+              (start <= schedule.start_time && end >= schedule.end_time)
+            )
+          );
+    
+          const sectionAvailable = !schedules.some(schedule =>
             schedule.section_name === section &&
             schedule.section_group === group &&
-            schedule.day === meetingDay
-          ) {
-            return (
-              (newStartTimeInMinutes >= start && newStartTimeInMinutes < end) ||
-              (newEndTimeInMinutes > start && newEndTimeInMinutes <= end) ||
-              (newStartTimeInMinutes <= start && newEndTimeInMinutes >= end)
-            );
+            schedule.day === day &&
+            (
+              (start >= schedule.start_time && start < schedule.end_time) ||
+              (end > schedule.start_time && end <= schedule.end_time) ||
+              (start <= schedule.start_time && end >= schedule.end_time)
+            )
+          );
+    
+          if (instructorAvailable && roomAvailable && sectionAvailable) {
+            availableSlots.push({ day, start, end });
           }
-          return false;
-        };
+        }
+      });
+    
+      setRecommendations(availableSlots);
+    };
       
-        const hasTimeConflict = schedules.some(timeConflict);
-        setTimeError(hasTimeConflict);
-      
-        const instructorAvailability = schedules.some(schedule =>
-          schedule.instructor === instructorName &&
-          schedule.day === meetingDay &&
-          (
-            (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
-            (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
-            (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
-          )
-        );
-        setInstructorError(instructorAvailability);
-      
-        const roomAvailability = schedules.some(schedule =>
-          schedule.room === roomName &&
-          schedule.day === meetingDay &&
-          (
-            (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
-            (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
-            (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
-          )
-        );
-        setRoomError(roomAvailability);
-      
-        const startTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
-        const endTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
-        const newDuration = (endTimeInMinutes - startTimeInMinutes) / 60;
-      
-        const subjectSectionSchedules = schedules.filter(schedule =>
-          schedule.subject === subjectName &&
+  
+    const checkRealTimeErrors = () => {
+      const timeConflict = (schedule) => {
+        const newStartTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
+        const newEndTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
+        const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
+        const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
+    
+        // Check if the schedule matches the selected section and group
+        if (
           schedule.section_name === section &&
-          schedule.section_group === group
-        );
-      
-        const totalHours = subjectSectionSchedules.reduce((sum, schedule) => {
-          const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
-          const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
-          return sum + (end - start) / 60;
-        }, 0);
-      
-        const numberOfMeetings = subjectSectionSchedules.length;
-      
-        const exceedsLimits = totalHours + newDuration > 5 || numberOfMeetings >= 2;
-        setSubjectError(exceedsLimits);
-      
-        const hasLecture = subjectSectionSchedules.some(schedule => schedule.class_type === 'Lecture');
-        const hasLaboratory = subjectSectionSchedules.some(schedule => schedule.class_type === 'Laboratory');
-      
-        const alreadyExists = (courseType === 'Lecture' && hasLecture) || (courseType === 'Laboratory' && hasLaboratory);
-        setCourseError(alreadyExists);
+          schedule.section_group === group &&
+          schedule.day === meetingDay
+        ) {
+          return (
+            (newStartTimeInMinutes >= start && newStartTimeInMinutes < end) ||
+            (newEndTimeInMinutes > start && newEndTimeInMinutes <= end) ||
+            (newStartTimeInMinutes <= start && newEndTimeInMinutes >= end)
+          );
+        }
+        return false;
       };
+    
+      const hasTimeConflict = schedules.some(timeConflict);
+      setTimeError(hasTimeConflict);
+    
+      const instructorAvailability = schedules.some(schedule =>
+        schedule.instructor === instructorName &&
+        schedule.day === meetingDay &&
+        (
+          (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
+          (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
+          (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
+        )
+      );
+      setInstructorError(instructorAvailability);
+    
+      const roomAvailability = schedules.some(schedule =>
+        schedule.room === roomName &&
+        schedule.day === meetingDay &&
+        (
+          (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
+          (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
+          (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
+        )
+      );
+      setRoomError(roomAvailability);
+    
+      const startTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
+      const endTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
+      const newDuration = (endTimeInMinutes - startTimeInMinutes) / 60;
+    
+      const subjectSectionSchedules = schedules.filter(schedule =>
+        schedule.subject === subjectName &&
+        schedule.section_name === section &&
+        schedule.section_group === group
+      );
+    
+      const totalHours = subjectSectionSchedules.reduce((sum, schedule) => {
+        const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
+        const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
+        return sum + (end - start) / 60;
+      }, 0);
+    
+      const numberOfMeetings = subjectSectionSchedules.length;
+    
+      const exceedsLimits = totalHours + newDuration > 5 || numberOfMeetings >= 2;
+      setSubjectError(exceedsLimits);
+    
+      const hasLecture = subjectSectionSchedules.some(schedule => schedule.class_type === 'Lecture');
+      const hasLaboratory = subjectSectionSchedules.some(schedule => schedule.class_type === 'Laboratory');
+    
+      const alreadyExists = (courseType === 'Lecture' && hasLecture) || (courseType === 'Laboratory' && hasLaboratory);
+      setCourseError(alreadyExists);
+    };
       
       
       
@@ -386,22 +411,13 @@ function AddItemModal({ onClose, instructors, subjects, rooms, section, group, o
               </div>
               <button className="add-sched" type="submit">Add Item</button>
             </div>
-            {/*<div className='right'>
-              {instructorError && <p className="error-message">The selected instructor is not available during this time slot.</p>}
-              {roomError && <p className="error-message">The selected room is not available during this time slot.</p>}
-              <div className='preview' style={{ backgroundColor: selectedColor, height: '100px', width: '100px' }}>
-                  <h6>{subjectName}</h6>
-                  <h6>{instructorName}</h6>
-                  <h6>{roomName}</h6>
-              </div>
-            </div>*/}
           </form>
           <div className="lists">
             <div className="list-container">
               <h3>Instructors</h3>
               <ul>
                 {instructors.slice(currentInstructorPage * itemsPerPage, (currentInstructorPage + 1) * itemsPerPage).map(instructor => (
-                  <li key={instructor.id} onClick={() => handleClickInstructor(instructor.firstname + ' ' + instructor.middlename + ' ' + instructor.lastname)}>
+                  <li key={instructor.id} onClick={() => setInstructorName(instructor.firstname + ' ' + instructor.middlename + ' ' + instructor.lastname)}>
                     {instructor.firstname + ' ' + instructor.lastname}
                   </li>
                 ))}
@@ -425,7 +441,7 @@ function AddItemModal({ onClose, instructors, subjects, rooms, section, group, o
               <h3>Subjects</h3>
               <ul>
                 {subjects.slice(currentSubjectPage * itemsPerPage, (currentSubjectPage + 1) * itemsPerPage).map(subject => (
-                  <li key={subject.id} onClick={() => handleClickSubject(subject.subject_name)}>
+                  <li key={subject.id} onClick={() => setSubjectName(subject.subject_name)}>
                     {subject.subject_name}
                   </li>
                 ))}
@@ -449,7 +465,7 @@ function AddItemModal({ onClose, instructors, subjects, rooms, section, group, o
               <h3>Rooms</h3>
               <ul>
                 {filteredRooms.slice(currentRoomPage * itemsPerPage, (currentRoomPage + 1) * itemsPerPage).map(room => (
-                  <li key={room.id} onClick={() => handleClickRoom(room.room_name)}>{room.room_name}</li>
+                  <li key={room.id} onClick={() => setRoomName(room.room_name)}>{room.room_name}</li>
                 ))}
               </ul>
               <ReactPaginate

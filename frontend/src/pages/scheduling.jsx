@@ -6,6 +6,7 @@ import { Toaster, toast } from 'react-hot-toast';
 import '../css/scheduling.css';
 import AddItemModal from './AddItemModal';
 import DeleteItemModal from './DeleteItemModal';
+import EditItemModal from './EditItemModal';
 
 function Scheduling() {
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -28,18 +29,12 @@ function Scheduling() {
 
   const [schedules, setSchedules] = useState([]);
   const [sections, setSections] = useState([]);
-  const [instructors, setInstructors] = useState([]);
-  const [subjects, setSubjects] = useState([]);
-  const [rooms, setRooms] = useState([]);
   const [selectedSection, setSelectedSection] = useState('');
   const [selectedGroup, setSelectedGroup] = useState('Group 1');
   const [showAddItemModal, setShowAddItemModal] = useState(false);
 
   useEffect(() => {
     fetchSections();
-    fetchInstructors();
-    fetchSubjects();
-    fetchRooms();
     fetchSchedules();
   }, []);
 
@@ -56,36 +51,6 @@ function Scheduling() {
     } catch (error) {
       console.error('Error fetching sections:', error);
       toast.error('Failed to fetch sections');
-    }
-  };
-
-  const fetchInstructors = async () => {
-    try {
-      const response = await axios.get('http://localhost:8082/api/instructors/fetch');
-      setInstructors(response.data);
-    } catch (error) {
-      console.error('Error fetching instructors:', error);
-      toast.error('Failed to fetch instructors');
-    }
-  };
-
-  const fetchSubjects = async () => {
-    try {
-      const response = await axios.get('http://localhost:8082/api/subjects/fetch');
-      setSubjects(response.data);
-    } catch (error) {
-      console.error('Error fetching subjects:', error);
-      toast.error('Failed to fetch subjects');
-    }
-  };
-
-  const fetchRooms = async () => {
-    try {
-      const response = await axios.get('http://localhost:8082/api/rooms/fetch');
-      setRooms(response.data);
-    } catch (error) {
-      console.error('Error fetching rooms:', error);
-      toast.error('Failed to fetch rooms');
     }
   };
 
@@ -121,6 +86,36 @@ function Scheduling() {
     const startHour = parseInt(startTime.split(':')[0], 10);
     const endHour = parseInt(endTime.split(':')[0], 10);
     return endHour - startHour;
+  };
+
+
+
+  //---------UPDATE----------//
+  const [showUpdateItemModal, setShowUpdateItemModal] = useState(false);
+  const [showEditItemModal, setShowEditItemModal] = useState(false);
+  const [itemToEdit, setItemToEdit] = useState(null);
+
+  const handleUpdateItemClick = () => {
+    setShowUpdateItemModal(true);
+  };
+
+  const handleCloseUpdateModal = () => {
+    setShowUpdateItemModal(false);
+  };
+
+  const handleEditItemClick = (item) => {
+    setItemToEdit(item);
+    setShowUpdateItemModal(false);
+    setShowEditItemModal(true);
+  };
+  
+  const handleCloseEditModal = () => {
+    setShowEditItemModal(false);
+  };
+
+
+  const handleItemUpdated = async () => {
+    await fetchSchedules();
   };
 
 
@@ -174,7 +169,7 @@ function Scheduling() {
           </div>
           <div>
             <button className="add-item-btn" onClick={handleAddItemClick}>Add Item</button>
-            <button className="edit-item-btn">Edit Item</button>
+            <button className="edit-item-btn" onClick={handleUpdateItemClick}>Edit Item</button>
             <button className="delete-item-btn" onClick={handleDeleteItemClick}>Delete Item</button>
           </div>
         </div>
@@ -244,13 +239,24 @@ function Scheduling() {
       {showAddItemModal && (
         <AddItemModal
           onClose={handleCloseModal}
-          instructors={instructors}
-          subjects={subjects}
-          rooms={rooms}
           section={selectedSection}
           group={selectedGroup}
           onItemAdded={handleItemAdded}
         />        
+      )}
+      {showUpdateItemModal && (
+        <UpdateItemModal
+          onClose={handleCloseUpdateModal}
+          schedules={schedules.filter(schedule => schedule.section_name === selectedSection && schedule.section_group === selectedGroup)}
+          onEditItemClick={handleEditItemClick}
+        />
+      )}
+      {showEditItemModal && (
+        <EditItemModal
+          onClose={handleCloseEditModal}
+          item={itemToEdit}
+          onItemUpdated={handleItemUpdated}
+        />
       )}
       {showDeleteItemModal && (
         <DeleteItemModal
@@ -262,5 +268,34 @@ function Scheduling() {
     </div>
   );
 }
+
+function UpdateItemModal({ onClose, schedules, onEditItemClick }) {
+  return (
+    <div className="update-screen">
+      <div className="update-container">
+        <div className="update-header">
+          <span>Select Item to Update</span>
+          <button onClick={onClose} className="update-close-btn">X</button>
+        </div>
+        <div className="update-body">
+          {schedules.map(schedule => (
+            <div
+              key={schedule.schedule_id}
+              className="schedule-item"
+              style={{ background: schedule.background_color }}
+              onClick={() => onEditItemClick(schedule)}
+            >
+              <span>{schedule.instructor}</span>
+              <span>{schedule.subject}</span> - <span>{schedule.room}</span>
+              <span>({schedule.start_time} - {schedule.end_time})</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 
 export default Scheduling;
