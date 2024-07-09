@@ -259,8 +259,48 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
     }
     };
   
+
+    //------FILTERING------//
+
+    //------instructors-------//
+    const [selectedTag, setSelectedTag] = useState('');
+    const [selectedLevel, setSelectedLevel] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const handleTagChange = (e) => {
+      setSelectedTag(e.target.value);
+      setCurrentInstructorPage(0); // Reset pagination when filter changes
+    };
+  
+    const handleSearchChange = (e) => {
+      setSearchQuery(e.target.value);
+      setCurrentInstructorPage(0); // Reset pagination when search query changes
+    };
+  
+    const filteredInstructors = instructors.filter(instructor => {
+      const matchesTag = selectedTag === '' || instructor.tags === selectedTag;
+      const matchesSearch = instructor.firstname.toLowerCase().includes(searchQuery.toLowerCase()) || instructor.lastname.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesTag && matchesSearch;
+    });
+
+
+    //------subject-------//
+    const handleLevelChange = (e) => {
+      setSelectedLevel(e.target.value);
+      setCurrentInstructorPage(0); // Reset pagination when filter changes
+    }
+
+    const filteredSubjects = subjects.filter(subject => {
+      const matchesLevel = selectedLevel === '' || subject.year_lvl === selectedLevel;
+      return matchesLevel;
+    });
+
+
+    //------rooms-------//
     const filteredRooms = rooms.filter(room => room.room_type === courseType);
   
+
+    
     return (
       <div className="modal">
         <div className="modal-content">
@@ -414,24 +454,37 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
           </form>
           <div className="lists">
             <div className="list-container">
-              <h3>Instructors</h3>
+              <div>
+                <h3>Instructors</h3>
+                <select name="instructorTags" id="instructorTags" value={selectedTag} onChange={handleTagChange}>
+                  <option value="">All Tags</option>
+                  {Array.from(new Set(instructors.map(instructor => instructor.tags))).map((tag, index) => (
+                    <option key={index} value={tag}>
+                      {tag}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="text"
+                  className='search-bar'
+                  placeholder='Search'
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
+              </div>
               <ul>
-                {instructors.slice(currentInstructorPage * itemsPerPage, (currentInstructorPage + 1) * itemsPerPage).map(instructor => (
-                  <li key={instructor.id} onClick={() => setInstructorName(instructor.firstname + ' ' + instructor.middlename + ' ' + instructor.lastname)}>
-                    {instructor.firstname + ' ' + instructor.lastname}
+                {filteredInstructors.slice(currentInstructorPage * itemsPerPage, (currentInstructorPage + 1) * itemsPerPage).map(instructor => (
+                  <li key={instructor.id} onClick={() => setInstructorName(`${instructor.firstname} ${instructor.middlename} ${instructor.lastname}`)}>
+                    {instructor.firstname} {instructor.lastname}
                   </li>
                 ))}
               </ul>
               <ReactPaginate
-                previousLabel={
-                  <FontAwesomeIcon icon={faAngleLeft} className='previous-icon' />
-                }
-                nextLabel={
-                  <FontAwesomeIcon icon={faAngleRight} className='previous-icon' />
-                }
+                previousLabel={<FontAwesomeIcon icon={faAngleLeft} className='previous-icon' />}
+                nextLabel={<FontAwesomeIcon icon={faAngleRight} className='previous-icon' />}
                 breakLabel={'...'}
                 breakClassName={'break-me'}
-                pageCount={Math.ceil(instructors.length / itemsPerPage)}
+                pageCount={Math.ceil(filteredInstructors.length / itemsPerPage)}
                 onPageChange={({ selected }) => setCurrentInstructorPage(selected)}
                 containerClassName={'pagination'}
                 activeClassName={'active-page'}
@@ -439,8 +492,16 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
             </div>
             <div className="list-container">
               <h3>Subjects</h3>
+              <select name="yearLevel" id="yearLevel" value={selectedLevel} onChange={handleLevelChange}>
+                  <option value="">All</option>
+                  {Array.from(new Set(subjects.map(subject => subject.year_lvl))).map((year, index) => (
+                    <option key={index} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
               <ul>
-                {subjects.slice(currentSubjectPage * itemsPerPage, (currentSubjectPage + 1) * itemsPerPage).map(subject => (
+                {filteredSubjects.slice(currentSubjectPage * itemsPerPage, (currentSubjectPage + 1) * itemsPerPage).map(subject => (
                   <li key={subject.id} onClick={() => setSubjectName(subject.subject_name)}>
                     {subject.subject_name}
                   </li>
