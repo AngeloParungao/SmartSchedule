@@ -160,80 +160,89 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
 
   
 
-  const checkRealTimeErrors = () => {
-    const timeConflict = (schedule) => {
-      const newStartTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
-      const newEndTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
-      const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
-      const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
-  
-      // Check if the schedule matches the selected section and group
-      if (
-        schedule.section_name === item.section &&
-        schedule.section_group === item.group &&
-        schedule.day === meetingDay
-      ) {
-        return (
-          (newStartTimeInMinutes >= start && newStartTimeInMinutes < end) ||
-          (newEndTimeInMinutes > start && newEndTimeInMinutes <= end) ||
-          (newStartTimeInMinutes <= start && newEndTimeInMinutes >= end)
-        );
-      }
-      return false;
-    };
-  
-    const hasTimeConflict = schedules.some(timeConflict);
-    setTimeError(hasTimeConflict);
-  
-    const instructorAvailability = schedules.some(schedule =>
-      schedule.instructor === instructorName &&
-      schedule.day === meetingDay &&
-      (
-        (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
-        (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
-        (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
-      )
-    );
-    setInstructorError(instructorAvailability);
-  
-    const roomAvailability = schedules.some(schedule =>
-      schedule.room === roomName &&
-      schedule.day === meetingDay &&
-      (
-        (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
-        (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
-        (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
-      )
-    );
-    setRoomError(roomAvailability);
-  
-    const startTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
-    const endTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
-    const newDuration = (endTimeInMinutes - startTimeInMinutes) / 60;
-  
-    const subjectSectionSchedules = schedules.filter(schedule =>
-      schedule.subject === subjectName &&
+const checkRealTimeErrors = () => {
+  const timeConflict = (schedule) => {
+    if (schedule.schedule_id === item.schedule_id) return false; // Exclude the current schedule
+
+    const newStartTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
+    const newEndTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
+    const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
+    const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
+
+    // Check if the schedule matches the selected section and group
+    if (
       schedule.section_name === item.section &&
-      schedule.section_group === item.group
-    );
-  
-    const totalHours = subjectSectionSchedules.reduce((sum, schedule) => {
-      const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
-      const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
-      return sum + (end - start) / 60;
-    }, 0);
-  
-    const numberOfMeetings = subjectSectionSchedules.length;
-  
-    const exceedsLimits = totalHours + newDuration > 5 || numberOfMeetings >= 2;
-    setSubjectError(exceedsLimits);
-  
-    const hasLecture = subjectSectionSchedules.some(schedule => schedule.class_type === 'Lecture');
-    const hasLaboratory = subjectSectionSchedules.some(schedule => schedule.class_type === 'Laboratory');
-  
-    const alreadyExists = (courseType === 'Lecture' && hasLecture) || (courseType === 'Laboratory' && hasLaboratory);
-    setCourseError(alreadyExists);
+      schedule.section_group === item.group &&
+      schedule.day === meetingDay
+    ) {
+      return (
+        (newStartTimeInMinutes >= start && newStartTimeInMinutes < end) ||
+        (newEndTimeInMinutes > start && newEndTimeInMinutes <= end) ||
+        (newStartTimeInMinutes <= start && newEndTimeInMinutes >= end)
+      );
+    }
+    return false;
   };
+
+  const hasTimeConflict = schedules.some(timeConflict);
+  setTimeError(hasTimeConflict);
+
+  const instructorAvailability = schedules.some(schedule =>
+    schedule.schedule_id !== item.schedule_id &&
+    schedule.instructor === instructorName &&
+    schedule.day === meetingDay &&
+    (
+      (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
+      (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
+      (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
+    )
+  );
+  setInstructorError(instructorAvailability);
+
+  const roomAvailability = schedules.some(schedule =>
+    schedule.schedule_id !== item.schedule_id &&
+    schedule.room === roomName &&
+    schedule.day === meetingDay &&
+    (
+      (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
+      (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
+      (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
+    )
+  );
+  setRoomError(roomAvailability);
+
+  const startTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
+  const endTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
+  const newDuration = (endTimeInMinutes - startTimeInMinutes) / 60;
+
+  const subjectSectionSchedules = schedules.filter(schedule =>
+    schedule.schedule_id !== item.schedule_id && // Exclude the current schedule
+    schedule.subject === subjectName &&
+    schedule.section_name === item.section &&
+    schedule.section_group === item.group
+  );
+
+  const totalHours = subjectSectionSchedules.reduce((sum, schedule) => {
+    const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
+    const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
+    return sum + (end - start) / 60;
+  }, 0);
+
+  const numberOfMeetings = subjectSectionSchedules.length;
+
+  const exceedsLimits = totalHours + newDuration > 5 || numberOfMeetings >= 2;
+  setSubjectError(exceedsLimits);
+
+  const hasLecture = subjectSectionSchedules.some(schedule => schedule.class_type === 'Lecture');
+  const hasLaboratory = subjectSectionSchedules.some(schedule => schedule.class_type === 'Laboratory');
+
+  const alreadyExists = (
+    (courseType === 'Lecture' && (hasLecture || item.class_type === 'Laboratory')) || 
+    (courseType === 'Laboratory' && (hasLaboratory || item.class_type === 'Lecture'))
+  );
+  setCourseError(alreadyExists);
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -303,7 +312,8 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
 
     const filteredSubjects = subjects.filter(subject => {
       const matchesLevel = selectedLevel === '' || subject.year_lvl === selectedLevel;
-      return matchesLevel;
+      const specialized = selectedTag === '' || subject.subject_tags === selectedTag;
+      return matchesLevel && specialized;
     });
 
 
@@ -474,7 +484,7 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
               <div>
                 <h3>Instructors</h3>
                 <select name="instructorTags" id="instructorTags" value={selectedTag} onChange={handleTagChange}>
-                  <option value="">All Tags</option>
+                  <option value="">All</option>
                   {Array.from(new Set(instructors.map(instructor => instructor.tags))).map((tag, index) => (
                     <option key={index} value={tag}>
                       {tag}

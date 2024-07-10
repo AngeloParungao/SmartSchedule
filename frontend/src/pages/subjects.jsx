@@ -221,7 +221,7 @@ function Subjects() {
                         <textarea
                             name="subjectTags"
                             id="subjectTags"
-                            placeholder='Labels and Tags'
+                            placeholder='Specialization for Business Analytics'
                             value={subjectTags}
                             onChange={(e) => setSubjectTags(e.target.value)}
                         ></textarea>

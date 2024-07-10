@@ -292,7 +292,8 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
 
     const filteredSubjects = subjects.filter(subject => {
       const matchesLevel = selectedLevel === '' || subject.year_lvl === selectedLevel;
-      return matchesLevel;
+      const specialized = selectedTag === '' || subject.subject_tags === selectedTag;
+      return matchesLevel && specialized;
     });
 
 
@@ -457,7 +458,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
               <div>
                 <h3>Instructors</h3>
                 <select name="instructorTags" id="instructorTags" value={selectedTag} onChange={handleTagChange}>
-                  <option value="">All Tags</option>
+                  <option value="">All</option>
                   {Array.from(new Set(instructors.map(instructor => instructor.tags))).map((tag, index) => (
                     <option key={index} value={tag}>
                       {tag}
