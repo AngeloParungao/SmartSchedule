@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Toaster, toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import ReactPaginate from 'react-paginate';
 import '../css/scheduling.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleLeft, faAngleRight, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faAngleLeft, faAngleRight, faWarning, faLightbulb, faUser, faDoorOpen, faBook, faB } from '@fortawesome/free-solid-svg-icons';
 
 function AddItemModal({ onClose, section, group, onItemAdded }) {
   const [schedules, setSchedules] = useState([]);
@@ -310,23 +310,30 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
           </div>
           <form className='schedule-form' onSubmit={handleSubmit}>
             <div className='recommendation'>
-              <h5>Recommendation</h5>
-              <div className='recommended'>
-                {recommendations.length > 0 ? (
-                  recommendations.map((rec, index) => (
-                    <div key={index} onClick={() => {
-                      setMeetingDay(rec.day);
-                      setStartTime(rec.start);
-                      setEndTime(rec.end);
-                    }}>
-                      {rec.day}: {rec.start} - {rec.end}
-                    </div>
-                  ))
-                ) : (
-                  <p>No recommendations available</p>
-                )}
+                <span>
+                  <FontAwesomeIcon icon={faLightbulb} className='lightbulb' />
+                  Recommendation
+                </span>
+                  {recommendations.length > 0 ? (
+                    recommendations.map((rec, index) => (
+                      <div key={index} onClick={() => {
+                        setMeetingDay(rec.day);
+                        setStartTime(rec.start);
+                        setEndTime(rec.end);
+                      }}>
+                        <span id='day'>
+                          {rec.day}
+                        </span>
+                        : 
+                        <span id='time'>
+                        {`${rec.start.slice(0, 2) % 12 || 12}:${rec.start.slice(3, 5)} ${rec.start.slice(0, 2) >= 12 ? 'PM' : 'AM'} - ${rec.end.slice(0, 2) % 12 || 12}:${rec.end.slice(3, 5)} ${rec.end.slice(0, 2) >= 12 ? 'PM' : 'AM'}`}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No recommendations available</p>
+                  )}
               </div>
-            </div>
             <div className='form'>
               <div className='form-content'>
                 <div>
@@ -456,7 +463,10 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
           <div className="lists">
             <div className="list-container">
               <div>
-                <h3>Instructors</h3>
+                <h4>
+                  <FontAwesomeIcon icon={faUser} className='instructor-icon' />
+                  Instructors
+                </h4>
                 <select name="instructorTags" id="instructorTags" value={selectedTag} onChange={handleTagChange}>
                   <option value="">All</option>
                   {Array.from(new Set(instructors.map(instructor => instructor.tags))).map((tag, index) => (
@@ -492,7 +502,10 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
               />
             </div>
             <div className="list-container">
-              <h3>Subjects</h3>
+              <h4>
+                <FontAwesomeIcon icon={faBook} className='subject-icon' />
+                Subjects
+              </h4>
               <select name="yearLevel" id="yearLevel" value={selectedLevel} onChange={handleLevelChange}>
                   <option value="">All</option>
                   {Array.from(new Set(subjects.map(subject => subject.year_lvl))).map((year, index) => (
@@ -524,7 +537,10 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
               />
             </div>
             <div className="list-container">
-              <h3>Rooms</h3>
+              <h4>
+                <FontAwesomeIcon icon={faDoorOpen} className='room-icon' />
+                Rooms
+              </h4>
               <ul>
                 {filteredRooms.slice(currentRoomPage * itemsPerPage, (currentRoomPage + 1) * itemsPerPage).map(room => (
                   <li key={room.id} onClick={() => setRoomName(room.room_name)}>{room.room_name}</li>

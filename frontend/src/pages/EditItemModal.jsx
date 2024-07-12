@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Toaster, toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 import ReactPaginate from 'react-paginate';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleLeft, faAngleRight, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faAngleLeft, faAngleRight, faWarning , faLightbulb, faUser, faDoorOpen, faBook } from '@fortawesome/free-solid-svg-icons';
 import '../css/scheduling.css';
 
 function EditItemModal({ onClose, item, onItemUpdated }) {
@@ -41,7 +41,6 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
   }, []);
 
   useEffect(() => {
-    if (item) {
       setSubjectName(item.subject);
       setInstructorName(item.instructor);
       setRoomName(item.room);
@@ -50,14 +49,14 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
       setStartTime(item.start_time);
       setEndTime(item.end_time);
       setCourseType(item.class_type);
-    }
   }, [item]);
 
   useEffect(() => {
-    if (instructorName && subjectName && roomName && courseType) {
+    if (instructorName && subjectName && roomName && courseType && meetingDay && startTime && endTime) {
       generateRecommendations(schedules);
     }
-  }, [instructorName, subjectName, roomName, courseType]);
+  }, [instructorName, subjectName, roomName, courseType, meetingDay, startTime, endTime, schedules]);
+
 
   useEffect(() => {
     checkRealTimeErrors();
@@ -104,59 +103,60 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
   };
 
   const generateRecommendations = (schedules) => {
-  if (!instructorName || !roomName || !meetingDay || !startTime || !endTime || !item) {
-    setRecommendations([]);
-    return;
-  }
-
-  const duration = courseType === 'Lecture' ? 2 : 3;
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const availableSlots = [];
-
-  days.forEach(day => {
-    for (let hour = 7; hour <= 20 - duration; hour++) {
-      const start = `${hour.toString().padStart(2, '0')}:00:00`;
-      const end = `${(hour + duration).toString().padStart(2, '0')}:00:00`;
-
-      const instructorAvailable = !schedules.some(schedule =>
-        schedule.instructor === instructorName &&
-        schedule.day === day &&
-        (
-          (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
-          (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
-          (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
-        )
-      );
-
-      const roomAvailable = !schedules.some(schedule =>
-        schedule.room === roomName &&
-        schedule.day === day &&
-        (
-          (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
-          (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
-          (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
-        )
-      );
-
-      const sectionAvailable = !schedules.some(schedule =>
-        schedule.section_name === item.section_name &&
-        schedule.section_group === item.section_group &&
-        schedule.day === day &&
-        (
-          (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
-          (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
-          (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
-        )
-      );
-
-      if (instructorAvailable && roomAvailable && sectionAvailable) {
-        availableSlots.push({ day, start, end });
-      }
+    if (!instructorName || !roomName || !meetingDay || !startTime || !endTime || !item) {
+      setRecommendations([]);
+      return;
     }
-  });
-
-  setRecommendations(availableSlots);
-};
+  
+    const duration = courseType === 'Lecture' ? 2 : 3;
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const availableSlots = [];
+  
+    days.forEach(day => {
+      for (let hour = 7; hour <= 20 - duration; hour++) {
+        const start = `${hour.toString().padStart(2, '0')}:00:00`;
+        const end = `${(hour + duration).toString().padStart(2, '0')}:00:00`;
+  
+        const isConflict = (schedule, start, end) => {
+          const scheduleStart = schedule.start_time;
+          const scheduleEnd = schedule.end_time;
+          return (
+            (start >= scheduleStart && start < scheduleEnd) ||
+            (end > scheduleStart && end <= scheduleEnd) ||
+            (start <= scheduleStart && end >= scheduleEnd)
+          );
+        };
+  
+        const instructorAvailable = !schedules.some(schedule =>
+          schedule.instructor === item.instructor &&
+          schedule.instructor === instructorName &&
+          schedule.day === day &&
+          isConflict(schedule, start, end)
+        );
+  
+        const roomAvailable = !schedules.some(schedule =>
+          schedule.room === item.room &&
+          schedule.room === roomName &&
+          schedule.day === day &&
+          isConflict(schedule, start, end)
+        );
+  
+        const sectionAvailable = !schedules.some(schedule =>
+          schedule.section_name === item.section_name &&
+          schedule.section_group === item.section_group &&
+          schedule.day === day &&
+          isConflict(schedule, start, end)
+        );
+  
+        if (instructorAvailable && roomAvailable && sectionAvailable) {
+          availableSlots.push({ day, start, end });
+        }
+      }
+    });
+  
+    setRecommendations(availableSlots);
+  };
+  
 
   
 
@@ -328,23 +328,30 @@ const checkRealTimeErrors = () => {
         </div>
         <form className='schedule-form' onSubmit={handleSubmit}>
           <div className='recommendation'>
-            <h5>Recommendation</h5>
-            <div className='recommended'>
-              {recommendations.length > 0 ? (
-                recommendations.map((rec, index) => (
-                  <div key={index} onClick={() => {
-                    setMeetingDay(rec.day);
-                    setStartTime(rec.start);
-                    setEndTime(rec.end);
-                  }}>
-                    {rec.day}: {rec.start} - {rec.end}
-                  </div>
-                ))
-              ) : (
-                <p>No recommendations available</p>
-              )}
+              <span>
+                <FontAwesomeIcon icon={faLightbulb} className='lightbulb' />
+                Recommendation
+              </span>
+                {recommendations.length > 0 ? (
+                  recommendations.map((rec, index) => (
+                    <div key={index} onClick={() => {
+                      setMeetingDay(rec.day);
+                      setStartTime(rec.start);
+                      setEndTime(rec.end);
+                    }}>
+                      <span id='day'>
+                        {rec.day}
+                      </span>
+                       : 
+                      <span id='time'>
+                      {`${rec.start.slice(0, 2) % 12 || 12}:${rec.start.slice(3, 5)} ${rec.start.slice(0, 2) >= 12 ? 'PM' : 'AM'} - ${rec.end.slice(0, 2) % 12 || 12}:${rec.end.slice(3, 5)} ${rec.end.slice(0, 2) >= 12 ? 'PM' : 'AM'}`}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p>No recommendations available</p>
+                )}
             </div>
-          </div>
           <div className='form'>
             <div className='form-content'>
               <div>
@@ -431,19 +438,19 @@ const checkRealTimeErrors = () => {
               <div></div>
             </div>
             <div className='form-content'>
-              <div>
-                <label>Meeting Day</label>
-                <input
-                  type="text"
-                  name="meetingDay"
-                  placeholder="Meeting Day"
-                  value={meetingDay}
-                  onChange={(e) => setMeetingDay(e.target.value)}
-                  required
-                />
+                <div>
+                  <label>Meeting Day</label>
+                  <div className="days-checkboxes">
+                    <label>M<input type="radio" value="Monday" name='day' checked={meetingDay === 'Monday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                    <label>T<input type="radio" value="Tuesday" name='day' checked={meetingDay === 'Tuesday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                    <label>W<input type="radio" value="Wednesday" name='day' checked={meetingDay === 'Wednesday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                    <label>Th<input type="radio" value="Thursday" name='day' checked={meetingDay === 'Thursday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                    <label>F<input type="radio" value="Friday" name='day' checked={meetingDay === 'Friday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                    <label>S<input type="radio" value="Saturday" name='day' checked={meetingDay === 'Saturday'} onChange={(e) => setMeetingDay(e.target.value)} /></label>
+                  </div>
+                </div>
+                <div></div>
               </div>
-              <div></div>
-            </div>
             <div className='form-content'>
               <div>
                 <label>Start Time</label>
@@ -482,7 +489,10 @@ const checkRealTimeErrors = () => {
         <div className="lists">
             <div className="list-container">
               <div>
-                <h3>Instructors</h3>
+                <h4>
+                  <FontAwesomeIcon icon={faUser} className='instructor-icon' />
+                  Instructors
+                </h4>
                 <select name="instructorTags" id="instructorTags" value={selectedTag} onChange={handleTagChange}>
                   <option value="">All</option>
                   {Array.from(new Set(instructors.map(instructor => instructor.tags))).map((tag, index) => (
@@ -518,7 +528,10 @@ const checkRealTimeErrors = () => {
               />
             </div>
             <div className="list-container">
-              <h3>Subjects</h3>
+              <h4>
+                <FontAwesomeIcon icon={faBook} className='subject-icon' />
+                Subjects
+              </h4>
               <select name="yearLevel" id="yearLevel" value={selectedLevel} onChange={handleLevelChange}>
                   <option value="">All</option>
                   {Array.from(new Set(subjects.map(subject => subject.year_lvl))).map((year, index) => (
@@ -550,7 +563,10 @@ const checkRealTimeErrors = () => {
               />
             </div>
             <div className="list-container">
-              <h3>Rooms</h3>
+              <h4>
+                <FontAwesomeIcon icon={faDoorOpen} className='room-icon' />
+                Rooms
+              </h4>
               <ul>
                 {filteredRooms.slice(currentRoomPage * itemsPerPage, (currentRoomPage + 1) * itemsPerPage).map(room => (
                   <li key={room.id} onClick={() => setRoomName(room.room_name)}>{room.room_name}</li>
