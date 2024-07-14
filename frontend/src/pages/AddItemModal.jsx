@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import ReactPaginate from 'react-paginate';
 import '../css/scheduling.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleLeft, faAngleRight, faWarning, faLightbulb, faUser, faDoorOpen, faBook, faB } from '@fortawesome/free-solid-svg-icons';
+import { faAngleLeft, faAngleRight, faWarning, faLightbulb, faUser, faDoorOpen, faBook, faSearch } from '@fortawesome/free-solid-svg-icons';
 
 function AddItemModal({ onClose, section, group, onItemAdded }) {
   const [schedules, setSchedules] = useState([]);
@@ -457,24 +457,27 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
                 </div>
                 <div></div>
               </div>
-              <button className="add-sched" type="submit">Add Item</button>
+              <button className="add-sched" type="submit">Add schedule</button>
             </div>
           </form>
           <div className="lists">
             <div className="list-container">
               <div>
-                <h4>
-                  <FontAwesomeIcon icon={faUser} className='instructor-icon' />
-                  Instructors
-                </h4>
-                <select name="instructorTags" id="instructorTags" value={selectedTag} onChange={handleTagChange}>
-                  <option value="">All</option>
-                  {Array.from(new Set(instructors.map(instructor => instructor.tags))).map((tag, index) => (
-                    <option key={index} value={tag}>
-                      {tag}
-                    </option>
-                  ))}
-                </select>
+                <div className='list-headings'>
+                  <h4>
+                    <FontAwesomeIcon icon={faUser} className='instructor-icon' />
+                    Instructors
+                  </h4>
+                  <select name="instructorTags" id="instructorTags" value={selectedTag} onChange={handleTagChange}>
+                    <option value="">All</option>
+                    {Array.from(new Set(instructors.map(instructor => instructor.tags))).map((tag, index) => (
+                      <option key={index} value={tag}>
+                        {tag}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <FontAwesomeIcon icon={faSearch} className='search-bar-icon'/>
                 <input
                   type="text"
                   className='search-bar'
@@ -502,11 +505,12 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
               />
             </div>
             <div className="list-container">
-              <h4>
-                <FontAwesomeIcon icon={faBook} className='subject-icon' />
-                Subjects
-              </h4>
-              <select name="yearLevel" id="yearLevel" value={selectedLevel} onChange={handleLevelChange}>
+              <div className="list-headings">
+                <h4>
+                  <FontAwesomeIcon icon={faBook} className='subject-icon' />
+                  Subjects
+                </h4>
+                <select name="yearLevel" id="yearLevel" value={selectedLevel} onChange={handleLevelChange}>
                   <option value="">All</option>
                   {Array.from(new Set(subjects.map(subject => subject.year_lvl))).map((year, index) => (
                     <option key={index} value={year}>
@@ -514,6 +518,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
                     </option>
                   ))}
                 </select>
+              </div>
               <ul>
                 {filteredSubjects.slice(currentSubjectPage * itemsPerPage, (currentSubjectPage + 1) * itemsPerPage).map(subject => (
                   <li key={subject.id} onClick={() => setSubjectName(subject.subject_name)}>
@@ -537,10 +542,12 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
               />
             </div>
             <div className="list-container">
-              <h4>
-                <FontAwesomeIcon icon={faDoorOpen} className='room-icon' />
-                Rooms
-              </h4>
+              <div className="list-headings">
+                <h4>
+                  <FontAwesomeIcon icon={faDoorOpen} className='room-icon' />
+                  Rooms
+                </h4>
+              </div>
               <ul>
                 {filteredRooms.slice(currentRoomPage * itemsPerPage, (currentRoomPage + 1) * itemsPerPage).map(room => (
                   <li key={room.id} onClick={() => setRoomName(room.room_name)}>{room.room_name}</li>
