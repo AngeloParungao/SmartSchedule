@@ -46,6 +46,18 @@ function Sections(){
             sectionTags,
         };
 
+         // Check if the section and group already exist, excluding the current section being updated
+        const sectionExists = sections.some(section =>
+            section.section_name === sectionName &&
+            section.section_group === sectionGroup &&
+            section.section_id !== sectionIdToUpdate // Exclude the current section being updated
+        );
+
+        if (sectionExists) {
+            toast.error('Section with the same name and group already exists!');
+            return;
+        }
+
         if (isUpdating) {
             axios.put(`http://localhost:8082/api/sections/update/${sectionIdToUpdate}`, sectionData)
                 .then(res => {
@@ -58,16 +70,6 @@ function Sections(){
                     toast.error("Error in updating");
                 });
         } else {
-            const sectionExists = sections.some(section => section.section_name === sectionName);
-            const groupExists = sections.some(section => section.section_group === sectionGroup);
-
-            if (sectionExists) {
-                if(groupExists){
-                    toast.error('Section and Group No. Already Exists!');
-                    return;
-                }
-            }
-
             axios.post("http://localhost:8082/api/sections/adding", sectionData)
                 .then(res => {
                     toast.success("Added Successfully!");

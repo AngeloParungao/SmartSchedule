@@ -156,15 +156,23 @@ function Scheduling() {
           <div>
             <label htmlFor="">Year & Section</label>
             <select className="section-dropdown" value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)}>
-              {sections.map(section => (
-                <option key={section.section_id} value={section.section_name}>
-                  {section.section_name}
+              {Array.from(new Set(sections.map(section => section.section_name))).map((section, index) => (
+                <option key={index} value={section}>
+                  {section}
                 </option>
               ))}
             </select>
             <select className="group-dropdown" value={selectedGroup} onChange={(e) => setSelectedGroup(e.target.value)}>
-              <option value="Group 1">Group 1</option>
-              <option value="Group 2">Group 2</option>
+            {sections.map((section, index) => {
+              if (section.section_name === selectedSection) {
+                return (
+                  <option key={index} value={section.section_group}>
+                    {section.section_group}
+                  </option>
+                );
+              }
+              return null;
+            })}
             </select>
           </div>
           <div>
@@ -188,7 +196,7 @@ function Scheduling() {
                 <tr key={time.startTime}>
                   <td>
                     <span className='time'>
-                      {`${time.startTime.slice(0, -6)<12 ? time.startTime.slice(0, -3)+" AM" : time.startTime.slice(0, -3)+" PM"} - ${time.endTime.slice(0, -6)<12 ? time.endTime.slice(0, -3)+" AM" : time.endTime.slice(0, -3)+" PM"}`}
+                      {time.startTime.slice(0,2) % 12 || 12}:{time.startTime.slice(3,5)} {time.startTime.slice(0, 2)>12? " PM" :  ' AM'} - {time.endTime.slice(0, 2) % 12 || 12}:{time.endTime.slice(3,5)} {time.endTime.slice(0, 2) < 12 ? " AM" : " PM"}
                     </span>
                   </td>
                   {daysOfWeek.map((day, dayIndex) => {
@@ -287,7 +295,7 @@ function UpdateItemModal({ onClose, schedules, onEditItemClick }) {
             >
               <span>{schedule.instructor}</span>
               <span>{schedule.subject}</span> - <span>{schedule.room}</span>
-              <span>({schedule.start_time} - {schedule.end_time})</span>
+              <span>({schedule.start_time.slice(0,2) % 12 || 12}:{schedule.start_time.slice(3,5)} {schedule.start_time.slice(0, 2)>12? " PM" :  ' AM'} - {schedule.end_time.slice(0, 2) % 12 || 12}:{schedule.end_time.slice(3,5)} {schedule.end_time.slice(0, 2) < 12 ? " AM" : " PM"})</span>
             </div>
           ))}
         </div>

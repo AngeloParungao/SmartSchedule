@@ -41,10 +41,9 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
   }, []);
 
   useEffect(() => {
-    if (instructorName && subjectName && roomName && courseType) {
-      generateRecommendations(schedules);
-    }
-  }, [instructorName, subjectName, roomName, courseType]);
+    generateRecommendations(schedules);
+  }, [instructorName, subjectName, roomName, courseType, meetingDay]);
+  
 
   useEffect(() => {
     checkRealTimeErrors();
@@ -101,6 +100,12 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
       const availableSlots = [];
     
       days.forEach(day => {
+
+        if (meetingDay && meetingDay !== day) {
+          return;
+        }
+
+
         for (let hour = 7; hour <= 20 - duration; hour++) {
           const start = `${hour.toString().padStart(2, '0')}:00:00`;
           const end = `${(hour + duration).toString().padStart(2, '0')}:00:00`;
@@ -137,7 +142,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
           );
     
           if (instructorAvailable && roomAvailable && sectionAvailable) {
-            availableSlots.push({ day, start, end });
+              availableSlots.push({ day, start, end });
           }
         }
       });
@@ -175,9 +180,9 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
         schedule.instructor === instructorName &&
         schedule.day === meetingDay &&
         (
-          (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
-          (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
-          (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
+          (startTime >= schedule.start_time && startTime < schedule.end_time) ||
+          (endTime > schedule.start_time && endTime <= schedule.end_time) ||
+          (startTime <= schedule.start_time && endTime >= schedule.end_time)
         )
       );
       setInstructorError(instructorAvailability);
@@ -186,9 +191,9 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
         schedule.room === roomName &&
         schedule.day === meetingDay &&
         (
-          (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
-          (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
-          (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
+          (startTime >= schedule.start_time && startTime < schedule.end_time) ||
+          (endTime > schedule.start_time && endTime <= schedule.end_time) ||
+          (startTime <= schedule.start_time && endTime >= schedule.end_time)
         )
       );
       setRoomError(roomAvailability);

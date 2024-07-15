@@ -113,6 +113,11 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
     const availableSlots = [];
   
     days.forEach(day => {
+
+      if (meetingDay && meetingDay !== day) {
+        return;
+      }
+
       for (let hour = 7; hour <= 20 - duration; hour++) {
         const start = `${hour.toString().padStart(2, '0')}:00:00`;
         const end = `${(hour + duration).toString().padStart(2, '0')}:00:00`;
@@ -192,9 +197,9 @@ const checkRealTimeErrors = () => {
     schedule.instructor === instructorName &&
     schedule.day === meetingDay &&
     (
-      (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
-      (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
-      (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
+      (startTime >= schedule.start_time && startTime < schedule.end_time) ||
+      (endTime > schedule.start_time && endTime <= schedule.end_time) ||
+      (startTime <= schedule.start_time && endTime >= schedule.end_time)
     )
   );
   setInstructorError(instructorAvailability);
@@ -204,9 +209,9 @@ const checkRealTimeErrors = () => {
     schedule.room === roomName &&
     schedule.day === meetingDay &&
     (
-      (startTime >= schedule.start_time.slice(0, -3) && startTime < schedule.end_time.slice(0, -3)) ||
-      (endTime > schedule.start_time.slice(0, -3) && endTime <= schedule.end_time.slice(0, -3)) ||
-      (startTime <= schedule.start_time.slice(0, -3) && endTime >= schedule.end_time.slice(0, -3))
+      (startTime >= schedule.start_time && startTime < schedule.end_time) ||
+      (endTime > schedule.start_time && endTime <= schedule.end_time) ||
+      (startTime <= schedule.start_time && endTime >= schedule.end_time)
     )
   );
   setRoomError(roomAvailability);
