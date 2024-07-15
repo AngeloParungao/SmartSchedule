@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import '../../css/sidebar.css';
 import logo from '../images/logo_white_no_bg 2.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome , faCalendar , faGear, faArrowCircleLeft} from '@fortawesome/free-solid-svg-icons';
+import { faHome , faCalendar , faBell, faGear, faArrowCircleLeft} from '@fortawesome/free-solid-svg-icons';
 
 function Sidebar(){
     return(
@@ -17,6 +17,9 @@ function Sidebar(){
                 </NavLink> 
                 <NavLink to="/scheduling">
                     <FontAwesomeIcon icon={faCalendar} className='side-icon'/>
+                </NavLink>
+                <NavLink to="/history">
+                    <FontAwesomeIcon icon={faBell} className='side-icon'/>
                 </NavLink>
                 <NavLink to="/setting">
                     <FontAwesomeIcon icon={faGear} className='side-icon'/>
