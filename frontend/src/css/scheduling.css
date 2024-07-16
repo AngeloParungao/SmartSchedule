@@ -22,7 +22,7 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 0.2rem 2rem;
+    padding: 2rem;
   }
 
   .controls div label{
@@ -68,6 +68,7 @@
     justify-content: center;
     align-items: center;
     height: fixed;
+    height: 100%;
   }
   
   .timetable table {
@@ -95,11 +96,12 @@
   }
 
   .time{
-    font-size: 0.8rem;
+    font-size: 0.85rem;
   }
 
   .instructor-name{
-    font-size: 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
   }
 
   .subject-name{
@@ -107,7 +109,8 @@
   }
 
   .room-name{
-    font-size: 0.8rem;
+    font-size: 0.7rem;
+    font-style: italic;
   }
 
   .actions {
@@ -166,21 +169,23 @@
   border-radius: 0.5rem;
   height: 98%;
   width: 98%;
+  padding: 0.5rem;
   overflow: hidden;
+  background-color: rgb(245, 245, 245);
 }
 
 .upper{
+  position: absolute;
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 0.7rem 1rem;
+  align-self: flex-end;
 }
 
 .close-btn {
   position: absolute;
   background: none;
   border: none;
-  margin-top: 1.5rem;
+  margin-top: 0.5em;
+  right: 0.5rem;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -190,17 +195,21 @@
 .schedule-form {
   display: flex;
   align-items: center;
-  height: 45%;
-  gap: 3rem;
+  height: 50%;
+  gap: 2rem;
+  padding: 0.5rem;
 }
 
 .recommendation{
   display: flex;
   flex-direction: column;
-  padding: 0 1rem;
   gap: 0.5rem;
+  padding: 0.5rem;
   height: 100%;
-  flex: 0.8;
+  flex: 0.9;
+  border-radius: 0.5rem;
+  background-color: white;
+  border: 0.2rem solid rgb(235, 235, 235);
   overflow: auto;
 }
 
@@ -270,10 +279,10 @@
 .form {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-evenly;
   flex: 2;
   height: 100%;
-  gap: 0.6rem;
+  gap: 0.5rem;
 }
 
 .form-content{
@@ -288,7 +297,6 @@
   align-items: center;
   flex: 1;
   gap: 2rem;
-  line-height: 1.8rem;
 }
   
 .form-content div:nth-child(1) label{
@@ -296,9 +304,8 @@
 }
 
 .form-content div:nth-child(1) input{
-  padding: 0 1rem;
+  padding: 0.2rem 1rem;
   width: 70%;
-  height: 1.8rem;
 }
 
 .form-content div:nth-child(1) input:focus{
@@ -306,7 +313,7 @@
 }
 
 .form-content div:nth-child(1) select{
-  padding: 0.3rem 1rem;
+  padding: 0.2rem 1rem;
 }
 
 .form-content div:nth-child(2){
@@ -315,34 +322,35 @@
   align-items: center;
 }
 
-.warning-icon{
-  color: white;
-  font-size: 1rem;
-  margin-right: 0.7rem;
-}
 
 .days-checkboxes{
   display: flex;
-  justify-content: space-between;
-  width: 70%;
+  justify-content: space-evenly;
 }
 
 .days-checkboxes label{
   display: flex;
-  width: 100%;
-  gap: 0.3rem;
+  gap: 0.2rem;
+}
+
+.warning-icon{
+  color: orange;
+  font-size: 1rem;
+  margin-right: 0.7rem;
 }
 
 .error-message{
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   padding: 0.3rem 1rem;
-  color: white;
-  background-color: rgb(248, 191, 84);
+  color: black;
+  background-color: rgb(255, 255, 255);
   border-radius: 0.3rem;
+  border: 0.1rem solid orange;
 }
 
 .error-border {
-  border: 1px solid red;
+  outline: 1px solid red;
+  border: none;
   border-radius: 0.3rem;
 }
 
@@ -357,13 +365,16 @@
   border-radius: 0.3rem;
 }
 
+.add-sched:hover{
+  background-color: rgb(54, 163, 54);
+  cursor: pointer;
+}
 
 .lists {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 1.5rem;
-  flex: 1;
+  height: 50%;
 }
 
 .list-container {
@@ -426,7 +437,7 @@
 }
 
 .list-container ul li {
-  background: #f7f7f7;
+  background: #ffffff;
   font-size: 0.8rem;
   padding: 0.5rem 1rem;
   border-radius: 5px;
@@ -435,7 +446,7 @@
 }
 
 .list-container ul li:hover{
-  background: #e6e6e6;
+  background: #f8f8f8;
 }
 
 /* Pagination styling */
@@ -450,42 +461,44 @@
 
 .list-container .pagination li {
   cursor: pointer;
-  background: none; /* Ensure no background color */
-  box-shadow: none; /* Ensure no shadow */
+  background: none;
+  box-shadow: none;
   padding: none;
   height: 0%;
   width: 0%;
 }
 
 .list-container .pagination li a {
-  font-size: 0.6rem !important;
+  font-size: 0.7rem;
   padding: 0.3rem 0.5rem;
-  color: #000000 !important;
+  color: #000000;
   text-decoration: none;
-  border: 1px solid #ddd !important;
-  border-radius: 4px !important;
-  background: none; /* Ensure no background color */
-  box-shadow: none; /* Ensure no shadow */
+  border: 0.1rem solid #bebebe;
+  border-radius: 0.5rem;
+  background: none;
+  box-shadow: none;
 }
 
 .list-container .pagination li a:hover {
-  background-color: #acacac !important;
+  background-color: white;
+  color: black;
+  border: 0.1rem solid rgb(54, 54, 54);
 }
 
 .list-container .pagination .active-page a {
-  background-color: #007bff !important;
-  color: white !important;
-  border-color: #007bff !important;
+  background-color: #007bff;
+  color: white;
+  border: none;
 }
 
 .list-container .pagination .previous-icon,
 .list-container .pagination .next-icon {
-  font-size: 0.6rem !important;
+  font-size: 0.6rem;
 }
 
 .list-container .pagination li:hover {
-  background: none; /* Remove hover background */
-  box-shadow: none; /* Remove hover shadow */
+  background: none;
+  box-shadow: none;
 }
 
  /* Delete Modal styling */
@@ -504,30 +517,43 @@
   z-index: 1000;
 }
 
-/* Modal */
 .delete-container {
   display: flex;
   flex-direction: column;
   background: white;
   border-radius: 8px;
   width: 40%;
+  max-height: 25rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
+  overflow: auto;
 }
 
-.delete-container .delete{
-  align-self: flex-end;
-  color: white;
+.delete-container::-webkit-scrollbar {
+  width: 0.4rem;
+  background-color: rgb(236, 236, 236);
+  border-radius: 0.5rem;
+}
+
+.delete-container::-webkit-scrollbar-thumb {
+  width: 0.6rem;
+  background-color: rgb(201, 201, 201);
+  border-radius: 0.5rem;
+}
+
+.delete{
+  position: absolute;
+  font-weight: 600;
+  color: rgb(250, 47, 47);
   padding: 0.4rem 1rem;
-  margin: 0 0.5rem 0.5rem 0;
+  left: 3rem;
   border: none;
   border-radius: 0.3rem;
   cursor: pointer;
-  background-color: rgb(248, 112, 112);
+  background-color: rgb(255, 255, 255);
 }
 
-.delete-container .delete:hover{
-  background-color: rgb(248, 89, 89);
+.delete:hover{
+  background-color: rgb(219, 219, 219);
 }
 
 .delete-header {
@@ -535,7 +561,8 @@
   padding: 0.5rem;
   text-align: center;
   color: white;
-  position: relative;
+  position: sticky;
+  top: 0;
 }
 
 .delete-header span {
@@ -619,23 +646,21 @@
   background: white;
   border-radius: 8px;
   width: 40%;
+  max-height: 25rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
+  overflow: auto;
 }
 
-.update-container .update{
-  align-self: flex-end;
-  color: white;
-  padding: 0.4rem 1rem;
-  margin: 0 0.5rem 0.5rem 0;
-  border: none;
-  border-radius: 0.3rem;
-  cursor: pointer;
-  background-color: rgb(253, 156, 92);
+.update-container::-webkit-scrollbar {
+  width: 0.4rem;
+  background-color: rgb(236, 236, 236);
+  border-radius: 0.5rem;
 }
 
-.update-container .update:hover{
-  background-color: rgb(247, 131, 53);
+.update-container::-webkit-scrollbar-thumb {
+  width: 0.6rem;
+  background-color: rgb(201, 201, 201);
+  border-radius: 0.5rem;
 }
 
 .update-header {
@@ -643,7 +668,8 @@
   padding: 0.5rem;
   text-align: center;
   color: white;
-  position: relative;
+  position: sticky;
+  top: 0;
 }
 
 .update-header span {

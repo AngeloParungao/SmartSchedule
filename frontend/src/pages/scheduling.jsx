@@ -239,10 +239,6 @@ function Scheduling() {
             </tbody>
           </table>
         </div>
-        <div className="actions">
-          <button className="discard-changes-btn">Discard Changes</button>
-          <button className="apply-changes-btn">Apply Changes</button>
-        </div>
       </div>
       {showAddItemModal && (
         <AddItemModal

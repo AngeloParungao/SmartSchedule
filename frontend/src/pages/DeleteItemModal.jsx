@@ -40,12 +40,13 @@ function DeleteItemModal({ onClose, schedules, onDeleteItem }) {
     <div className="delete-screen">
       <div className="delete-container">
         <div className="delete-header">
-        <input
-            type="checkbox"
-            className='checkAll'
-            checked={selectAll}
-            onChange={toggleSelectAll}
-          />
+          <input
+              type="checkbox"
+              className='checkAll'
+              checked={selectAll}
+              onChange={toggleSelectAll}
+            />
+          <button onClick={handleDelete}className='delete'>Delete</button>
           <span>Select Item to Delete</span>
           <button onClick={onClose} className="delete-close-btn">X</button>
         </div>
@@ -63,7 +64,6 @@ function DeleteItemModal({ onClose, schedules, onDeleteItem }) {
             </div>
           ))}
         </div>
-        <button onClick={handleDelete}className='delete'>Delete</button>
       </div>
     </div>
   );
