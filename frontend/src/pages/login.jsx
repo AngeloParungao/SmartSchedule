@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../css/login.css';
@@ -7,50 +7,95 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 import toast, { Toaster } from 'react-hot-toast';
 
-function Login(){
-
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+function Login() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [users, setUsers] = useState([]);
     const navigate = useNavigate();
+    
+    useEffect(() => {
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+            navigate('/home');
+        }
+    }, [navigate]);
 
-    function handleSubmit(event){
-        event.preventDefault();
-        axios.post("http://localhost:8082/api/auth/login", {email, password})
+    useEffect(() => {
+        axios.get("http://localhost:8082/api/auth/fetch")
             .then(res => {
-                toast.success("Login Successful!");
-                setTimeout(() => {
-                    navigate('/home');
-                }, 2000);
+                setUsers(res.data);
             })
-            .catch(err => toast.error("Invalid Information!"));
+            .catch(err => {
+                console.error('Failed to fetch users:', err);
+                toast.error("Failed to fetch users");
+            });
+    }, []);
+
+    function handleSubmit(event) {
+        event.preventDefault();
+        setLoading(true);
+
+        // Validate email and password against fetched user data
+        const user = users.find(user => user.email === email && user.password === password);
+
+        if (user) {
+            localStorage.setItem('userId', user.user_id);
+            console.log(localStorage.getItem('userId'));
+            setTimeout(() => {
+                setLoading(false);
+                toast.success("Login Successful!");
+            }, 2000);
+            setTimeout(() => {
+                navigate('/home');
+            }, 4000);
+        } else {
+            setTimeout(() => {
+                setLoading(false);
+                toast.error("Invalid email or password");
+            }, 2000);
+        }
     }
 
-    return(
+    return (
         <div className='wrapper'>
-            <div><Toaster
-            position="bottom-right"
-            reverseOrder={false}
-            /></div>
+            <Toaster position="bottom-right" reverseOrder={false} />
             <div className='content'>
                 <div className='logo'>
-                    <img src= {logo}  alt="" />
+                    <img src={logo} alt="SmartSched Logo" />
                 </div>
                 <form onSubmit={handleSubmit} className='login-form'>
                     <span className='title'>BulSU SmartSchedule</span>
                     <div>
-                        <FontAwesomeIcon icon={faEnvelope} className='icon'/>
-                        <input type="email" placeholder="Email" onChange={e => setEmail(e.target.value)} required/>
+                        <FontAwesomeIcon icon={faEnvelope} className='icon' />
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={e => setEmail(e.target.value)}
+                            aria-label="Email"
+                            required
+                        />
                     </div>
                     <div>
-                        <FontAwesomeIcon icon={faLock} className='icon'/>
-                        <input type="password" placeholder='Password' onChange={e => setPassword(e.target.value)} required/>
+                        <FontAwesomeIcon icon={faLock} className='icon' />
+                        <input
+                            type="password"
+                            placeholder='Password'
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            aria-label="Password"
+                            required
+                        />
                     </div>
-                    <button type='submit'>LOGIN</button>
-                    <a href="">viewing schedule</a>
+                    <button type='submit' disabled={loading}>
+                        {loading ? 'Logging in...' : 'LOGIN'}
+                    </button>
+                    <a href="#">Viewing schedule</a>
                 </form>
             </div>
         </div>
-    )
+    );
 }
 
-export default Login
+export default Login;

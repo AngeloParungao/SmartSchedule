@@ -41,8 +41,17 @@
     color: white;
 }
 
+.side-icon:hover{
+    cursor: pointer;
+    color: gray;
+}
+
 .center-navigation a:not(.active) .side-icon{
     color: white;
+}
+
+.center-navigation a:not(.active) .side-icon:hover{
+    color: gray;
 }
 
 .center-navigation a:is(.active) .side-icon{

@@ -1,28 +1,30 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import './App.css'
-import Login from './pages/login.jsx'
-import Home from './pages/home.jsx'
-import Scheduling from './pages/scheduling.jsx'
-import Settings from './pages/settings.jsx';
-import Instructors from './pages/instructors.jsx';
-import Sections from './pages/sections.jsx';
-import Subjects from './pages/subjects.jsx';
-import Rooms from './pages/rooms.jsx';
-
+import './App.css';
+import PrivateRoute from './PrivateRoute';
+import Login from './pages/login';
+import Home from './pages/home';
+import Scheduling from './pages/scheduling';
+import Settings from './pages/settings';
+import Instructors from './pages/instructors';
+import Sections from './pages/sections';
+import Subjects from './pages/subjects';
+import Rooms from './pages/rooms';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login/>}></Route>
-        <Route path="/home" element={<Home/>}></Route>
-        <Route path="/scheduling" element={<Scheduling/>}></Route>
-        <Route path="/instructors" element={<Instructors/>}></Route>
-        <Route path="/sections" element={<Sections/>}></Route>
-        <Route path="/subjects" element={<Subjects/>}></Route>
-        <Route path="/rooms" element={<Rooms/>}></Route>
-        <Route path="/setting" element={<Settings/>}></Route>
+        <Route path="/" element={<Login />} />
+        <Route element={<PrivateRoute />}>
+          <Route path="/home" element={<Home />} />
+          <Route path="/scheduling" element={<Scheduling />} />
+          <Route path="/instructors" element={<Instructors />} />
+          <Route path="/sections" element={<Sections />} />
+          <Route path="/subjects" element={<Subjects />} />
+          <Route path="/rooms" element={<Rooms />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
       </Routes>
     </Router>
   );

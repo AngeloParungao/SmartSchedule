@@ -146,9 +146,7 @@ function Scheduling() {
 
   return (
     <div>
-      <div>
-        <Toaster position="bottom-right" reverseOrder={false} />
-      </div>
+      <Toaster position="bottom-right" reverseOrder={false} />
       <Sidebar />
       <Navbar />
       <div className="scheduling-container">
