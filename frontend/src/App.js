@@ -10,6 +10,7 @@ import Instructors from './pages/instructors';
 import Sections from './pages/sections';
 import Subjects from './pages/subjects';
 import Rooms from './pages/rooms';
+import ActivityLog from './pages/activityLogs';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/subjects" element={<Subjects />} />
           <Route path="/rooms" element={<Rooms />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/history" element={<ActivityLog />} />
         </Route>
       </Routes>
     </Router>
