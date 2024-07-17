@@ -3,14 +3,14 @@ const db = require('../database');
 const router = express.Router();
 
 router.post('/adding', (req, res) => {
-    const { instructorName, subjectName, section, group, courseType, roomName, selectedColor, meetingDay, startTime, endTime } = req.body;
+    const { instructorName, subjectName, section, group, courseType, roomName, selectedColor, meetingDay, startTime, endTime, currentUser } = req.body;
 
     const sql = `
-        INSERT INTO schedules (instructor, subject, section_name, section_group, class_type, room, background_color, day, start_time, end_time)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO schedules (instructor, subject, section_name, section_group, class_type, room, background_color, day, start_time, end_time, creator_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(sql, [instructorName, subjectName, section, group, courseType, roomName, selectedColor, meetingDay, startTime, endTime], (err, result) => {
+    db.query(sql, [instructorName, subjectName, section, group, courseType, roomName, selectedColor, meetingDay, startTime, endTime, currentUser], (err, result) => {
         if (err) {
             console.error('Error inserting data:', err);
             return res.status(500).json({ error: 'Failed to add schedule' });

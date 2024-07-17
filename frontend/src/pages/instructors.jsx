@@ -20,6 +20,8 @@ function Instructors() {
     const [instructorIdToUpdate, setInstructorIdToUpdate] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const currentUser = JSON.parse(localStorage.getItem('userId'));
+
 
     //FETCHING OF INSTRUCTORS DATA
     useEffect(() => {
@@ -28,7 +30,7 @@ function Instructors() {
 
     const fetchInstructors = async () => {
         try {
-            const response = await axios.get('http://localhost:8082/api/instructors/fetch');
+            const response = await axios.get(`http://localhost:8082/api/instructors/fetch?creator_id=${currentUser}`);
             setInstructors(response.data);
         } catch (error) {
             console.error('Error fetching instructors:', error);
@@ -48,6 +50,7 @@ function Instructors() {
             lastName,
             workType,
             tags,
+            currentUser
         };
 
         //FOR UPDATING

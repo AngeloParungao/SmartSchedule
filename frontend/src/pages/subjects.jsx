@@ -20,13 +20,16 @@ function Subjects() {
     const [subjectIdToUpdate, setSubjectIdToUpdate] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const currentUser = JSON.parse(localStorage.getItem('userId'));
+
+
     useEffect(() => {
         fetchSubjects();
     }, []);
 
     const fetchSubjects = async () => {
         try {
-            const response = await axios.get('http://localhost:8082/api/subjects/fetch');
+            const response = await axios.get(`http://localhost:8082/api/subjects/fetch?creator_id=${currentUser}`);
             setSubjects(response.data);
         } catch (error) {
             console.error('Error fetching subjects:', error);
@@ -44,6 +47,7 @@ function Subjects() {
             subjectType,
             subjectUnits,
             subjectTags,
+            currentUser
         };
 
         if (isUpdating) {

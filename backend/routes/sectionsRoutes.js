@@ -4,11 +4,11 @@ const router = express.Router();
 
 
 router.post('/adding', (req, res) => {
-    const { sectionName , sectionGroup, yearLvl , numberOfStudents , sectionTags } = req.body;
+    const { sectionName , sectionGroup, yearLvl , numberOfStudents , sectionTags, currentUser } = req.body;
 
-    const sql = "INSERT INTO sections (section_name, section_group, year_lvl, number_of_students, section_tags) VALUES (?, ?, ?, ?, ?)";
+    const sql = "INSERT INTO sections (section_name, section_group, year_lvl, number_of_students, section_tags, creator_id) VALUES (?, ?, ?, ?, ?, ?)";
 
-    db.query(sql, [sectionName , sectionGroup, yearLvl , numberOfStudents , sectionTags], (err, result) => {
+    db.query(sql, [sectionName , sectionGroup, yearLvl , numberOfStudents , sectionTags, currentUser], (err, result) => {
         if (err) {
             console.error('Error inserting data:', err);
             return res.status(500).json({ error: 'Failed to add sectionId' });
@@ -19,7 +19,8 @@ router.post('/adding', (req, res) => {
 
 
 router.get('/fetch', (req, res) => {
-    const sql = "SELECT * FROM sections";
+    const { creator_id } = req.query;
+    const sql = "SELECT * FROM sections WHERE creator_id =" + creator_id;
 
     db.query(sql, (err, results) => {
         if (err) {

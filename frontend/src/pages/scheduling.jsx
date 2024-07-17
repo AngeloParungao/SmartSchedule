@@ -33,6 +33,8 @@ function Scheduling() {
   const [selectedGroup, setSelectedGroup] = useState('Group 1');
   const [showAddItemModal, setShowAddItemModal] = useState(false);
 
+  const currentUser = JSON.parse(localStorage.getItem('userId'));
+  
   useEffect(() => {
     fetchSections();
     fetchSchedules();
@@ -40,7 +42,7 @@ function Scheduling() {
 
   const fetchSections = async () => {
     try {
-      const response = await axios.get('http://localhost:8082/api/sections/fetch');
+      const response = await axios.get(`http://localhost:8082/api/sections/fetch?creator_id=${currentUser}`);
       setSections(response.data);
       if (response.data.length > 0) {
         setSelectedSection(response.data[0].section_name.toString());
@@ -56,7 +58,7 @@ function Scheduling() {
 
   const fetchSchedules = async () => {
     try {
-      const response = await axios.get('http://localhost:8082/api/schedule/fetch');
+      const response = await axios.get(`http://localhost:8082/api/schedule/fetch?creator_id=${currentUser}`);
       setSchedules(response.data);
     } catch (error) {
       console.error('Error fetching schedules:', error);

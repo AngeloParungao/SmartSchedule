@@ -20,6 +20,8 @@ function Sections(){
     const [sectionIdToUpdate, setSectionIdToUpdate] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const currentUser = JSON.parse(localStorage.getItem('userId'));
+
 
     useEffect(() => {
         fetchSections();
@@ -27,7 +29,7 @@ function Sections(){
 
     const fetchSections = async () => {
         try {
-            const response = await axios.get('http://localhost:8082/api/sections/fetch');
+            const response = await axios.get(`http://localhost:8082/api/sections/fetch?creator_id=${currentUser}`);
             setSections(response.data);
         } catch (error) {
             console.error('Error fetching sections:', error);
@@ -44,6 +46,7 @@ function Sections(){
             yearLvl,
             numberOfStudents,
             sectionTags,
+            currentUser
         };
 
          // Check if the section and group already exist, excluding the current section being updated

@@ -4,11 +4,11 @@ const router = express.Router();
 
 
 router.post('/adding', (req, res) => {
-    const { subjectName , subjectCode, yearLvl , subjectType , subjectUnits , subjectTags } = req.body;
+    const { subjectName , subjectCode, yearLvl , subjectType , subjectUnits , subjectTags, currentUser } = req.body;
 
-    const sql = "INSERT INTO subjects (subject_name, subject_code, year_lvl, subject_type, subject_units, subject_tags) VALUES (?, ?, ?, ?, ?, ?)";
+    const sql = "INSERT INTO subjects (subject_name, subject_code, year_lvl, subject_type, subject_units, subject_tags, creator_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    db.query(sql, [subjectName , subjectCode, yearLvl , subjectType , subjectUnits , subjectTags], (err, result) => {
+    db.query(sql, [subjectName , subjectCode, yearLvl , subjectType , subjectUnits , subjectTags, currentUser], (err, result) => {
         if (err) {
             console.error('Error inserting data:', err);
             return res.status(500).json({ error: 'Failed to add subjectId' });
@@ -19,7 +19,8 @@ router.post('/adding', (req, res) => {
 
 
 router.get('/fetch', (req, res) => {
-    const sql = "SELECT * FROM subjects";
+    const {creator_id} = req.query;
+    const sql = "SELECT * FROM subjects WHERE creator_id =" + creator_id;
 
     db.query(sql, (err, results) => {
         if (err) {

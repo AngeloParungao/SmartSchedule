@@ -4,11 +4,11 @@ const router = express.Router();
 
 
 router.post('/adding', (req, res) => {
-    const { email, firstName, middleName, lastName, workType, tags } = req.body;
+    const { email, firstName, middleName, lastName, workType, tags, currentUser} = req.body;
 
-    const sql = "INSERT INTO instructors (email, firstName, middleName, lastName, workType, tags) VALUES (?, ?, ?, ?, ?, ?)";
+    const sql = "INSERT INTO instructors (email, firstName, middleName, lastName, workType, tags, creator_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    db.query(sql, [email, firstName, middleName, lastName, workType, tags], (err, result) => {
+    db.query(sql, [email, firstName, middleName, lastName, workType, tags, currentUser], (err, result) => {
         if (err) {
             console.error('Error inserting data:', err);
             return res.status(500).json({ error: 'Failed to add instructor' });
@@ -19,7 +19,8 @@ router.post('/adding', (req, res) => {
 
 
 router.get('/fetch', (req, res) => {
-    const sql = "SELECT * FROM instructors";
+    const { creator_id } = req.query;
+    const sql = "SELECT * FROM instructors WHERE creator_id = " + creator_id;
 
     db.query(sql, (err, results) => {
         if (err) {

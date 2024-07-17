@@ -33,6 +33,8 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
   const [timeError, setTimeError] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
 
+  const currentUser = JSON.parse(localStorage.getItem('userId'));
+
   useEffect(() => {
     fetchSchedules();
     fetchInstructors();
@@ -51,7 +53,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
 
   const fetchSchedules = async () => {
     try {
-      const response = await axios.get('http://localhost:8082/api/schedule/fetch');
+      const response = await axios.get(`http://localhost:8082/api/schedule/fetch?creator_id=${currentUser}`);
       setSchedules(response.data);
     } catch (error) {
       console.error('Error fetching schedules:', error);
@@ -61,7 +63,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
 
   const fetchInstructors = async () => {
     try {
-      const response = await axios.get('http://localhost:8082/api/instructors/fetch');
+      const response = await axios.get(`http://localhost:8082/api/instructors/fetch?creator_id=${currentUser}`);
       setInstructors(response.data);
     } catch (error) {
       console.error('Error fetching instructors:', error);
@@ -71,7 +73,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
 
   const fetchSubjects = async () => {
     try {
-      const response = await axios.get('http://localhost:8082/api/subjects/fetch');
+      const response = await axios.get(`http://localhost:8082/api/subjects/fetch?creator_id=${currentUser}`);
       setSubjects(response.data);
     } catch (error) {
       console.error('Error fetching subjects:', error);
@@ -246,6 +248,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
         courseType,
         section,
         group,
+        currentUser
       };
   
       try {
