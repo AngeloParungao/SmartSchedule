@@ -1,62 +1,131 @@
 // src/components/ActivityLog.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Sidebar from '../assets/components/sidebar';
-import "../css/activityLogs.css"
+import "../css/activityLogs.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faCheck, faTrash} from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faPerson, faCheck, faTrash } from '@fortawesome/free-solid-svg-icons';
 
+function ActivityLog() {
+  const [activity, setActivity] = useState([]);
 
-const activities = [
-  { id: 1, message: 'BSIT 3D - G1 Schedule has been added to the draft.', type: 'draft' },
-  { id: 2, message: 'BSIT 1A - G1 Schedule has been published successfully.', type: 'success' },
-  { id: 3, message: 'BSIT 2B - G2 Schedule has been deleted successfully.', type: 'delete' },
-  { id: 4, message: 'BSIT 3A - G1 Schedule has been deleted successfully.', type: 'delete' },
-  { id: 5, message: 'BSIT 1A - G1 Schedule has been published successfully.', type: 'success' },
-  { id: 6, message: 'BSIT 3D - G1 Schedule has been added to the draft.', type: 'draft' },
-  { id: 7, message: 'BSIT 1A - G2 Schedule has been published successfully.', type: 'success' },
-  { id: 8, message: 'BSIT 1B - G1 Schedule has been published successfully.', type: 'success' }
-];
+  useEffect(() => {
+    fetchActivity();
+  }, []);
 
-const ActivityLog = () => {
+  const fetchActivity = async () => {
+    try {
+      const response = await axios.get("http://localhost:8082/api/activity/fetch");
+      setActivity(response.data);
+    } catch (err) {
+      console.error("Error fetching activity logs:", err);
+    }
+  };
+
   const getIcon = (type) => {
     switch (type) {
-      case 'draft':
-        return <FontAwesomeIcon icon={faSearch} className='calendar'/>;
-      case 'success':
-        return <FontAwesomeIcon icon={faCheck} className='calendar'/>;
-      case 'delete':
-        return <FontAwesomeIcon icon={faTrash} className='calendar'/>;
+      case 'instructor':
+        return <FontAwesomeIcon icon={faPerson} />;
+      case 'section':
+        return <FontAwesomeIcon icon={faSearch} />;
+      case 'subject':
+        return <FontAwesomeIcon icon={faSearch} />;
+      case 'rooms':
+        return <FontAwesomeIcon icon={faSearch} />;
       default:
         return null;
     }
   };
 
-  const getBackgroundColor = (type) => {
-    switch (type) {
-      case 'draft':
-        return '#ffffcc';
-      case 'success':
+  const getBackgroundColor = (action) => {
+    switch (action) {
+      case 'Add':
         return '#ccffcc';
-      case 'delete':
+      case 'Update':
+        return '#ffffcc';
+      case 'Delete':
         return '#ffcccc';
       default:
         return 'white';
     }
   };
 
+  const getActionMessage = (log) => {
+    switch (log.action) {
+      case 'Add':
+        if(log.type == "instructor"){
+          return `${log.details} has been added to ${log.type}`;
+        }
+        else if(log.type == "section"){
+          return `Section ${log.details} has been created`;
+        }
+        else if(log.type == "subject"){
+          return `${log.details} has been added to ${log.type}`;
+        }
+        else if(log.type == "room"){
+          return `${log.details} has been added to ${log.type}`;
+        }
+        else if(log.type == "schedule"){
+          return `Schedule added for ${log.details}`;
+        }
+      case 'Update':
+        if(log.type == "instructor"){
+          return `Instructor ${log.details} has been updated`;
+        }
+        else if(log.type == "section"){
+          return `Section ${log.details} has been updated`;
+        }
+        else if(log.type == "subject"){
+          return `Subject ${log.details} has been updated`;
+        }
+        else if(log.type == "room"){
+          return `Room ${log.details} has been updated`;
+        }
+        else if(log.type == "schedule"){
+          return `Schedule added for ${log.details}`;
+        }
+      case 'Delete':
+        return `${log.details} ${log.type} has been deleted`;
+      default:
+        return log.details;
+    }
+  };
+
   return (
     <div>
-        <Sidebar/>
-        <div className="activity-log-container">
-            <div className="activity-log-header">
-                Activity Logs
-            </div>
-            <div className="activity-log-list">
-                
-            </div>
+      <Sidebar />
+      <div className="activity-log-container">
+        <div className="activity-log-header">
+          Activity Logs
         </div>
+        <div className="activity-log">
+          <div className='activity-log-wrapper'>
+            <div className='list'>
+              {activity.map((log, index) => (
+                <div
+                  key={index}
+                  className="activity-log-item"
+                  style={{ backgroundColor: getBackgroundColor(log.action) }}
+                >
+                  <div className="activity-log-icon">
+                    {getIcon(log.type)}
+                  </div>
+                  <div className="activity-log-content">
+                    <div className="activity-log-action">
+                      {getActionMessage(log)}
+                    </div>
+                    <div className="activity-log-timestamp">
+                      {new Date(log.timestamp).toLocaleString()}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
-};
+}
 
 export default ActivityLog;
