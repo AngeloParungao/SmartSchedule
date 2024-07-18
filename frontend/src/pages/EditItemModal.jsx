@@ -33,6 +33,8 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
   const [timeError, setTimeError] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
 
+  const currentUser = JSON.parse(localStorage.getItem("userId"));
+
   useEffect(() => {
     fetchSchedules();
     fetchInstructors();
@@ -64,7 +66,7 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
 
   const fetchSchedules = async () => {
     try {
-      const response = await axios.get('http://localhost:8082/api/schedule/fetch');
+      const response = await axios.get(`http://localhost:8082/api/schedule/fetch?creator_id=${currentUser}`);
       setSchedules(response.data);
     } catch (error) {
       console.error('Error fetching schedules:', error);
@@ -74,7 +76,7 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
 
   const fetchInstructors = async () => {
     try {
-      const response = await axios.get('http://localhost:8082/api/instructors/fetch');
+      const response = await axios.get(`http://localhost:8082/api/instructors/fetch?creator_id=${currentUser}`);
       setInstructors(response.data);
     } catch (error) {
       console.error('Error fetching instructors:', error);
@@ -84,7 +86,7 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
 
   const fetchSubjects = async () => {
     try {
-      const response = await axios.get('http://localhost:8082/api/subjects/fetch');
+      const response = await axios.get(`http://localhost:8082/api/subjects/fetch?creator_id=${currentUser}`);
       setSubjects(response.data);
     } catch (error) {
       console.error('Error fetching subjects:', error);
@@ -94,7 +96,7 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
 
   const fetchRooms = async () => {
     try {
-      const response = await axios.get('http://localhost:8082/api/rooms/fetch');
+      const response = await axios.get(`http://localhost:8082/api/rooms/fetch?creator_id=${currentUser}`);
       setRooms(response.data);
     } catch (error) {
       console.error('Error fetching rooms:', error);
@@ -164,89 +166,88 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
   
 
   
+  const checkRealTimeErrors = () => {
+    const timeConflict = (schedule) => {
+      if (schedule.schedule_id === item.schedule_id) return false; // Exclude the current schedule
 
-const checkRealTimeErrors = () => {
-  const timeConflict = (schedule) => {
-    if (schedule.schedule_id === item.schedule_id) return false; // Exclude the current schedule
+      const newStartTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
+      const newEndTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
+      const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
+      const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
 
-    const newStartTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
-    const newEndTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
-    const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
-    const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
+      // Check if the schedule matches the selected section and group
+      if (
+        schedule.section_name === item.section &&
+        schedule.section_group === item.group &&
+        schedule.day === meetingDay
+      ) {
+        return (
+          (newStartTimeInMinutes >= start && newStartTimeInMinutes < end) ||
+          (newEndTimeInMinutes > start && newEndTimeInMinutes <= end) ||
+          (newStartTimeInMinutes <= start && newEndTimeInMinutes >= end)
+        );
+      }
+      return false;
+    };
 
-    // Check if the schedule matches the selected section and group
-    if (
+    const hasTimeConflict = schedules.some(timeConflict);
+    setTimeError(hasTimeConflict);
+
+    const instructorAvailability = schedules.some(schedule =>
+      schedule.schedule_id !== item.schedule_id &&
+      schedule.instructor === instructorName &&
+      schedule.day === meetingDay &&
+      (
+        (startTime >= schedule.start_time && startTime < schedule.end_time) ||
+        (endTime > schedule.start_time && endTime <= schedule.end_time) ||
+        (startTime <= schedule.start_time && endTime >= schedule.end_time)
+      )
+    );
+    setInstructorError(instructorAvailability);
+
+    const roomAvailability = schedules.some(schedule =>
+      schedule.schedule_id !== item.schedule_id &&
+      schedule.room === roomName &&
+      schedule.day === meetingDay &&
+      (
+        (startTime >= schedule.start_time && startTime < schedule.end_time) ||
+        (endTime > schedule.start_time && endTime <= schedule.end_time) ||
+        (startTime <= schedule.start_time && endTime >= schedule.end_time)
+      )
+    );
+    setRoomError(roomAvailability);
+
+    const startTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
+    const endTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
+    const newDuration = (endTimeInMinutes - startTimeInMinutes) / 60;
+
+    const subjectSectionSchedules = schedules.filter(schedule =>
+      schedule.schedule_id !== item.schedule_id && // Exclude the current schedule
+      schedule.subject === subjectName &&
       schedule.section_name === item.section &&
-      schedule.section_group === item.group &&
-      schedule.day === meetingDay
-    ) {
-      return (
-        (newStartTimeInMinutes >= start && newStartTimeInMinutes < end) ||
-        (newEndTimeInMinutes > start && newEndTimeInMinutes <= end) ||
-        (newStartTimeInMinutes <= start && newEndTimeInMinutes >= end)
-      );
-    }
-    return false;
+      schedule.section_group === item.group
+    );
+
+    const totalHours = subjectSectionSchedules.reduce((sum, schedule) => {
+      const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
+      const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
+      return sum + (end - start) / 60;
+    }, 0);
+
+    const numberOfMeetings = subjectSectionSchedules.length;
+
+    const exceedsLimits = totalHours + newDuration > 5 || numberOfMeetings >= 2;
+    setSubjectError(exceedsLimits);
+
+    const hasLecture = subjectSectionSchedules.some(schedule => schedule.class_type === 'Lecture');
+    const hasLaboratory = subjectSectionSchedules.some(schedule => schedule.class_type === 'Laboratory');
+
+    const alreadyExists = (
+      (courseType === 'Lecture' && (hasLecture || item.class_type === 'Laboratory')) || 
+      (courseType === 'Laboratory' && (hasLaboratory || item.class_type === 'Lecture'))
+    );
+    setCourseError(alreadyExists);
   };
-
-  const hasTimeConflict = schedules.some(timeConflict);
-  setTimeError(hasTimeConflict);
-
-  const instructorAvailability = schedules.some(schedule =>
-    schedule.schedule_id !== item.schedule_id &&
-    schedule.instructor === instructorName &&
-    schedule.day === meetingDay &&
-    (
-      (startTime >= schedule.start_time && startTime < schedule.end_time) ||
-      (endTime > schedule.start_time && endTime <= schedule.end_time) ||
-      (startTime <= schedule.start_time && endTime >= schedule.end_time)
-    )
-  );
-  setInstructorError(instructorAvailability);
-
-  const roomAvailability = schedules.some(schedule =>
-    schedule.schedule_id !== item.schedule_id &&
-    schedule.room === roomName &&
-    schedule.day === meetingDay &&
-    (
-      (startTime >= schedule.start_time && startTime < schedule.end_time) ||
-      (endTime > schedule.start_time && endTime <= schedule.end_time) ||
-      (startTime <= schedule.start_time && endTime >= schedule.end_time)
-    )
-  );
-  setRoomError(roomAvailability);
-
-  const startTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
-  const endTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
-  const newDuration = (endTimeInMinutes - startTimeInMinutes) / 60;
-
-  const subjectSectionSchedules = schedules.filter(schedule =>
-    schedule.schedule_id !== item.schedule_id && // Exclude the current schedule
-    schedule.subject === subjectName &&
-    schedule.section_name === item.section &&
-    schedule.section_group === item.group
-  );
-
-  const totalHours = subjectSectionSchedules.reduce((sum, schedule) => {
-    const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
-    const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
-    return sum + (end - start) / 60;
-  }, 0);
-
-  const numberOfMeetings = subjectSectionSchedules.length;
-
-  const exceedsLimits = totalHours + newDuration > 5 || numberOfMeetings >= 2;
-  setSubjectError(exceedsLimits);
-
-  const hasLecture = subjectSectionSchedules.some(schedule => schedule.class_type === 'Lecture');
-  const hasLaboratory = subjectSectionSchedules.some(schedule => schedule.class_type === 'Laboratory');
-
-  const alreadyExists = (
-    (courseType === 'Lecture' && (hasLecture || item.class_type === 'Laboratory')) || 
-    (courseType === 'Laboratory' && (hasLaboratory || item.class_type === 'Lecture'))
-  );
-  setCourseError(alreadyExists);
-};
 
 
   const handleSubmit = async (e) => {
@@ -272,6 +273,15 @@ const checkRealTimeErrors = () => {
     try {
       const response = await axios.put(`http://localhost:8082/api/schedule/update/${item.schedule_id}`, updatedItem);
       if (response.status === 200) {
+
+        //FOR ACTIVITY HISTORY
+        axios.post("http://localhost:8082/api/activity/adding",{
+          user_id : currentUser,
+          action : 'Update',
+          details : `${item.section_name} - ${item.section_group}`,
+          type : 'schedule'
+        });
+
         toast.success('Item updated successfully!');
         onItemUpdated(updatedItem);
         onClose();

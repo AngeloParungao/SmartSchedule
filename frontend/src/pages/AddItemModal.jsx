@@ -254,6 +254,14 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
       try {
         const response = await axios.post('http://localhost:8082/api/schedule/adding', newItem);
         if (response.status === 200) {
+          //FOR ACTIVITY HISTORY
+          axios.post("http://localhost:8082/api/activity/adding",{
+            user_id : currentUser,
+            action : 'Add',
+            details : `${section} - ${group}`,
+            type : 'schedule'
+          });
+
           toast.success('Item added successfully!');
           onItemAdded(newItem);
           onClose();

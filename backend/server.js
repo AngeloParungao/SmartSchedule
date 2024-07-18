@@ -7,6 +7,7 @@ const instructorsRoutes = require('./routes/instructorsRoutes');
 const sectionsRoutes = require('./routes/sectionsRoutes');
 const subjectsRoutes = require('./routes/subjectsRoutes');
 const roomsRoutes = require('./routes/roomsRoutes');
+const activityRoutes = require("./routes/activityRoutes")
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use('/api/instructors', instructorsRoutes);
 app.use('/api/sections', sectionsRoutes);
 app.use('/api/subjects', subjectsRoutes);
 app.use('/api/rooms', roomsRoutes);
+app.use('/api/activity', activityRoutes);
 
 app.listen(8082, () => {
     console.log("Server is listening on port 8082");

@@ -137,6 +137,15 @@ function Scheduling() {
       for (const id of itemIds) {
         await axios.delete(`http://localhost:8082/api/schedule/delete/${id}`);
       }
+      //FOR ACTIVITY HISTORY
+      const number = itemIds.length;
+      axios.post("http://localhost:8082/api/activity/adding",{
+          user_id : currentUser,
+          action : 'Delete',
+          details : `${number}`,
+          type : 'schedule'
+      });
+
       toast.success('Items deleted successfully');
       fetchSchedules(); // Refresh the schedules
       handleCloseDeleteModal(); // Close the modal

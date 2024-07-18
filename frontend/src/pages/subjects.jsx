@@ -53,6 +53,14 @@ function Subjects() {
         if (isUpdating) {
             axios.put(`http://localhost:8082/api/subjects/update/${subjectIdToUpdate}`, subjectData)
                 .then(res => {
+                    //FOR ACTIVITY HISTORY
+                    axios.post("http://localhost:8082/api/activity/adding",{
+                        user_id : currentUser,
+                        action : 'Update',
+                        details : `${subjectName}(${subjectCode})`,
+                        type : 'subject'
+                    });
+
                     toast.success("Updated Successfully!");
                     fetchSubjects();
                     resetForm();
@@ -76,6 +84,14 @@ function Subjects() {
 
             axios.post("http://localhost:8082/api/subjects/adding", subjectData)
                 .then(res => {
+                    //FOR ACTIVITY HISTORY
+                    axios.post("http://localhost:8082/api/activity/adding",{
+                        user_id : currentUser,
+                        action : 'Add',
+                        details : `${subjectName}(${subjectCode})`,
+                        type : 'subject'
+                    });
+
                     toast.success("Added Successfully!");
                     fetchSubjects();
                     resetForm();
@@ -110,6 +126,15 @@ function Subjects() {
             data: { subjectIds: selectedSubjectIds }
         })
         .then(res => {
+            //FOR ACTIVITY HISTORY
+            const number = selectedSubjectIds.length;
+            axios.post("http://localhost:8082/api/activity/adding",{
+                user_id : currentUser,
+                action : 'Delete',
+                details : `${number}`,
+                type : 'subject'
+            });
+
             toast.success("Deleted Successfully!");
             fetchSubjects();
             setSelectedSubjectIds([]);

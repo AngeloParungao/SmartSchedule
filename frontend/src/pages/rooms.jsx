@@ -17,6 +17,8 @@ function Rooms() {
     const [roomIdToUpdate, setRoomIdToUpdate] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const currentUser = JSON.parse(localStorage.getItem("userId"));
+
     useEffect(() => {
         fetchRooms();
     }, []);
@@ -43,6 +45,14 @@ function Rooms() {
         if (isUpdating) {
             axios.put(`http://localhost:8082/api/rooms/update/${roomIdToUpdate}`, roomData)
                 .then(res => {
+                    //FOR ACTIVITY HISTORY
+                    axios.post("http://localhost:8082/api/activity/adding",{
+                        user_id : currentUser,
+                        action : 'Update',
+                        details : `${roomName}`,
+                        type : 'room'
+                    });
+
                     toast.success("Updated Successfully!");
                     fetchRooms();
                     resetForm();
@@ -59,6 +69,14 @@ function Rooms() {
             }
             axios.post("http://localhost:8082/api/rooms/adding", roomData)
                 .then(res => {
+                    //FOR ACTIVITY HISTORY
+                    axios.post("http://localhost:8082/api/activity/adding",{
+                        user_id : currentUser,
+                        action : 'Add',
+                        details : `${roomName}`,
+                        type : 'room'
+                    });
+
                     toast.success("Added Successfully!");
                     fetchRooms();
                     resetForm();
@@ -91,6 +109,15 @@ function Rooms() {
             data: { roomIds: selectedRoomIds }
         })
         .then(res => {
+            //FOR ACTIVITY HISTORY
+            const number = selectedRoomIds.length;
+            axios.post("http://localhost:8082/api/activity/adding",{
+                user_id : currentUser,
+                action : 'Delete',
+                details : `${number}`,
+                type : 'room'
+            });
+
             toast.success("Deleted Successfully!");
             fetchRooms();
             setSelectedRoomIds([]);

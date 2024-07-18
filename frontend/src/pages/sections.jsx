@@ -64,6 +64,15 @@ function Sections(){
         if (isUpdating) {
             axios.put(`http://localhost:8082/api/sections/update/${sectionIdToUpdate}`, sectionData)
                 .then(res => {
+                    //FOR ACTIVITY HISTORY
+                    axios.post("http://localhost:8082/api/activity/adding",{
+                        user_id : currentUser,
+                        action : 'Update',
+                        details : `${sectionName} - ${sectionGroup}`,
+                        type : 'section'
+                    });
+
+
                     toast.success("Updated Successfully!");
                     fetchSections();
                     resetForm();
@@ -75,6 +84,14 @@ function Sections(){
         } else {
             axios.post("http://localhost:8082/api/sections/adding", sectionData)
                 .then(res => {
+                    //FOR ACTIVITY HISTORY
+                    axios.post("http://localhost:8082/api/activity/adding",{
+                        user_id : currentUser,
+                        action : 'Add',
+                        details : `${sectionName} - ${sectionGroup}`,
+                        type : 'section'
+                    });
+
                     toast.success("Added Successfully!");
                     fetchSections();
                     resetForm();
@@ -108,9 +125,20 @@ function Sections(){
             data: { sectionIds: selectedSectionIds }
         })
         .then(res => {
+            //FOR ACTIVITY HISTORY
+            const number = selectedSectionIds.length;
+            axios.post("http://localhost:8082/api/activity/adding",{
+                user_id : currentUser,
+                action : 'Delete',
+                details : `${number}`,
+                type : 'section'
+            });
+
+            
             toast.success("Deleted Successfully!");
             fetchSections();
             setSelectedSectionIds([]);
+
         })
         .catch(err => toast.error("Error Deleting Sections"));
     };

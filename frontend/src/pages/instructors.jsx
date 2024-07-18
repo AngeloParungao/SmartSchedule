@@ -57,6 +57,15 @@ function Instructors() {
         if (isUpdating) {
             axios.put(`http://localhost:8082/api/instructors/update/${instructorIdToUpdate}`, instructorData)
                 .then(res => {
+                    //FOR ACTIVITY HISTORY
+                    axios.post("http://localhost:8082/api/activity/adding",{
+                        user_id : currentUser,
+                        action : 'Update',
+                        details : `${lastName}, ${firstName} ${middleName}`,
+                        type : 'instructor'
+                    });
+
+
                     toast.success("Updated Successfully!");
                     fetchInstructors(); // Refresh instructors list after updating
                     resetForm(); // Reset form fields
@@ -65,6 +74,7 @@ function Instructors() {
                     console.error('Error updating instructor:', err);
                     toast.error("Error in updating");
                 });
+
         } else {
 
             // Check if the email already exists
@@ -76,6 +86,15 @@ function Instructors() {
             //FOR ADDING
             axios.post("http://localhost:8082/api/instructors/adding", instructorData)
                 .then(res => {
+                     //FOR ACTIVITY HISTORY
+                     axios.post("http://localhost:8082/api/activity/adding",{
+                        user_id : currentUser,
+                        action : 'Add',
+                        details : `${lastName}, ${firstName} ${middleName}`,
+                        type : 'instructor'
+                    });
+
+                    
                     toast.success("Added Successfully!");
                     fetchInstructors(); // Refresh instructors list after adding
                     resetForm(); // Reset form fields
@@ -113,9 +132,19 @@ function Instructors() {
             data: { instructorIds: selectedInstructorIds }
         })
         .then(res => {
+            //FOR ACTIVITY HISTORY
+            const number = selectedInstructorIds.length;
+            axios.post("http://localhost:8082/api/activity/adding",{
+                user_id : currentUser,
+                action : 'Delete',
+                details : `${number}`,
+                type : 'instructor'
+            });
+
             toast.success("Deleted Successfully!");
             fetchInstructors(); // Refresh instructors list after deletion
             setSelectedInstructorIds([]); // Clear selected ids after deletion
+
         })
         .catch(err => toast.error("Error Deleting Instructors"));
     };
