@@ -41,10 +41,16 @@ function Login() {
 
         if (user) {
             localStorage.setItem('userId', user.user_id);
-            console.log(localStorage.getItem('userId'));
             setTimeout(() => {
                 setLoading(false);
                 toast.success("Login Successful!");
+                const userId = JSON.parse(localStorage.getItem('userId'));
+                if (userId) {
+                const userTheme = localStorage.getItem(`theme-${userId}`);
+                if (userTheme) {
+                    document.body.className = userTheme;
+                }
+                }
             }, 2000);
             setTimeout(() => {
                 navigate('/home');

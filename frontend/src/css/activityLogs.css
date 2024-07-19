@@ -6,6 +6,7 @@
     width: calc(100vw - 6rem);
     margin-left: 6rem;
     font-family: 'Poppins', serif;
+    background-color: var(--background-color);
 }
 
 .activity-log-header{
@@ -16,6 +17,7 @@
     font-weight: 400;
     height: 5rem;
     border-bottom: 0.1rem solid gray;
+    color: var(--text-color);
 }
 
 .activity-log {

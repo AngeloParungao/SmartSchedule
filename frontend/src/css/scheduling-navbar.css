@@ -8,14 +8,15 @@
     width: calc(100vw - 6rem);
     margin-left: 6rem;
     padding: 2rem;
-    background-color: white;
     font-family: 'Poppins', serif;
     border-bottom: 0.1rem solid gray;
+    background-color: var(--background-color);
 }
 
 span{
     font-size: 2rem;
     font-weight: 400;
+    color: var(--text-color);
 }
 
 .navigation{
@@ -28,9 +29,11 @@ span{
     font-size: 1rem;
     text-decoration: none;
     color: black;
+    color: var(--text-color);
 }
 
 .navigation a.active{
-    color: blue;
-    border-bottom: 0.2rem solid blue;
+    color: var(--active);
+    border-bottom: 0.2rem solid var(--active);
+    background-color: var(--background-color);
 }

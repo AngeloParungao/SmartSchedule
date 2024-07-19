@@ -5,10 +5,13 @@ import Sidebar from '../assets/components/sidebar';
 import "../css/activityLogs.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faUser, faChalkboardTeacher, faBook, faDoorClosed, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { json } from 'react-router-dom';
 
 function ActivityLog() {
   const [activity, setActivity] = useState([]);
   const [selectedDate, setSelectedDate] = useState('');
+
+  const currentUser = JSON.parse(localStorage.getItem("userId"));
 
   useEffect(() => {
     fetchActivity();
@@ -16,7 +19,7 @@ function ActivityLog() {
 
   const fetchActivity = async () => {
     try {
-      const response = await axios.get("http://localhost:8082/api/activity/fetch");
+      const response = await axios.get(`http://localhost:8082/api/activity/fetch?user_id=${currentUser}`);
       setActivity(response.data);
     } catch (err) {
       console.error("Error fetching activity logs:", err);

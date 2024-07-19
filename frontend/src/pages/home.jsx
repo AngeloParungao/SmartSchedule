@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarPlus, faEye, faBell, faCog} from '@fortawesome/free-solid-svg-icons';
 import '../css/home.css';
+import { useEffect } from 'react';
 
 function Home() {
     const navigate = useNavigate();

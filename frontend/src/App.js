@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import PrivateRoute from './PrivateRoute';
@@ -13,6 +13,7 @@ import Rooms from './pages/rooms';
 import ActivityLog from './pages/activityLogs';
 
 function App() {
+
   return (
     <Router>
       <Routes>
@@ -24,7 +25,7 @@ function App() {
           <Route path="/sections" element={<Sections />} />
           <Route path="/subjects" element={<Subjects />} />
           <Route path="/rooms" element={<Rooms />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/setting" element={<Settings />} />
           <Route path="/history" element={<ActivityLog />} />
         </Route>
       </Routes>

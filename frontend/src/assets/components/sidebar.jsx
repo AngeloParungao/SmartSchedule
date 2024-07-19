@@ -13,7 +13,7 @@ function Sidebar(){
     const logout = () =>{
         toast.success("Logging Out");
         setTimeout(() => {
-            localStorage.clear();
+            localStorage.removeItem('userId');
             navigate('/');
         }, 2000);
 

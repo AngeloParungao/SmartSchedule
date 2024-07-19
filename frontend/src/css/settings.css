@@ -1,6 +1,74 @@
 .settings-container{
     height: 100vh;
     width: calc(100vw - 6rem);
-    background-color: yellow;
     margin-left: 6rem;
+    background-color: var(--background-color);
 }
+
+.settings-card, .user-preference-card {
+    background: #f0f0f0;
+    border-radius: 10px;
+    padding: 20px;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .settings-card h3, .user-preference-card h3 {
+    text-align: center;
+    background: #c0d7e8;
+    padding: 10px;
+    border-radius: 10px 10px 0 0;
+    margin: -20px -20px 10px -20px;
+  }
+  
+  .settings-card label, .user-preference-card h4 {
+    display: block;
+    margin: 10px 0 5px;
+  }
+  
+  .settings-card input {
+    width: calc(100% - 20px);
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .btn-danger {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .btn-success {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  .color-options {
+    display: flex;
+    justify-content: space-around;
+    margin: 10px 0;
+  }
+  
+  .color-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .color-circle.black { background-color: #686868; }
+  .color-circle.white { background-color: white; }

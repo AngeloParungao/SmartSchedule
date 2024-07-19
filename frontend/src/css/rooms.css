@@ -9,6 +9,7 @@
     margin-left: 6rem;
     padding: 1rem;
     font-family: 'Poppins' , serif;
+    background-color: var(--background-color);
 }
 
 h2{
@@ -143,6 +144,10 @@ h2{
 
 .rooms-table th {
     background-color: rgb(216, 216, 216);
+}
+
+.rooms-table td{
+    color: var(--text-color);
 }
 
 .btns {

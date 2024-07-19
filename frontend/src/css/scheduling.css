@@ -9,6 +9,7 @@
     width: calc(100vw - 6rem);
     margin-left: 6rem;
     padding: 0.3rem;
+    background-color: var(--background-color);
 }
   
   .controls {
@@ -23,6 +24,7 @@
     align-items: center;
     gap: 1rem;
     padding: 2rem;
+    color: var(--text-color);
   }
 
   .controls div label{
@@ -87,8 +89,8 @@
   .timetable th {
     font-weight: 500;
     padding: 0.2rem;
-    color: rgb(49, 49, 49);
-    background-color: #f0f0f0;
+    color: var(--text-color);
+    background-color: var(--background-color);
   }
 
   .timetable td{
@@ -97,6 +99,7 @@
 
   .time{
     font-size: 0.85rem;
+    color: var(--text-color);
   }
 
   .instructor-name{
@@ -127,16 +130,6 @@
     border-radius: 0.5rem;
     cursor: pointer;
   }
-    
-  .discard-changes-btn {
-    background-color: #f8d7da;
-    color: #721c24;
-  }
-    
-  .apply-changes-btn {
-    background-color: #d4edda;
-    color: #155724;
-  }
 
 
 
@@ -165,13 +158,12 @@
 .modal-content {
   display: flex;
   flex-direction: column;
-  background: white;
   border-radius: 0.5rem;
   height: 98%;
   width: 98%;
   padding: 0.5rem;
+  background-color: var(--background-color);
   overflow: hidden;
-  background-color: rgb(245, 245, 245);
 }
 
 .upper{
@@ -301,6 +293,7 @@
   
 .form-content div:nth-child(1) label{
   font-size: 0.9rem;
+  color: var(--text-color);
 }
 
 .form-content div:nth-child(1) input{
@@ -382,16 +375,19 @@
 }
 
 .instructor-icon{
+  color: var(--text-color);
   font-size: 0.9rem;
   margin-right: 0.5rem;
 }
 
 .subject-icon{
+  color: var(--text-color);
   font-size: 0.9rem;
   margin-right: 0.5rem;
 }
 
 .room-icon{
+  color: var(--text-color);
   font-size: 0.9rem;
   margin-right: 0.5rem;
 }
@@ -404,7 +400,7 @@
 }
 
 .list-headings h4 {
-  color: rgb(150, 150, 150);
+  color: var(--text-color);
 }
 
 .list-headings select{
@@ -471,7 +467,7 @@
 .list-container .pagination li a {
   font-size: 0.7rem;
   padding: 0.3rem 0.5rem;
-  color: #000000;
+  color: var(--text-color);
   text-decoration: none;
   border: 0.1rem solid #bebebe;
   border-radius: 0.5rem;
@@ -520,7 +516,7 @@
 .delete-container {
   display: flex;
   flex-direction: column;
-  background: white;
+  background: var(--background-color);
   border-radius: 8px;
   width: 40%;
   max-height: 25rem;
@@ -560,13 +556,13 @@
   background: #f44336;
   padding: 0.5rem;
   text-align: center;
-  color: white;
   position: sticky;
   top: 0;
 }
 
 .delete-header span {
   font-size: 0.9rem;
+  color: white;
 }
 
 .checkAll{
@@ -604,6 +600,7 @@
 
 .schedule-item span:nth-child(2){
   font-size: 1rem;
+  color: black;
 }
 
 .schedule-item input{
@@ -612,6 +609,7 @@
 
 .schedule-item span:nth-child(3){
   font-size: 0.8rem;
+  color: black;
 }
 
 .schedule-item span:nth-child(4){
@@ -621,6 +619,7 @@
 
 .schedule-item span:nth-child(5){
   font-size: 0.8rem;
+  color: black;
 }
 
 
@@ -643,7 +642,7 @@
 .update-container {
   display: flex;
   flex-direction: column;
-  background: white;
+  background: var(--background-color);
   border-radius: 8px;
   width: 40%;
   max-height: 25rem;
@@ -697,10 +696,13 @@
 
 .update-body .schedule-item span:nth-child(1){
   font-size: 1rem;
+  color: black;
 }
 
 .update-body .schedule-item span:nth-child(2){
   font-size: 0.8rem;
+  color: black;
+
 }
 
 .update-body .schedule-item span:nth-child(3){
@@ -710,5 +712,6 @@
 
 .update-body .schedule-item span:nth-child(4){
   font-size: 0.8rem;
+  color: black;
 }
       

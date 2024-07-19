@@ -18,7 +18,8 @@ router.post('/adding', (req, res) => {
 });
 
 router.get('/fetch', (req, res) => {
-    const sql = "SELECT * FROM activity";
+    const { user_id } = req.query;
+    const sql = "SELECT * FROM activity WHERE user_id =" + user_id;
 
     db.query(sql, (err, results) => {
         if (err) {
