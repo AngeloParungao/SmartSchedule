@@ -30,7 +30,8 @@
     text-decoration: none;
     height: 4rem;
     width: 6rem;
-    transition: all 0.4s ease-in-out;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
 }
 
 .side-icon{
@@ -43,7 +44,12 @@
 
 .side-icon:hover{
     cursor: pointer;
-    color: gray;
+    color: rgb(204, 204, 204); 
+}
+
+.center-navigation a:hover,
+.bottom-navigation button:hover{
+    background-color: #2c323b;
 }
 
 .center-navigation a:not(.active) .side-icon{
@@ -51,13 +57,17 @@
 }
 
 .center-navigation a:not(.active) .side-icon:hover{
-    color: gray;
+    color: rgb(204, 204, 204);
 }
 
 .center-navigation a:is(.active) .side-icon{
-    color: #343B46;
+    color: #282d36;
 }
     
+.center-navigation a:is(.active):hover .side-icon{
+    color: white;
+}
+
 .active{
     background-color: white;
 }

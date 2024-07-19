@@ -14,6 +14,14 @@ import ActivityLog from './pages/activityLogs';
 
 function App() {
 
+  const userId = JSON.parse(localStorage.getItem('userId'));
+  if (userId) {
+      const userTheme = localStorage.getItem(`theme-${userId}`);
+      if (userTheme) {
+          document.body.className = userTheme;
+      }
+  }
+
   return (
     <Router>
       <Routes>

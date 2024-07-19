@@ -74,6 +74,7 @@
   padding: 0.5rem;
   gap: 0.5rem;
   background-color: rgb(253, 253, 253);
+  height: 100%;
   overflow-y: auto;
 }
 

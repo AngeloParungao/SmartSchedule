@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import Sidebar from '../assets/components/sidebar';
 import '../css/settings.css';
 
@@ -24,7 +25,11 @@ function Settings() {
 
   const handleChangeTheme = () => {
     if (userId) {
-      localStorage.setItem(`theme-${userId}`, theme);
+        localStorage.setItem(`theme-${userId}`, theme);
+        toast.success("Theme successfully changed");
+        setTimeout(() =>{
+            window.location.reload();
+        }, 2000);
     }
   };
 

@@ -44,17 +44,13 @@ function Login() {
             setTimeout(() => {
                 setLoading(false);
                 toast.success("Login Successful!");
-                const userId = JSON.parse(localStorage.getItem('userId'));
-                if (userId) {
-                const userTheme = localStorage.getItem(`theme-${userId}`);
-                if (userTheme) {
-                    document.body.className = userTheme;
-                }
-                }
             }, 2000);
             setTimeout(() => {
                 navigate('/home');
             }, 4000);
+            setTimeout(() => {
+                window.location.reload();
+            }, 3000);
         } else {
             setTimeout(() => {
                 setLoading(false);
