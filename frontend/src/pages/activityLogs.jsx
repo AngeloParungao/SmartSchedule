@@ -4,10 +4,11 @@ import axios from 'axios';
 import Sidebar from '../assets/components/sidebar';
 import "../css/activityLogs.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faPerson, faCheck, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faUser, faChalkboardTeacher, faBook, faDoorClosed, faCalendar } from '@fortawesome/free-solid-svg-icons';
 
 function ActivityLog() {
   const [activity, setActivity] = useState([]);
+  const [selectedDate, setSelectedDate] = useState('');
 
   useEffect(() => {
     fetchActivity();
@@ -25,13 +26,15 @@ function ActivityLog() {
   const getIcon = (type) => {
     switch (type) {
       case 'instructor':
-        return <FontAwesomeIcon icon={faPerson} />;
+        return <FontAwesomeIcon icon={faUser} />;
       case 'section':
-        return <FontAwesomeIcon icon={faSearch} />;
+        return <FontAwesomeIcon icon={faChalkboardTeacher} />;
       case 'subject':
-        return <FontAwesomeIcon icon={faSearch} />;
-      case 'rooms':
-        return <FontAwesomeIcon icon={faSearch} />;
+        return <FontAwesomeIcon icon={faBook} />;
+      case 'room':
+        return <FontAwesomeIcon icon={faDoorClosed} />;
+      case 'schedule':
+        return <FontAwesomeIcon icon={faCalendar} />;
       default:
         return null;
     }
@@ -53,35 +56,35 @@ function ActivityLog() {
   const getActionMessage = (log) => {
     switch (log.action) {
       case 'Add':
-        if(log.type == "instructor"){
+        if(log.type === "instructor"){
           return `${log.details} has been added to ${log.type}`;
         }
-        else if(log.type == "section"){
+        else if(log.type === "section"){
           return `Section ${log.details} has been created`;
         }
-        else if(log.type == "subject"){
+        else if(log.type === "subject"){
           return `${log.details} has been added to ${log.type}`;
         }
-        else if(log.type == "room"){
+        else if(log.type === "room"){
           return `${log.details} has been added to ${log.type}`;
         }
-        else if(log.type == "schedule"){
+        else if(log.type === "schedule"){
           return `Schedule added for ${log.details}`;
         }
       case 'Update':
-        if(log.type == "instructor"){
+        if(log.type === "instructor"){
           return `Instructor ${log.details} has been updated`;
         }
-        else if(log.type == "section"){
+        else if(log.type === "section"){
           return `Section ${log.details} has been updated`;
         }
-        else if(log.type == "subject"){
+        else if(log.type === "subject"){
           return `Subject ${log.details} has been updated`;
         }
-        else if(log.type == "room"){
+        else if(log.type === "room"){
           return `Room ${log.details} has been updated`;
         }
-        else if(log.type == "schedule"){
+        else if(log.type === "schedule"){
           return `Schedule added for ${log.details}`;
         }
       case 'Delete':
@@ -90,6 +93,14 @@ function ActivityLog() {
         return log.details;
     }
   };
+
+  const handleDateChange = (event) => {
+    setSelectedDate(event.target.value);
+  };
+
+  const filteredActivity = selectedDate 
+    ? activity.filter(log => new Date(log.timestamp).toISOString().split('T')[0] === selectedDate)
+    : activity;
 
   return (
     <div>
@@ -100,8 +111,15 @@ function ActivityLog() {
         </div>
         <div className="activity-log">
           <div className='activity-log-wrapper'>
+            <div className='list-header'>
+              History
+              <div>
+                <label htmlFor="date" className='date-label'>Date: </label>
+                <input className="date" type="date" value={selectedDate} onChange={handleDateChange} />
+              </div>
+            </div>
             <div className='list'>
-              {activity.map((log, index) => (
+              {filteredActivity.map((log, index) => (
                 <div
                   key={index}
                   className="activity-log-item"
