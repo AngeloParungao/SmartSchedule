@@ -4,19 +4,30 @@
     font-style: 'Poppins', serif;
 }
 
-:root {
-    --background-dark: #686868;
-    --background-lightgrey: white;
-  }
-  
 body.theme-dark {
---background-color: var(--background-dark);
---text-color: white;
---active: white;
+  --background-color: #686868;
+  --modal-color: #686868;
+  --text-color: white;
+  --active: white;
 }
 
 body.theme-light {
---background-color: var(--background-lightgrey);
---text-color: black;
---active: blue;
+  --background-color: white;
+  --modal-color: rgb(223, 223, 223);
+  --text-color: black;
+  --active: blue;
 }
+
+body.theme-red {
+  --background-color: rgb(202, 102, 102);
+  --modal-color: rgb(202, 102, 102);
+  --text-color: white;
+  --active: white;
+}
+
+body.theme-green {
+  --background-color: rgb(85, 129, 85);
+  --modal-color: rgb(85, 129, 85);
+  --text-color: white;
+  --active: white;
+  }

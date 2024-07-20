@@ -126,6 +126,7 @@ h2{
 .sections-table {
     width: 100%;
     table-layout: fixed; /* Fixed table layout */
+    background-color: white;
 }
 
 .sections-table th,
@@ -149,7 +150,8 @@ h2{
 }
 
 .sections-table td{
-    color: var(--text-color);
+    color: black;
+    font-size: 0.95rem;
 }
 
 .btns {

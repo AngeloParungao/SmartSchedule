@@ -34,7 +34,8 @@
   flex-direction: column;
   height: 32rem;
   width: 70%;
-  box-shadow: 0px 5px 10px rgb(204, 204, 204);
+  border-radius: 0.5rem ;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.35);
 }
 
 .list-header{
@@ -75,11 +76,14 @@
   gap: 0.5rem;
   background-color: rgb(253, 253, 253);
   height: 100%;
+  border-bottom-left-radius: 0.5rem ;
+  border-bottom-right-radius: 0.5rem ;
   overflow-y: auto;
 }
 
 .list::-webkit-scrollbar {
   width: 0.5rem;
+  border-bottom-right-radius: 0.5rem ;
   background-color: rgb(194, 194, 194);
 }
 

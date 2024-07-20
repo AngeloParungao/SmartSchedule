@@ -125,6 +125,7 @@ h2{
 .instructors-table {
     width: 100%;
     table-layout: fixed; /* Fixed table layout */
+    background-color: white;
 }
 
 .instructors-table th,
@@ -148,7 +149,8 @@ h2{
 }
 
 .instructors-table td{
-    color: var(--text-color);
+    color: black;
+    font-size: 0.95rem;
 }
 
 .btns {

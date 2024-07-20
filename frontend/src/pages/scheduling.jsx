@@ -298,9 +298,15 @@ function UpdateItemModal({ onClose, schedules, onEditItemClick }) {
               style={{ background: schedule.background_color }}
               onClick={() => onEditItemClick(schedule)}
             >
-              <span>{schedule.instructor}</span>
-              <span>{schedule.subject}</span> - <span>{schedule.room}</span>
-              <span>({schedule.start_time.slice(0,2) % 12 || 12}:{schedule.start_time.slice(3,5)} {schedule.start_time.slice(0, 2)>12? " PM" :  ' AM'} - {schedule.end_time.slice(0, 2) % 12 || 12}:{schedule.end_time.slice(3,5)} {schedule.end_time.slice(0, 2) < 12 ? " AM" : " PM"})</span>
+              <div className='update-details-left'>
+                <span>{schedule.instructor}</span>
+                <span>{schedule.subject}</span>
+              </div>
+              <div className='update-details-right'>
+                <span>{schedule.room}</span>
+                <span>{schedule.day}</span>
+                <span>({schedule.start_time.slice(0,2) % 12 || 12}:{schedule.start_time.slice(3,5)} {schedule.start_time.slice(0, 2)>12? " PM" :  ' AM'}-{schedule.end_time.slice(0, 2) % 12 || 12}:{schedule.end_time.slice(3,5)} {schedule.end_time.slice(0, 2) < 12 ? " AM" : " PM"})</span>
+              </div>
             </div>
           ))}
         </div>

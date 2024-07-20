@@ -58,9 +58,15 @@ function DeleteItemModal({ onClose, schedules, onDeleteItem }) {
                 checked={selectedItems.includes(schedule.schedule_id)} 
                 onChange={() => handleSelectItem(schedule.schedule_id)} 
               />
-              <span>{schedule.instructor}</span>
-              <span>{schedule.subject}</span> - <span>{schedule.room}</span>
-              <span>({schedule.start_time.slice(0,2) % 12 || 12}:{schedule.start_time.slice(3,5)} {schedule.start_time.slice(0, 2)>12? " PM" :  ' AM'} - {schedule.end_time.slice(0, 2) % 12 || 12}:{schedule.end_time.slice(3,5)} {schedule.end_time.slice(0, 2) < 12 ? " AM" : " PM"})</span>
+              <div className='delete-details-left'>
+                <span>{schedule.instructor}</span>
+                <span>{schedule.subject}</span>
+              </div>
+              <div className='delete-details-right'>
+                <span>{schedule.room}</span>
+                <span>{schedule.day}</span>
+                <span>({schedule.start_time.slice(0,2) % 12 || 12}:{schedule.start_time.slice(3,5)} {schedule.start_time.slice(0, 2)>12? " PM" :  ' AM'} - {schedule.end_time.slice(0, 2) % 12 || 12}:{schedule.end_time.slice(3,5)} {schedule.end_time.slice(0, 2) < 12 ? " AM" : " PM"})</span>
+              </div>
             </div>
           ))}
         </div>
