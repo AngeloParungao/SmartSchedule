@@ -7,6 +7,9 @@ import '../css/scheduling.css';
 import AddItemModal from './AddItemModal';
 import DeleteItemModal from './DeleteItemModal';
 import EditItemModal from './EditItemModal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+
 
 function Scheduling() {
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -288,7 +291,9 @@ function UpdateItemModal({ onClose, schedules, onEditItemClick }) {
       <div className="update-container">
         <div className="update-header">
           <span>Select Item to Update</span>
-          <button onClick={onClose} className="update-close-btn">X</button>
+          <button onClick={onClose} className="update-close-btn">
+            <FontAwesomeIcon icon={faXmark} />
+          </button>
         </div>
         <div className="update-body">
           {schedules.map(schedule => (

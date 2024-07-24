@@ -1,14 +1,27 @@
-import React from 'react';
+import React , { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { toast, Toaster } from 'react-hot-toast';
+import axios from 'axios';
 import '../../css/sidebar.css';
 import logo from '../images/logo_white_no_bg 2.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome , faCalendar , faBell, faGear, faArrowCircleLeft} from '@fortawesome/free-solid-svg-icons';
+import { faHome , faCalendar , faBell, faGear, faRightFromBracket} from '@fortawesome/free-solid-svg-icons';
 
 function Sidebar(){
-
+    const [user, setUsers] = useState([]);
+    const currentUser = JSON.parse(localStorage.getItem('userId'));
     const navigate = useNavigate();
+
+    useEffect(() => {
+        axios.get("http://localhost:8082/api/auth/fetch")
+            .then(res => {
+                setUsers(res.data);
+            })
+            .catch(err => {
+                console.error('Failed to fetch users:', err);
+                toast.error("Failed to fetch users");
+            });
+        });
 
     const logout = () =>{
         toast.success("Logging Out");
@@ -16,7 +29,6 @@ function Sidebar(){
             localStorage.removeItem('userId');
             navigate('/');
         }, 2000);
-
     }
 
     return(
@@ -42,11 +54,23 @@ function Sidebar(){
 
             <div className='bottom-navigation'>
                 <button className='logout'onClick={logout}>
-                    <FontAwesomeIcon icon={faArrowCircleLeft} className='side-icon'/>
+                    <FontAwesomeIcon icon={faRightFromBracket} className='side-icon'/>
                 </button>
-                <button className='profile'>
-                    <FontAwesomeIcon icon={faArrowCircleLeft} className='side-icon'/>
-                </button>
+                <div className='profile'>
+                    <div>
+                        {
+                            user.map(user =>{
+                                if(user.user_id === currentUser){
+                                    return(
+                                        <span className='initial'>
+                                            {user.username.charAt(0)}
+                                        </span>
+                                    )
+                                }
+                            })
+                        }
+                    </div>
+                </div>
             </div>
         </div>
     )

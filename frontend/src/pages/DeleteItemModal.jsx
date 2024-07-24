@@ -1,7 +1,10 @@
 // DeleteItemModal.jsx
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import '../css/scheduling.css'; // Import any necessary styles
+import '../css/scheduling.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faX, faXmark } from '@fortawesome/free-solid-svg-icons';
+
 
 function DeleteItemModal({ onClose, schedules, onDeleteItem }) {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -48,7 +51,9 @@ function DeleteItemModal({ onClose, schedules, onDeleteItem }) {
             />
           <button onClick={handleDelete}className='delete'>Delete</button>
           <span>Select Item to Delete</span>
-          <button onClick={onClose} className="delete-close-btn">X</button>
+          <button onClick={onClose} className="delete-close-btn">
+            <FontAwesomeIcon icon={faXmark}/>
+          </button>
         </div>
         <div className="delete-body">
           {schedules.map(schedule => (

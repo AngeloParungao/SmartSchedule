@@ -16,12 +16,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: -10rem;
+    margin-top: -5rem;
     width: 100%;
 }
 
+.bottom-navigation{
+    margin-bottom: 2rem;
+}
+
 .center-navigation a,
-.bottom-navigation button{
+.bottom-navigation button ,
+.bottom-navigation div{
     display: flex;
     align-items: center;
     justify-content: center;
@@ -73,6 +78,7 @@
 }
 
 .logout{
+    transform: rotateY(180deg);
     background-color: transparent;
     border: none;
 }
@@ -80,4 +86,19 @@
 .profile{
     background-color: transparent;
     border: none;
+}
+
+
+.profile div{
+    height: 3.2rem;
+    width: 3.2rem;
+    border-radius: 0.4rem;
+    border: 0.15rem solid white;
+}
+
+.initial{
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
 }

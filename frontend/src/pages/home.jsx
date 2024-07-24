@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarPlus, faEye, faBell, faCog} from '@fortawesome/free-solid-svg-icons';
 import '../css/home.css';
-import { useEffect } from 'react';
 
 function Home() {
     const navigate = useNavigate();
@@ -21,7 +20,7 @@ function Home() {
                         <FontAwesomeIcon icon={faCalendarPlus} className='calendar'/>
                         <span>Create Schedule</span>
                     </div>
-                    <div className="dashboard-button draft-schedules">
+                    <div className="dashboard-button draft-schedules" onClick={() => navigate('/draft')}>
                         <FontAwesomeIcon icon={faEye} className='eye'/>
                         <span>Draft Schedules</span>
                     </div>

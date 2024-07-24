@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import ReactPaginate from 'react-paginate';
 import '../css/scheduling.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleLeft, faAngleRight, faWarning, faLightbulb, faUser, faDoorOpen, faBook, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faAngleLeft, faAngleRight, faWarning, faLightbulb, faUser, faDoorOpen, faBook, faSearch, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 function AddItemModal({ onClose, section, group, onItemAdded }) {
   const [schedules, setSchedules] = useState([]);
@@ -322,7 +322,9 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
       <div className="modal">
         <div className="modal-content">
           <div className='upper'>
-            <button className="close-btn" onClick={onClose}>X</button>
+            <button className="close-btn" onClick={onClose}>
+              <FontAwesomeIcon icon={faXmark}/>
+            </button>
           </div>
           <form className='schedule-form' onSubmit={handleSubmit}>
             <div className='recommendation'>
