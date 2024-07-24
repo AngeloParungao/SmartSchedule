@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import PrivateRoute from './PrivateRoute';
 import Login from './pages/login';
 import Home from './pages/home';
+import Draft from './pages/draft-schedules';
 import Scheduling from './pages/scheduling';
 import Settings from './pages/settings';
 import Instructors from './pages/instructors';
@@ -28,6 +29,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route element={<PrivateRoute />}>
           <Route path="/home" element={<Home />} />
+          <Route path="/draft" element={<Draft />} />
           <Route path="/scheduling" element={<Scheduling />} />
           <Route path="/instructors" element={<Instructors />} />
           <Route path="/sections" element={<Sections />} />
