@@ -16,13 +16,13 @@ function Home() {
                     <span>Dashboard</span>
                 </div>
                 <div className="dashboard-buttons">
-                    <div className="dashboard-button create-schedule" onClick={() => navigate('/scheduling')}>
-                        <FontAwesomeIcon icon={faCalendarPlus} className='calendar'/>
-                        <span>Create Schedule</span>
-                    </div>
                     <div className="dashboard-button draft-schedules" onClick={() => navigate('/draft')}>
                         <FontAwesomeIcon icon={faEye} className='eye'/>
                         <span>Draft Schedules</span>
+                    </div>
+                    <div className="dashboard-button create-schedule" onClick={() => navigate('/scheduling')}>
+                        <FontAwesomeIcon icon={faCalendarPlus} className='calendar'/>
+                        <span>Create Schedule</span>
                     </div>
                     <div className="dashboard-button activity-logs" onClick={() => navigate('/history')}>
                         <FontAwesomeIcon icon={faBell} className='bell'/>
