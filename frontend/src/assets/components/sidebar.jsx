@@ -5,7 +5,7 @@ import axios from 'axios';
 import '../../css/sidebar.css';
 import logo from '../images/logo_white_no_bg 2.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome , faCalendar , faBell, faGear, faRightFromBracket} from '@fortawesome/free-solid-svg-icons';
+import { faHome , faNoteSticky,faCalendar , faBell, faGear, faRightFromBracket} from '@fortawesome/free-solid-svg-icons';
 
 function Sidebar(){
     const [user, setUsers] = useState([]);
@@ -40,6 +40,9 @@ function Sidebar(){
             <div className='center-navigation'>
                 <NavLink exact to="/home">
                     <FontAwesomeIcon icon={faHome} className='side-icon'/>
+                </NavLink> 
+                <NavLink exact to="/draft">
+                    <FontAwesomeIcon icon={faNoteSticky} className='side-icon'/>
                 </NavLink> 
                 <NavLink to="/scheduling">
                     <FontAwesomeIcon icon={faCalendar} className='side-icon'/>

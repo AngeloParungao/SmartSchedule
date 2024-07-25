@@ -51,6 +51,10 @@ function Draft() {
         try {
             const response = await axios.get(`http://localhost:8082/api/schedule/fetch?creator_id=${currentUser}`);
             setSchedules(response.data);
+
+            if (response.data.length > 0) {
+                setSelectedInstructor(response.data[0].instructor.toString());
+            }
         } catch (error) {
             console.error('Error fetching schedules:', error);
             toast.error('Failed to fetch schedules');
@@ -64,6 +68,7 @@ function Draft() {
 
             if (response.data.length > 0) {
                 setSelectedSection(response.data[0].section_name.toString());
+                setSelectedGroup(response.data[0].section_group.toString());
             }
         } catch (error) {
             console.error('Error fetching sections:', error);
@@ -145,6 +150,104 @@ function Draft() {
             });
         }
     };
+
+    const generateAllPDFs = async () => {
+        try {
+            const timeElements = document.querySelectorAll('.time');
+            timeElements.forEach(el => {
+                el.style.color = 'black';
+            });
+            
+            const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape orientation
+            
+            let isFirstPage = true; // Flag to check if it's the first page
+            
+            pdf.setFontSize(18);
+            
+            if (category === 'instructor') {
+                for (const instructor of instructors) {
+                    setSelectedInstructor(`${instructor.firstname} ${instructor.middlename} ${instructor.lastname}`);
+                    await new Promise(resolve => setTimeout(resolve, 100)); // Wait for state update
+                    const scheduleContainer = document.querySelector('#scheduleTable');
+                    const canvas = await html2canvas(scheduleContainer, { 
+                        scale: 2,
+                        useCORS: true,
+                        backgroundColor: null // Adjust as needed
+                    });
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = 297; // A4 width in mm for landscape
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    const pageHeight = 210; // A4 height in mm for landscape
+                    let heightLeft = imgHeight;
+                    let position = 0;
+    
+                    if (!isFirstPage) {
+                        pdf.addPage();
+                    } else {
+                        isFirstPage = false; // After the first page, all subsequent pages should be added normally
+                    }
+                    
+                    pdf.text(`Instructor: ${instructor.firstname} ${instructor.lastname}`, 14, 20);
+                    pdf.addImage(imgData, 'PNG', 0, 40, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+        
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                }
+            } else {
+                const sectionGroups = [...new Set(sections.map(section => `${section.section_name}-${section.section_group}`))];
+                for (const sectionGroup of sectionGroups) {
+                    const [sectionName, group] = sectionGroup.split('-');
+                    setSelectedSection(sectionName);
+                    setSelectedGroup(group);
+                    await new Promise(resolve => setTimeout(resolve, 100)); // Wait for state update
+                    const scheduleContainer = document.querySelector('#scheduleTable');
+                    const canvas = await html2canvas(scheduleContainer, { 
+                        scale: 2,
+                        useCORS: true,
+                        backgroundColor: null // Adjust as needed
+                    });
+                    const imgData = canvas.toDataURL('image/png');
+                    const imgWidth = 297; // A4 width in mm for landscape
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    const pageHeight = 210; // A4 height in mm for landscape
+                    let heightLeft = imgHeight;
+                    let position = 0;
+    
+                    if (!isFirstPage) {
+                        pdf.addPage();
+                    } else {
+                        isFirstPage = false; // After the first page, all subsequent pages should be added normally
+                    }
+                    
+                    pdf.text(`Section: ${sectionName}, Group: ${group}`, 14, 20);
+                    pdf.addImage(imgData, 'PNG', 0, 40, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+        
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                }
+            }
+    
+            pdf.save('all_schedules.pdf');
+        } catch (error) {
+            console.error('Error generating all PDFs:', error);
+            toast.error('Failed to generate all PDFs');
+        } finally {
+            const timeElements = document.querySelectorAll('.time');
+            timeElements.forEach(el => {
+                el.style.color = '';
+            });
+        }
+    };
     
     
 
@@ -180,7 +283,7 @@ function Draft() {
                             </select>
                             <div className='draft-buttons'>
                                 <button className='print' onClick={() => generatePDF()}>Save as PDF</button>
-                                <button className='print-all' onClick={() => generatePDF()}>Save All as PDF</button>
+                                <button className='print-all' onClick={() => generateAllPDFs()}>Save All as PDF</button>
                             </div>
                         </div>
                     ) : (
@@ -218,7 +321,7 @@ function Draft() {
                             </select>
                             <div className='draft-buttons'>
                                 <button className='print' onClick={() => generatePDF()}>Save as PDF</button>
-                                <button className='print-all' onClick={() => generatePDF()}>Save All as PDF</button>
+                                <button className='print-all' onClick={() => generateAllPDFs()}>Save All as PDF</button>
                             </div>
                         </div>
                     )}
