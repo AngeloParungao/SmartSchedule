@@ -6,6 +6,7 @@ import logo from '../assets/images/smartsched_logo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock } from '@fortawesome/free-solid-svg-icons';
 import toast, { Toaster } from 'react-hot-toast';
+import { RotatingLines } from 'react-loader-spinner';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -91,7 +92,7 @@ function Login() {
                         />
                     </div>
                     <button type='submit' disabled={loading}>
-                        {loading ? 'Logging in...' : 'LOGIN'}
+                        {loading ? <RotatingLines height={20} width={20} color="white" strokeWidth="4" /> : 'LOGIN'}
                     </button>
                     <a href="#">Viewing schedule</a>
                 </form>
