@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 18, 2024 at 05:37 PM
+-- Generation Time: Jul 27, 2024 at 03:45 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -58,7 +58,13 @@ INSERT INTO `activity` (`activity_id`, `user_id`, `action`, `details`, `type`, `
 (53, 1, 'Update', 'BSIT 3D - Group 2', 'schedule', '2024-07-18 20:02:22'),
 (54, 1, 'Delete', '1', 'schedule', '2024-07-18 20:06:30'),
 (55, 1, 'Add', 'BSIT 3D - Group 2', 'schedule', '2024-07-18 20:06:57'),
-(56, 1, 'Update', 'BSIT 3D - Group 2', 'schedule', '2024-07-18 20:07:14');
+(56, 1, 'Update', 'BSIT 3D - Group 2', 'schedule', '2024-07-18 20:07:14'),
+(57, 1, 'Add', 'Lab1', 'room', '2024-07-19 12:48:02'),
+(58, 1, 'Add', 'test, test test', 'instructor', '2024-07-19 23:10:55'),
+(59, 1, 'Delete', '1', 'instructor', '2024-07-19 23:11:00'),
+(60, 1, 'Delete', '1', 'section', '2024-07-24 21:47:03'),
+(61, 1, 'Add', 'BSIT 3D - Group 1', 'schedule', '2024-07-25 11:37:33'),
+(62, 1, 'Update', 'BSIT 3D - Group 1', 'schedule', '2024-07-25 11:37:57');
 
 -- --------------------------------------------------------
 
@@ -107,7 +113,8 @@ CREATE TABLE `rooms` (
 
 INSERT INTO `rooms` (`room_id`, `room_type`, `room_name`, `room_tags`) VALUES
 (28, 'Lecture', 'RM201', 'Second Floor'),
-(29, 'Laboratory', 'MML', 'Multi Media Laboratory');
+(29, 'Laboratory', 'MML', 'Multi Media Laboratory'),
+(31, 'Laboratory', 'Lab1', '');
 
 -- --------------------------------------------------------
 
@@ -142,7 +149,8 @@ INSERT INTO `schedules` (`schedule_id`, `instructor`, `subject`, `section_name`,
 (57, 'Clyde  Mondero', 'System Analysis and Design', 'BSIT 3D', 'Group 2', 'Laboratory', 'RM201', '#f0b7e5', 'Friday', '07:00:00', '10:00:00', 1),
 (58, 'Erick  Caleja', 'Object Oriented Programming', 'BSIT 3D', 'Group 2', 'Lecture', 'RM201', '#ffffff', 'Thursday', '07:00:00', '09:00:00', 1),
 (61, 'Erick  Caleja', 'Object Oriented Programming', 'BSIT 3D', 'Group 2', 'Laboratory', 'MML', '#ffffff', 'Tuesday', '08:00:00', '11:00:00', 1),
-(62, 'Albert  Junio', 'Web Development', 'BSIT 3D', 'Group 2', 'Lecture', 'RM201', '#b1fbb3', 'Monday', '07:00:00', '09:00:00', 1);
+(62, 'Albert  Junio', 'Web Development', 'BSIT 3D', 'Group 2', 'Lecture', 'RM201', '#b1fbb3', 'Monday', '07:00:00', '09:00:00', 1),
+(63, 'Clyde  Mondero', 'Quality Assurance', 'BSIT 3D', 'Group 1', 'Lecture', 'RM201', '#e78ced', 'Monday', '09:00:00', '11:00:00', 1);
 
 -- --------------------------------------------------------
 
@@ -167,7 +175,6 @@ CREATE TABLE `sections` (
 INSERT INTO `sections` (`section_id`, `section_name`, `section_group`, `year_lvl`, `number_of_students`, `section_tags`, `creator_id`) VALUES
 (4, 'BSIT 3D', 'Group 2', '3rd Year', 23, '', 1),
 (11, 'BSIT 3D', 'Group 1', '3rd Year', 17, '', 1),
-(12, 'BSIT 1A', 'Group 2', '1st Year', 20, '', 1),
 (13, 'BSIT 1A', 'Group 1', '1st Year', 25, '', 1);
 
 -- --------------------------------------------------------
@@ -206,6 +213,7 @@ INSERT INTO `subjects` (`subject_id`, `subject_name`, `subject_code`, `year_lvl`
 
 CREATE TABLE `users` (
   `user_id` int(11) NOT NULL,
+  `username` varchar(20) NOT NULL,
   `email` varchar(50) NOT NULL,
   `password` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -214,9 +222,9 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `email`, `password`) VALUES
-(1, 'sample@gmail.com', 'sample123'),
-(2, 'test@gmail.com', 'test12345');
+INSERT INTO `users` (`user_id`, `username`, `email`, `password`) VALUES
+(1, 'sample', 'sample@gmail.com', 'sample123'),
+(2, 'test', 'test@gmail.com', 'test12345');
 
 --
 -- Indexes for dumped tables
@@ -272,25 +280,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity`
 --
 ALTER TABLE `activity`
-  MODIFY `activity_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `activity_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT for table `instructors`
 --
 ALTER TABLE `instructors`
-  MODIFY `instructor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `instructor_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `rooms`
 --
 ALTER TABLE `rooms`
-  MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `schedules`
 --
 ALTER TABLE `schedules`
-  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `sections`
