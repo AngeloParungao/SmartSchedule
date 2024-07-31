@@ -3,8 +3,7 @@
 
 .activity-log-container{
     height: 100vh;
-    width: calc(100vw - 6rem);
-    margin-left: 6rem;
+    width: 100%;
     font-family: 'Poppins', serif;
     background-color: var(--background-color);
 }
@@ -18,6 +17,7 @@
     height: 5rem;
     border-bottom: 0.1rem solid gray;
     color: var(--text-color);
+    margin-left: 6rem;
 }
 
 .activity-log {
@@ -28,7 +28,7 @@
   overflow-y: auto;
 }
 
-  
+
 .activity-log-wrapper {
   display: flex;
   flex-direction: column;
@@ -36,6 +36,7 @@
   width: 70%;
   border-radius: 0.5rem ;
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.35);
+  margin-left: 6rem;  
 }
 
 .list-header{
@@ -117,6 +118,7 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  gap: 1rem;
   padding: 0 1rem;
 }
 
@@ -127,4 +129,51 @@
 .activity-log-timestamp{
   font-size: 0.75rem;
   opacity: 0.5;
+}
+
+@media screen and (max-width: 600px) {
+  .activity-log-header{
+    height: 4rem;
+    margin-left: 0;
+  }
+  
+  .activity-log-header span{
+    font-weight: 400;
+    margin-left: 1.5rem;
+  }
+
+  .activity-log-wrapper {
+    width: 80%;
+    margin-left: 0;  
+  }
+
+  .date-label{
+    font-size: 0.7rem;
+    border: none;
+    color: gray;
+    border-radius: 0.3rem;
+    margin-left: 1rem;
+  }
+  
+  .date{
+    font-size: 0.6rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.3rem;
+    margin-left: 0.5rem;
+  }
+
+  .activity-log-action{
+    display: flex;
+    width: 100%;
+    font-size: 0.75rem;
+  }
+
+  .activity-log-timestamp{
+    display: flex;
+    justify-content: flex-end;
+    width: 25%;
+    font-size: 0.6rem;
+    opacity: 0.5;
+  }
 }

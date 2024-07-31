@@ -5,17 +5,18 @@
     justify-content: space-between;
     align-items: center;
     height: 5rem;
-    width: calc(100vw - 6rem);
-    margin-left: 6rem;
+    width: 100%;
     padding: 2rem;
     font-family: 'Poppins', serif;
     border-bottom: 0.1rem solid gray;
     background-color: var(--background-color);
 }
 
-span{
+.navbar span{
     font-size: 2rem;
     font-weight: 400;
+    padding-left: 1.5rem;
+    margin-left: 5rem;
     color: var(--text-color);
 }
 
@@ -36,4 +37,18 @@ span{
     color: var(--active);
     border-bottom: 0.2rem solid var(--active);
     background-color: var(--background-color);
+}
+
+@media screen and (max-width: 600px) {
+    .navbar{
+        height: 4rem;
+    }
+
+    .navbar span{
+        margin-left: 0;
+    }
+
+    .navigation{
+        display: none;
+    }
 }

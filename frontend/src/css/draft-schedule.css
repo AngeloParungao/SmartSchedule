@@ -2,8 +2,7 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-    width: calc(100vw - 6rem);
-    margin-left: 6rem;
+    width: 100%;
     font-family: 'Poppins', serif;
     background-color: var(--background-color);
 }
@@ -14,7 +13,8 @@
     padding-left: 2rem;
     font-size: 2rem;
     font-weight: 400;
-    height: 6.8rem;
+    height: 6.5rem;
+    margin-left: 6rem;
     border-bottom: 0.1rem solid gray;
     color: var(--text-color);
 }
@@ -24,6 +24,7 @@
     flex-direction: column;
     justify-content: center;
     height: 15%;
+    margin-left: 6rem;
 }
 
 .category-selector{
@@ -67,4 +68,54 @@
     color: #004085;
 }
 
+@media screen and (max-width: 600px) {
+    .draft-header{
+        font-weight: 400;
+        margin-left: 1.5rem;
+        height: 4rem;
+    }
 
+    .draft-controls {
+        margin-left: 0;
+    }
+    
+    .category-selector{
+        gap: 0.5rem;
+        padding: 0.3rem 2rem;
+        color: var(--text-color);
+    }
+    
+    .category-selector label{
+        font-size: 0.65rem;
+    }
+    
+    .draft-dropdown {
+        font-size: 0.55rem;
+        padding: 0.3rem;
+    }
+
+    .draft-buttons{
+        flex-direction: column;
+        margin-top: -2.5rem;
+        right: 1rem;
+        gap: 0.5rem;
+    }
+    
+    .draft-buttons button{
+        font-size: 0.6rem;
+        padding: 0.4rem 0.6rem;
+        border-radius:0.5rem; 
+        border: none;
+        cursor: pointer;
+    }
+    
+    .print {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .print-all {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+  }

@@ -1,7 +1,6 @@
 .settings-container{
     height: 100vh;
-    width: calc(100vw - 6rem);
-    margin-left: 6rem;
+    width: 100%;
     background-color: var(--background-color);
     font-family: 'Poppins', serif;
 }
@@ -10,6 +9,7 @@
   display: flex;
   align-items: center;
   padding-left: 2rem;
+  margin-left: 6rem;
   font-size: 2rem;
   font-weight: 400;
   height: 5rem;
@@ -21,7 +21,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 4rem;
+  margin-left: 6rem;
+  padding: 0.5rem;
+  gap: 2rem;
   height: calc(100% - 5rem);
 }
 
@@ -112,3 +114,51 @@
   .color-circle.black { background-color: #686868; }
   .color-circle.red { background-color: rgb(202, 102, 102) }
   .color-circle.green { background-color: rgb(85, 129, 85)}
+
+  @media screen and (max-width: 600px) {
+    .setting-header{
+        font-weight: 400;
+        margin-left: 0rem;
+        padding-left: 3.5rem;
+        height: 4rem;
+    }
+
+    .setting-content{
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-left: 0rem;
+      height: calc(100% - 4rem);
+    }
+
+    .settings-card, .user-preference-card {
+      background: #f0f0f0;
+      border-radius: 0.8rem;
+      padding: 2rem;
+      width: 18rem;
+      height: 17rem;
+      box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.35);
+    }
+
+    .settings-card h3, .user-preference-card h3 {
+      text-align: center;
+      background: #c0d7e8;
+      padding: 0.7rem;
+      border-radius: 10px 10px 0 0;
+      margin: -2rem -2rem -0.3rem -2rem;
+    }
+
+
+    .color-options {
+      display: flex;
+      justify-content: space-around;
+      margin: 0.75rem 0;
+    }
+    
+    .color-circle {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+  }

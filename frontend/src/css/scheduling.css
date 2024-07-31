@@ -6,8 +6,7 @@
     justify-content: space-around;
     font-family: 'Poppins', serif;
     height: calc(100vh - 5rem);
-    width: calc(100vw - 6rem);
-    margin-left: 6rem;
+    width: 100%;
     padding: 0.3rem;
     background-color: var(--background-color);
 }
@@ -17,6 +16,7 @@
     align-items: center;
     justify-content: space-between;
     height: 10%;
+    margin-left: 6rem
   }
 
   .controls div{
@@ -70,6 +70,7 @@
     justify-content: center;
     align-items: center;
     height: 100%;
+    margin-left: 6rem;
   }
   
   .timetable table {
@@ -102,22 +103,22 @@
   }
 
   .instructor-name{
-    font-size: 0.9rem;
+    font-size: 0.7rem;
     font-weight: 600;
   }
 
   .section-name{
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     font-weight: 500;
   }
 
   .subject-name{
-    font-size: 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 600;
   }
 
   .room-name{
     font-size: 0.65rem;
-    font-style: italic;
   }
 
   .actions {
@@ -127,15 +128,140 @@
     padding: 0 1.5rem;
   }
 
-  .discard-changes-btn,
-  .apply-changes-btn {
-    padding: 0.8rem 1.5rem;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
+  @media screen and (max-width: 600px) {
+
+    .scheduling-container{
+      height: calc(100vh - 4.05rem);
+      padding: 0;
+    }
+
+    .controls {
+      margin-left: 0rem;
+    }
+
+    .controls div{
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem;
+      color: var(--text-color);
+    }
+
+    .controls div label{
+      font-size: 0.7rem;
+    }
+    
+    .section-dropdown {
+      font-size: 0.6rem;
+      padding: 0.3rem;
+      border-radius: 0.5rem;
+    }
+  
+    .group-dropdown {
+      font-size: 0.6rem;
+      padding: 0.3rem;
+      border-radius: 0.5rem;
+    }
+
+    .scheduling-btns{
+      display: flex;
+      flex-direction: column;
+      margin-right: 1rem;
+    }
+
+    .add-item-btn,
+    .edit-item-btn,
+    .delete-item-btn {
+      font-size: 0.63rem;
+      padding: 0.25rem 0.35rem;
+      border-radius:0.25rem; 
+      border: none;
+      cursor: pointer;
+    }
+
+    .timetable{
+      height: 30rem;
+      width: 100%;
+      margin-left: 0;
+    }
+    
+    .timetable table {
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+      
+    .timetable th,
+    .timetable td   {
+      border: 1px solid #a5a5a5;
+      text-align: center;
+    }
+    
+    .timetable th {
+      font-size: 0.55rem;
+      font-weight: 500;
+      padding: 0.1rem;
+      color: var(--text-color);
+      background-color: var(--background-color);
+    }
+  
+    .time{
+      font-size: 0.3rem;
+      color: var(--text-color);
+    }
+
+    .section-name{
+      font-size: 0.45rem;
+      font-weight: 500;
+    }
+    
+    .subject-name{
+      font-size: 0.55rem;
+      font-weight: 600;
+    }
+
+    .instructor-name{
+      font-size: 0.45rem;
+      font-weight: 600;
+    }
+  
+    .room-name{
+      font-size: 0.4rem;
+    }
   }
 
+  @media screen and (max-width: 400px) {
 
+    .controls div label{
+      font-size: 0.45rem;
+    }
+
+    .section-dropdown {
+      font-size: 0.5rem;
+      padding: 0.3rem;
+      border-radius: 0.5rem;
+    }
+  
+    .group-dropdown {
+      font-size: 0.5rem;
+      padding: 0.3rem;
+      border-radius: 0.5rem;
+    }
+
+    .add-item-btn,
+    .edit-item-btn,
+    .delete-item-btn {
+      font-size: 0.5rem;
+      padding: 0.25rem 0.35rem;
+      border-radius:0.25rem; 
+      border: none;
+      cursor: pointer;
+    }
+
+    .time{
+      font-size: 0.2rem;
+      color: var(--text-color);
+    }
+  }
 
   /* Add Modal styling */
 .modal {
@@ -146,6 +272,7 @@
   justify-content: center;
   align-items: center;
   font-family: 'Poppins', serif;
+  z-index: 10;
   animation: slide-up 0.5s ease-in-out forwards;
 }
 

@@ -377,9 +377,9 @@ function Draft() {
                                             <td key={`${time.startTime}-${day}`} rowSpan={rowSpan} style={{ backgroundColor: scheduleItem?.background_color }} className='sched'>
                                                 {scheduleItem && (
                                                     <>
+                                                        <div className='subject-name'>{scheduleItem.subject}</div>
                                                         <div className='instructor-name'>{scheduleItem.instructor}</div>
                                                         {category === 'instructor' && <div className='section-name'>{`${scheduleItem.section_name} - ${scheduleItem.section_group.slice(0,1)}${scheduleItem.section_group.slice(6,7)}`}</div>}
-                                                        <div className='subject-name'>{scheduleItem.subject}</div>
                                                         <div className='room-name'>({scheduleItem.room})</div>
                                                     </>
                                                 )}

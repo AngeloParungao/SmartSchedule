@@ -1,7 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
 
 .sidebar{
-    position: absolute  ;
+    position: fixed;
+    top: 0;
     display: flex;
     flex-direction: column;
     align-items:center;
@@ -9,6 +10,17 @@
     height: 100vh;
     width: 6rem;
     background-color: #343B46;
+    z-index: 1;
+    transition: 0.5s ease-in-out;
+}
+
+.sidebar-action{
+    display: none;
+    transition: 0.1s ease-out;
+}
+
+#x-mark{
+    display: none;
 }
 
 .center-navigation{
@@ -34,7 +46,7 @@
     font-size: 1rem;
     text-decoration: none;
     height: 4rem;
-    width: 6rem;
+    width: 100%;
     transition: all 0.2s ease-in-out;
     cursor: pointer;
 }
@@ -101,4 +113,45 @@
     font-size: 2.5rem;
     font-weight: 600;
     text-transform: uppercase;
+}
+
+@media screen and (max-width: 600px) {
+
+    .sidebar-action{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        left: 4rem;
+        height: 4rem;
+        width: 3.5rem;
+    }
+    
+    .side-logo img{
+        margin-top: 1rem;
+        height: 4rem;
+    }
+
+    .sidebar{
+        margin-left: -4rem;
+        width: 4rem;
+    }
+
+    .side-icon{
+        height: 1.1rem;
+    }
+
+    .profile div{
+        height: 2.5rem;
+        width: 2.5rem;
+        border-radius: 0.4rem;
+        border: 0.15rem solid white;
+    }
+    
+    .initial{
+        color: white;
+        font-size: 2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
 }

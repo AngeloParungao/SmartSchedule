@@ -1,11 +1,9 @@
-// src/components/ActivityLog.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Sidebar from '../assets/components/sidebar';
 import "../css/activityLogs.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faUser, faChalkboardTeacher, faBook, faDoorClosed, faCalendar } from '@fortawesome/free-solid-svg-icons';
-import { json } from 'react-router-dom';
 
 function ActivityLog() {
   const [activity, setActivity] = useState([]);
@@ -59,35 +57,35 @@ function ActivityLog() {
   const getActionMessage = (log) => {
     switch (log.action) {
       case 'Add':
-        if(log.type === "instructor"){
+        if (log.type === "instructor") {
           return `${log.details} has been added to ${log.type}`;
         }
-        else if(log.type === "section"){
+        else if (log.type === "section") {
           return `Section ${log.details} has been created`;
         }
-        else if(log.type === "subject"){
+        else if (log.type === "subject") {
           return `${log.details} has been added to ${log.type}`;
         }
-        else if(log.type === "room"){
+        else if (log.type === "room") {
           return `${log.details} has been added to ${log.type}`;
         }
-        else if(log.type === "schedule"){
+        else if (log.type === "schedule") {
           return `Schedule added for ${log.details}`;
         }
       case 'Update':
-        if(log.type === "instructor"){
+        if (log.type === "instructor") {
           return `Instructor ${log.details} has been updated`;
         }
-        else if(log.type === "section"){
+        else if (log.type === "section") {
           return `Section ${log.details} has been updated`;
         }
-        else if(log.type === "subject"){
+        else if (log.type === "subject") {
           return `Subject ${log.details} has been updated`;
         }
-        else if(log.type === "room"){
+        else if (log.type === "room") {
           return `Room ${log.details} has been updated`;
         }
-        else if(log.type === "schedule"){
+        else if (log.type === "schedule") {
           return `Schedule added for ${log.details}`;
         }
       case 'Delete':
@@ -105,12 +103,17 @@ function ActivityLog() {
     ? activity.filter(log => new Date(log.timestamp).toISOString().split('T')[0] === selectedDate)
     : activity;
 
+  // Sort the filteredActivity by timestamp in descending order
+  const sortedActivity = filteredActivity.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
   return (
     <div>
       <Sidebar />
       <div className="activity-log-container">
         <div className="activity-log-header">
-          Activity Logs
+          <span>
+            Activity Logs
+          </span>
         </div>
         <div className="activity-log">
           <div className='activity-log-wrapper'>
@@ -122,7 +125,7 @@ function ActivityLog() {
               </div>
             </div>
             <div className='list'>
-              {filteredActivity.map((log, index) => (
+              {sortedActivity.map((log, index) => (
                 <div
                   key={index}
                   className="activity-log-item"

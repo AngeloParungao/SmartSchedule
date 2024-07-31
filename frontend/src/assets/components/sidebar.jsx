@@ -5,7 +5,7 @@ import axios from 'axios';
 import '../../css/sidebar.css';
 import logo from '../images/logo_white_no_bg 2.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome , faNoteSticky,faCalendar , faBell, faGear, faRightFromBracket} from '@fortawesome/free-solid-svg-icons';
+import { faBars, faXmark, faHome , faNoteSticky, faCalendar , faBell, faGear, faRightFromBracket} from '@fortawesome/free-solid-svg-icons';
 
 function Sidebar(){
     const [user, setUsers] = useState([]);
@@ -23,6 +23,25 @@ function Sidebar(){
             });
         });
 
+    const showSidebar = () =>{
+        document.querySelector('.sidebar-action').style.marginLeft = '0';
+        document.querySelector('.sidebar-action').style.backgroundColor = '#343B46';
+        document.querySelector('.sidebar-action').style.borderTopRightRadius = '1rem';
+        document.querySelector('.sidebar-action').style.borderBottomRightRadius = '1rem';
+        document.getElementById('bars').style.display = 'none';
+        document.getElementById('x-mark').style.display = 'block';
+        document.querySelector('.sidebar').style.marginLeft = '0';
+    }
+
+    const closeSidebar = () =>{
+        document.querySelector('.sidebar-action').style.marginLeft = '0';
+        document.querySelector('.sidebar-action').style.backgroundColor = 'transparent';
+        document.querySelector('.sidebar-action').style.borderRadius = '0';
+        document.getElementById('bars').style.display = 'block';
+        document.getElementById('x-mark').style.display = 'none';
+        document.querySelector('.sidebar').style.marginLeft = '-4rem';
+    }
+
     const logout = () =>{
         toast.success("Logging Out");
         setTimeout(() => {
@@ -34,6 +53,10 @@ function Sidebar(){
     return(
         <div className='sidebar'>
             <Toaster position="bottom-right" reverseOrder={false} />
+            <div className='sidebar-action'>
+                <FontAwesomeIcon icon={faBars} className='side-icon' id='bars' onClick={showSidebar}/>
+                <FontAwesomeIcon icon={faXmark} className='side-icon' id='x-mark' onClick={closeSidebar}/>
+            </div>
             <div className='side-logo'>
                 <img src={logo} alt="" />
             </div>
