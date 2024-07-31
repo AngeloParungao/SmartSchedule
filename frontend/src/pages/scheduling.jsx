@@ -187,7 +187,7 @@ function Scheduling() {
             })}
             </select>
           </div>
-          <div>
+          <div className='scheduling-btns'>
             <button className="add-item-btn" onClick={handleAddItemClick}>Add Item</button>
             <button className="edit-item-btn" onClick={handleUpdateItemClick}>Edit Item</button>
             <button className="delete-item-btn" onClick={handleDeleteItemClick}>Delete Item</button>
@@ -208,7 +208,7 @@ function Scheduling() {
                 <tr key={time.startTime}>
                   <td>
                     <span className='time'>
-                      {time.startTime.slice(0,2) % 12 || 12}:{time.startTime.slice(3,5)} {time.startTime.slice(0, 2)>12? " PM" :  ' AM'} - {time.endTime.slice(0, 2) % 12 || 12}:{time.endTime.slice(3,5)} {time.endTime.slice(0, 2) < 12 ? " AM" : " PM"}
+                      {time.startTime.slice(0,2) % 12 || 12}:{time.startTime.slice(3,5)} {time.startTime.slice(0, 2)>12? "PM" :  'AM'} - {time.endTime.slice(0, 2) % 12 || 12}:{time.endTime.slice(3,5)} {time.endTime.slice(0, 2) < 12 ? "AM" : "PM"}
                     </span>
                   </td>
                   {daysOfWeek.map((day, dayIndex) => {
@@ -238,8 +238,8 @@ function Scheduling() {
                       <td key={`${time.startTime}-${day}`} rowSpan={rowSpan} style={{ backgroundColor: scheduleItem?.background_color }} className='sched'>
                         {scheduleItem && (
                           <>
-                            <div className='instructor-name'>{scheduleItem.instructor}</div>
                             <div className='subject-name'>{scheduleItem.subject}</div>
+                            <div className='instructor-name'>{scheduleItem.instructor}</div>
                             <div className='room-name'>({scheduleItem.room})</div>
                           </>
                         )}
@@ -286,6 +286,24 @@ function Scheduling() {
 }
 
 function UpdateItemModal({ onClose, schedules, onEditItemClick }) {
+   // Define the order of days
+   const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+   // Function to get the index of the day
+   const getDayIndex = (day) => {
+     return daysOrder.indexOf(day);
+   };
+ 
+   // Sort schedules by day and then by start time
+   const sortedSchedules = [...schedules].sort((a, b) => {
+     const dayComparison = getDayIndex(a.day) - getDayIndex(b.day);
+     if (dayComparison !== 0) {
+       return dayComparison;
+     }
+     // Compare by start time if days are the same
+     return a.start_time.localeCompare(b.start_time);
+   });
+
   return (
     <div className="update-screen">
       <div className="update-container">
@@ -296,7 +314,7 @@ function UpdateItemModal({ onClose, schedules, onEditItemClick }) {
           </button>
         </div>
         <div className="update-body">
-          {schedules.map(schedule => (
+          {sortedSchedules.map(schedule => (
             <div
               key={schedule.schedule_id}
               className="schedule-item"
