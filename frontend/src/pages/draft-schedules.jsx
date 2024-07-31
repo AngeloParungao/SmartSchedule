@@ -256,7 +256,7 @@ function Draft() {
             <Sidebar />
             <div className='draft-container'>
                 <div className='draft-header'>
-                    <span>Drafts Schedules</span>
+                    <span>Draft Schedules</span>
                 </div>
                 <div className="draft-controls">
                     <div className="category-selector">
