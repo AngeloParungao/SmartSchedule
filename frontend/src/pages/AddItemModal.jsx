@@ -4,14 +4,29 @@ import { toast } from 'react-hot-toast';
 import ReactPaginate from 'react-paginate';
 import '../css/scheduling.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleLeft, faAngleRight, faWarning, faLightbulb, faUser, faDoorOpen, faBook, faSearch, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faAngleLeft, 
+  faAngleRight, 
+  faWarning, 
+  faLightbulb, 
+  faUser, 
+  faDoorOpen, 
+  faBook, 
+  faSearch, 
+  faXmark 
+} from '@fortawesome/free-solid-svg-icons';
+
+
 
 function AddItemModal({ onClose, section, group, onItemAdded }) {
+  // State variables to manage schedules, instructors, subjects, sections, and rooms data
   const [schedules, setSchedules] = useState([]);
   const [instructors, setInstructors] = useState([]);
   const [subjects, setSubjects] = useState([]);
+  const [sections, setSections] = useState([]);
   const [rooms, setRooms] = useState([]);
 
+  // State variables for the form fields
   const [subjectName, setSubjectName] = useState('');
   const [instructorName, setInstructorName] = useState('');
   const [roomName, setRoomName] = useState('');
@@ -21,11 +36,13 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
   const [endTime, setEndTime] = useState('');
   const [courseType, setCourseType] = useState('Lecture');
 
+  // Pagination state for instructors, subjects, and rooms
   const [currentInstructorPage, setCurrentInstructorPage] = useState(0);
   const [currentSubjectPage, setCurrentSubjectPage] = useState(0);
   const [currentRoomPage, setCurrentRoomPage] = useState(0);
   const itemsPerPage = 5;
 
+  // State variables for error handling
   const [instructorError, setInstructorError] = useState(false);
   const [roomError, setRoomError] = useState(false);
   const [courseError, setCourseError] = useState(false);
@@ -33,24 +50,29 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
   const [timeError, setTimeError] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
 
+  // Fetch the current user ID from local storage
   const currentUser = JSON.parse(localStorage.getItem('userId'));
 
+  // Fetch data when the component mounts
   useEffect(() => {
     fetchSchedules();
     fetchInstructors();
+    fetchSections();
     fetchSubjects();
     fetchRooms();
   }, []);
 
+  // Generate recommendations whenever relevant fields change
   useEffect(() => {
     generateRecommendations(schedules);
   }, [instructorName, subjectName, roomName, courseType, meetingDay]);
-  
 
+  // Check for real-time errors whenever relevant fields change
   useEffect(() => {
     checkRealTimeErrors();
   }, [instructorName, subjectName, roomName, meetingDay, startTime, endTime, courseType]);
 
+  // Fetch schedules from the API
   const fetchSchedules = async () => {
     try {
       const response = await axios.get(`http://localhost:8082/api/schedule/fetch?creator_id=${currentUser}`);
@@ -61,6 +83,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
     }
   };
 
+  // Fetch instructors from the API
   const fetchInstructors = async () => {
     try {
       const response = await axios.get(`http://localhost:8082/api/instructors/fetch?creator_id=${currentUser}`);
@@ -71,6 +94,18 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
     }
   };
 
+  // Fetch sections from the API
+  const fetchSections = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8082/api/sections/fetch?creator_id=${currentUser}`);
+      setSections(response.data);
+    } catch (error) {
+      console.error('Error fetching sections:', error);
+      toast.error('Failed to fetch sections');
+    }
+  };
+
+  // Fetch subjects from the API
   const fetchSubjects = async () => {
     try {
       const response = await axios.get(`http://localhost:8082/api/subjects/fetch?creator_id=${currentUser}`);
@@ -81,6 +116,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
     }
   };
 
+  // Fetch rooms from the API
   const fetchRooms = async () => {
     try {
       const response = await axios.get('http://localhost:8082/api/rooms/fetch');
@@ -91,189 +127,245 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
     }
   };
 
+  // Generate recommendations based on availability of instructors, rooms, and sections
   const generateRecommendations = (schedules) => {
-      if (!instructorName || !roomName) {
-        setRecommendations([]); // Clear recommendations if instructor or room is not selected
+    if (!instructorName || !roomName) {
+      setRecommendations([]);
+      return;
+    }
+
+    const subject = subjects.find(subject => subject.subject_name === subjectName);
+    const duration = courseType === 'Laboratory' || (subject && subject.subject_type === 'Minor') ? 3 : 2;
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const availableSlots = [];
+
+    days.forEach(day => {
+      if (meetingDay && meetingDay !== day) {
         return;
       }
-    
-      const duration = courseType === 'Lecture' ? 2 : 3;
-      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      const availableSlots = [];
-    
-      days.forEach(day => {
 
-        if (meetingDay && meetingDay !== day) {
-          return;
-        }
+      for (let hour = 7; hour <= 20 - duration; hour++) {
+        const start = `${hour.toString().padStart(2, '0')}:00:00`;
+        const end = `${(hour + duration).toString().padStart(2, '0')}:00:00`;
 
+        const instructorAvailable = !schedules.some(schedule =>
+          schedule.instructor === instructorName &&
+          schedule.day === day &&
+          (
+            (start >= schedule.start_time && start < schedule.end_time) ||
+            (end > schedule.start_time && end <= schedule.end_time) ||
+            (start <= schedule.start_time && end >= schedule.end_time)
+          )
+        );
 
-        for (let hour = 7; hour <= 20 - duration; hour++) {
-          const start = `${hour.toString().padStart(2, '0')}:00:00`;
-          const end = `${(hour + duration).toString().padStart(2, '0')}:00:00`;
-    
-          const instructorAvailable = !schedules.some(schedule =>
-            schedule.instructor === instructorName &&
-            schedule.day === day &&
-            (
-              (start >= schedule.start_time && start < schedule.end_time) ||
-              (end > schedule.start_time && end <= schedule.end_time) ||
-              (start <= schedule.start_time && end >= schedule.end_time)
-            )
-          );
-    
-          const roomAvailable = !schedules.some(schedule =>
-            schedule.room === roomName &&
-            schedule.day === day &&
-            (
-              (start >= schedule.start_time && start < schedule.end_time) ||
-              (end > schedule.start_time && end <= schedule.end_time) ||
-              (start <= schedule.start_time && end >= schedule.end_time)
-            )
-          );
-    
-          const sectionAvailable = !schedules.some(schedule =>
-            schedule.section_name === section &&
-            schedule.section_group === group &&
-            schedule.day === day &&
-            (
-              (start >= schedule.start_time && start < schedule.end_time) ||
-              (end > schedule.start_time && end <= schedule.end_time) ||
-              (start <= schedule.start_time && end >= schedule.end_time)
-            )
-          );
-    
-          if (instructorAvailable && roomAvailable && sectionAvailable) {
-              availableSlots.push({ day, start, end });
-          }
-        }
-      });
-    
-      setRecommendations(availableSlots);
-    };
-      
-  
-    const checkRealTimeErrors = () => {
-      const timeConflict = (schedule) => {
-        const newStartTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
-        const newEndTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
-        const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
-        const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
-    
-        // Check if the schedule matches the selected section and group
-        if (
+        const roomAvailable = !schedules.some(schedule =>
+          schedule.room === roomName &&
+          schedule.day === day &&
+          (
+            (start >= schedule.start_time && start < schedule.end_time) ||
+            (end > schedule.start_time && end <= schedule.end_time) ||
+            (start <= schedule.start_time && end >= schedule.end_time)
+          )
+        );
+
+        const sectionAvailable = !schedules.some(schedule =>
           schedule.section_name === section &&
           schedule.section_group === group &&
-          schedule.day === meetingDay
-        ) {
-          return (
-            (newStartTimeInMinutes >= start && newStartTimeInMinutes < end) ||
-            (newEndTimeInMinutes > start && newEndTimeInMinutes <= end) ||
-            (newStartTimeInMinutes <= start && newEndTimeInMinutes >= end)
-          );
+          schedule.day === day &&
+          (
+            (start >= schedule.start_time && start < schedule.end_time) ||
+            (end > schedule.start_time && end <= schedule.end_time) ||
+            (start <= schedule.start_time && end >= schedule.end_time)
+          )
+        );
+
+        const subject = subjects.find(subject => subject.subject_name === subjectName);
+        const alternateGroupAvailable = subject && subject.subject_type === 'Minor' ? 
+          !schedules.some(schedule =>
+            schedule.section_name === section &&
+            schedule.section_group === (group === 'Group 1' ? 'Group 2' : 'Group 1') &&
+            schedule.day === day &&
+            (
+              (start >= schedule.start_time && start < schedule.end_time) ||
+              (end > schedule.start_time && end <= schedule.end_time) ||
+              (start <= schedule.start_time && end >= schedule.end_time)
+            )
+          ) : true;
+
+        const bothSectionAndAlternateGroupAvailable = subject && subject.subject_type === 'Minor' ? 
+          (sectionAvailable && alternateGroupAvailable) : 
+          sectionAvailable;
+
+        if (instructorAvailable && roomAvailable && bothSectionAndAlternateGroupAvailable) {
+          availableSlots.push({ day, start, end });
         }
-        return false;
-      };
-    
-      const hasTimeConflict = schedules.some(timeConflict);
-      setTimeError(hasTimeConflict);
-    
-      const instructorAvailability = schedules.some(schedule =>
-        schedule.instructor === instructorName &&
-        schedule.day === meetingDay &&
-        (
-          (startTime >= schedule.start_time && startTime < schedule.end_time) ||
-          (endTime > schedule.start_time && endTime <= schedule.end_time) ||
-          (startTime <= schedule.start_time && endTime >= schedule.end_time)
-        )
-      );
-      setInstructorError(instructorAvailability);
-    
-      const roomAvailability = schedules.some(schedule =>
-        schedule.room === roomName &&
-        schedule.day === meetingDay &&
-        (
-          (startTime >= schedule.start_time && startTime < schedule.end_time) ||
-          (endTime > schedule.start_time && endTime <= schedule.end_time) ||
-          (startTime <= schedule.start_time && endTime >= schedule.end_time)
-        )
-      );
-      setRoomError(roomAvailability);
-    
-      const startTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
-      const endTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
-      const newDuration = (endTimeInMinutes - startTimeInMinutes) / 60;
-    
-      const subjectSectionSchedules = schedules.filter(schedule =>
-        schedule.subject === subjectName &&
+      }
+    });
+
+    setRecommendations(availableSlots);
+  };
+
+  // Check for real-time errors based on the current schedules and form inputs
+  const checkRealTimeErrors = () => {
+    const timeConflict = (schedule) => {
+      const newStartTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
+      const newEndTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
+      const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
+      const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
+
+      // Check if the schedule matches the selected section and group
+      if (
         schedule.section_name === section &&
-        schedule.section_group === group
-      );
-    
-      const totalHours = subjectSectionSchedules.reduce((sum, schedule) => {
-        const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
-        const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
-        return sum + (end - start) / 60;
-      }, 0);
-    
-      const numberOfMeetings = subjectSectionSchedules.length;
-    
-      const exceedsLimits = totalHours + newDuration > 5 || numberOfMeetings >= 2;
-      setSubjectError(exceedsLimits);
-    
-      const hasLecture = subjectSectionSchedules.some(schedule => schedule.class_type === 'Lecture');
-      const hasLaboratory = subjectSectionSchedules.some(schedule => schedule.class_type === 'Laboratory');
-    
-      const alreadyExists = (courseType === 'Lecture' && hasLecture) || (courseType === 'Laboratory' && hasLaboratory);
-      setCourseError(alreadyExists);
+        schedule.section_group === group &&
+        schedule.day === meetingDay
+      ) {
+        return (
+          (newStartTimeInMinutes >= start && newStartTimeInMinutes < end) ||
+          (newEndTimeInMinutes > start && newEndTimeInMinutes <= end) ||
+          (newStartTimeInMinutes <= start && newEndTimeInMinutes >= end)
+        );
+      }
+      return false;
     };
-      
-      
+
+    const hasTimeConflict = schedules.some(timeConflict);
+    setTimeError(hasTimeConflict);
+
+    const instructorAvailability = schedules.some(schedule =>
+      schedule.instructor === instructorName &&
+      schedule.day === meetingDay &&
+      (
+        (startTime >= schedule.start_time && startTime < schedule.end_time) ||
+        (endTime > schedule.start_time && endTime <= schedule.end_time) ||
+        (startTime <= schedule.start_time && endTime >= schedule.end_time)
+      )
+    );
+    setInstructorError(instructorAvailability);
+
+    const roomAvailability = schedules.some(schedule =>
+      schedule.room === roomName &&
+      schedule.day === meetingDay &&
+      (
+        (startTime >= schedule.start_time && startTime < schedule.end_time) ||
+        (endTime > schedule.start_time && endTime <= schedule.end_time) ||
+        (startTime <= schedule.start_time && endTime >= schedule.end_time)
+      )
+    );
+    setRoomError(roomAvailability);
+
+    const startTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
+    const endTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
+    const newDuration = (endTimeInMinutes - startTimeInMinutes) / 60;
+  
+    const subjectSectionSchedules = schedules.filter(schedule =>
+      schedule.subject === subjectName &&
+      schedule.section_name === section &&
+      schedule.section_group === group
+    );
+  
+    const totalHours = subjectSectionSchedules.reduce((sum, schedule) => {
+      const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
+      const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
+      return sum + (end - start) / 60;
+    }, 0);
+  
+    const numberOfMeetings = subjectSectionSchedules.length;
+  
+    const exceedsLimits = totalHours + newDuration > 5 || numberOfMeetings >= 2;
+    setSubjectError(exceedsLimits);
+  
+    const hasLecture = subjectSectionSchedules.some(schedule => schedule.class_type === 'Lecture');
+    const hasLaboratory = subjectSectionSchedules.some(schedule => schedule.class_type === 'Laboratory');
+  
+    const alreadyExists = (courseType === 'Lecture' && hasLecture) || (courseType === 'Laboratory' && hasLaboratory);
+    setCourseError(alreadyExists);
+  };
       
   
     const handleSubmit = async (e) => {
       e.preventDefault();
-  
-      if (instructorError || roomError || subjectError || courseError || timeError) {toast.error("Error in adding"); return;}
-      else{
-  
-      const newItem = {
-        subjectName,
-        instructorName,
-        roomName,
-        selectedColor,
-        meetingDay,
-        startTime,
-        endTime,
-        courseType,
-        section,
-        group,
-        currentUser
-      };
-  
-      try {
-        const response = await axios.post('http://localhost:8082/api/schedule/adding', newItem);
-        if (response.status === 200) {
-          //FOR ACTIVITY HISTORY
-          axios.post("http://localhost:8082/api/activity/adding",{
-            user_id : currentUser,
-            action : 'Add',
-            details : `${section} - ${group}`,
-            type : 'schedule'
+    
+      if (instructorError || roomError || subjectError || courseError || timeError) {
+        toast.error("Error in adding");
+        return;
+      } else {
+        const newItem = {
+          subjectName,
+          instructorName,
+          roomName,
+          selectedColor,
+          meetingDay,
+          startTime,
+          endTime,
+          courseType,
+          section,
+          group,
+          currentUser
+        };
+    
+        try {
+          // Check if subject type is 'Minor'
+          const subject = subjects.find(subject => subject.subject_name === subjectName);
+          if (subject && subject.subject_type === 'Minor') {
+            // Find the alternate group
+            const alternateGroup = group === 'Group 1' ? 'Group 2' : 'Group 1';
+            
+            // Check if the section has other groups
+            const sectionHasOtherGroups = sections.some(sec =>
+              sec.section_name === section &&
+              sec.section_group !== group
+            );
+    
+            if (sectionHasOtherGroups) {
+              // Check if alternate group is available
+              const isAlternateGroupAvailable = !schedules.some(schedule =>
+                schedule.section_name === section &&
+                schedule.section_group === alternateGroup &&
+                schedule.day === meetingDay &&
+                (
+                  (startTime >= schedule.start_time && startTime < schedule.end_time) ||
+                  (endTime > schedule.start_time && endTime <= schedule.end_time) ||
+                  (startTime <= schedule.start_time && endTime >= schedule.end_time)
+                )
+              );
+    
+              if (isAlternateGroupAvailable /*&& window.confirm(`Do you want to also add this to this section's other group (${alternateGroup})?`)*/) {
+                // Add the same item to the alternate group
+                const alternateItem = { ...newItem, group: alternateGroup };
+                await axios.post('http://localhost:8082/api/schedule/adding', alternateItem);
+                await axios.post('http://localhost:8082/api/activity/adding', {
+                  user_id: currentUser,
+                  action: 'Add',
+                  details: `${section} - ${alternateGroup}`,
+                  type: 'schedule'
+                });
+              }
+            } 
+          }
+    
+          // Add the item to the original group
+          await axios.post('http://localhost:8082/api/schedule/adding', newItem);
+    
+          // Add to activity history for the original item
+          await axios.post('http://localhost:8082/api/activity/adding', {
+            user_id: currentUser,
+            action: 'Add',
+            details: `${section} - ${group}`,
+            type: 'schedule'
           });
-
+    
           toast.success('Item added successfully!');
           onItemAdded(newItem);
           onClose();
-        } else {
+        } catch (error) {
+          console.error('Error adding item:', error);
           toast.error('Failed to add item');
         }
-      } catch (error) {
-        console.error('Error adding item:', error);
-        toast.error('Failed to add item');
       }
-    }
     };
+    
+    
+    
   
 
     //------FILTERING------//
@@ -391,20 +483,25 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
                     Subject has reached meeting quota</p>}
                 </div>
               </div>
-              <div className='form-content'>
-                <div>
-                  <label>Course Type</label>
-                  <select value={courseType} className={courseError ? 'error-border' : ''} onChange={(e) => setCourseType(e.target.value)} >
-                    <option>Lecture</option>
-                    <option>Laboratory</option>
-                  </select>
-                </div>
-                <div>
-                  {courseError && <p className="error-message">
-                    <FontAwesomeIcon icon={faWarning} className='warning-icon' />
-                    This course type is already created</p>}
-                </div>
-              </div>
+              {
+                subjectName === '' || subjects.find(subject => subject.subject_name === subjectName)?.subject_type === 'Major'
+                  ? 
+                  <div className='form-content'>
+                    <div>
+                      <label>Course Type</label>
+                      <select value={courseType} className={courseError ? 'error-border' : ''} onChange={(e) => setCourseType(e.target.value)} >
+                        <option>Lecture</option>
+                        <option value="Laboratory">Laboratory</option>
+                      </select>
+                    </div>
+                    <div>
+                      {courseError && <p className="error-message">
+                        <FontAwesomeIcon icon={faWarning} className='warning-icon' />
+                        This course type is already created</p>}
+                    </div>
+                  </div>
+                  : null
+              }
               <div className='form-content'>
                 <div>
                   <label>Room #</label>
