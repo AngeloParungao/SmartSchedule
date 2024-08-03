@@ -19,6 +19,7 @@ import {
 
 
 function AddItemModal({ onClose, section, group, onItemAdded }) {
+
   // State variables to manage schedules, instructors, subjects, sections, and rooms data
   const [schedules, setSchedules] = useState([]);
   const [instructors, setInstructors] = useState([]);
@@ -72,6 +73,8 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
     checkRealTimeErrors();
   }, [instructorName, subjectName, roomName, meetingDay, startTime, endTime, courseType]);
 
+
+  
   // Fetch schedules from the API
   const fetchSchedules = async () => {
     try {

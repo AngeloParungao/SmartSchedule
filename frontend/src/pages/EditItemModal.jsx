@@ -2,16 +2,32 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import ReactPaginate from 'react-paginate';
+import '../css/scheduling.css'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleLeft, faAngleRight, faWarning , faLightbulb, faUser, faDoorOpen, faBook, faSearch } from '@fortawesome/free-solid-svg-icons';
-import '../css/scheduling.css';
+import { 
+  faAngleLeft, 
+  faAngleRight, 
+  faWarning , 
+  faLightbulb, 
+  faUser, 
+  faDoorOpen, 
+  faBook, faSearch 
+} from '@fortawesome/free-solid-svg-icons';
+
+
+
+
 
 function EditItemModal({ onClose, item, onItemUpdated }) {
+
+  // State variables to manage schedules, instructors, subjects, sections, and rooms data
   const [schedules, setSchedules] = useState([]);
   const [instructors, setInstructors] = useState([]);
   const [subjects, setSubjects] = useState([]);
+  const [sections, setSections] = useState([]);
   const [rooms, setRooms] = useState([]);
 
+  // State variables for the form fields
   const [subjectName, setSubjectName] = useState('');
   const [instructorName, setInstructorName] = useState('');
   const [roomName, setRoomName] = useState('');
@@ -21,11 +37,13 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
   const [endTime, setEndTime] = useState('');
   const [courseType, setCourseType] = useState('Lecture');
 
+  // Pagination state for instructors, subjects, and rooms
   const [currentInstructorPage, setCurrentInstructorPage] = useState(0);
   const [currentSubjectPage, setCurrentSubjectPage] = useState(0);
   const [currentRoomPage, setCurrentRoomPage] = useState(0);
   const itemsPerPage = 5;
 
+  // State variables for error handling
   const [instructorError, setInstructorError] = useState(false);
   const [roomError, setRoomError] = useState(false);
   const [courseError, setCourseError] = useState(false);
@@ -33,14 +51,19 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
   const [timeError, setTimeError] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
 
+  // Fetch the current user ID from local storage
   const currentUser = JSON.parse(localStorage.getItem("userId"));
 
+
+  // Fetch data when the component mounts
   useEffect(() => {
     fetchSchedules();
     fetchInstructors();
+    fetchSections();
     fetchSubjects();
     fetchRooms();
   }, []);
+
 
   useEffect(() => {
       setSubjectName(item.subject);
@@ -53,6 +76,9 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
       setCourseType(item.class_type);
   }, [item]);
 
+
+
+  // Generate recommendations whenever relevant fields change
   useEffect(() => {
     if (instructorName && subjectName && roomName && courseType && meetingDay && startTime && endTime) {
       generateRecommendations(schedules);
@@ -60,10 +86,15 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
   }, [instructorName, subjectName, roomName, courseType, meetingDay, startTime, endTime, schedules]);
 
 
+
+  // Check for real-time errors whenever relevant fields change
   useEffect(() => {
     checkRealTimeErrors();
   }, [instructorName, subjectName, roomName, meetingDay, startTime, endTime, courseType]);
 
+
+
+  // Fetch schedules from the API
   const fetchSchedules = async () => {
     try {
       const response = await axios.get(`http://localhost:8082/api/schedule/fetch?creator_id=${currentUser}`);
@@ -74,6 +105,8 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
     }
   };
 
+
+  // Fetch instructors from the API
   const fetchInstructors = async () => {
     try {
       const response = await axios.get(`http://localhost:8082/api/instructors/fetch?creator_id=${currentUser}`);
@@ -84,6 +117,19 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
     }
   };
 
+  // Fetch sections from the API
+  const fetchSections = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8082/api/sections/fetch?creator_id=${currentUser}`);
+      setSections(response.data);
+    } catch (error) {
+      console.error('Error fetching sections:', error);
+      toast.error('Failed to fetch sections');
+    }
+  };
+
+
+  // Fetch subjects from the API
   const fetchSubjects = async () => {
     try {
       const response = await axios.get(`http://localhost:8082/api/subjects/fetch?creator_id=${currentUser}`);
@@ -94,6 +140,8 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
     }
   };
 
+
+  // Fetch rooms from the API
   const fetchRooms = async () => {
     try {
       const response = await axios.get(`http://localhost:8082/api/rooms/fetch?creator_id=${currentUser}`);
@@ -104,13 +152,16 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
     }
   };
 
+
+  // Generate recommendations based on availability of instructors, rooms, and sections
   const generateRecommendations = (schedules) => {
     if (!instructorName || !roomName || !meetingDay || !startTime || !endTime || !item) {
       setRecommendations([]);
       return;
     }
   
-    const duration = courseType === 'Lecture' ? 2 : 3;
+    const subject = subjects.find(subject => subject.subject_name === subjectName);
+    const duration = courseType === 'Laboratory' || (subject && subject.subject_type === 'Minor') ? 3 : 2;
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const availableSlots = [];
   
@@ -155,7 +206,24 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
           isConflict(schedule, start, end)
         );
   
-        if (instructorAvailable && roomAvailable && sectionAvailable) {
+        const subject = subjects.find(subject => subject.subject_name === subjectName);
+        const alternateGroupAvailable = subject && subject.subject_type === 'Minor' ? 
+          !schedules.some(schedule =>
+            schedule.section_name === item.section_name &&
+            schedule.section_group === (item.section_group === 'Group 1' ? 'Group 2' : 'Group 1') &&
+            schedule.day === day &&
+            (
+              (start >= schedule.start_time && start < schedule.end_time) ||
+              (end > schedule.start_time && end <= schedule.end_time) ||
+              (start <= schedule.start_time && end >= schedule.end_time)
+            )
+          ) : true;
+
+        const bothSectionAndAlternateGroupAvailable = subject && subject.subject_type === 'Minor' ? 
+          (sectionAvailable && alternateGroupAvailable) : 
+          sectionAvailable;
+
+        if (instructorAvailable && roomAvailable && bothSectionAndAlternateGroupAvailable) {
           availableSlots.push({ day, start, end });
         }
       }
@@ -255,44 +323,120 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
 
     // Validate form fields
     if (instructorError || roomError || subjectError || courseError || timeError) {
-      toast.error("Error in updating");
-      return;
+        toast.error("Error in updating");
+        return;
     }
 
     const updatedItem = {
-      subjectName,
-      instructorName,
-      roomName,
-      selectedColor,
-      meetingDay,
-      startTime,
-      endTime,
-      courseType,
+        subjectName,
+        instructorName,
+        roomName,
+        selectedColor,
+        meetingDay,
+        startTime,
+        endTime,
+        courseType,
     };
 
     try {
-      const response = await axios.put(`http://localhost:8082/api/schedule/update/${item.schedule_id}`, updatedItem);
-      if (response.status === 200) {
+        // Check if the subject type is 'Minor'
+        const subject = subjects.find(subject => subject.subject_name === subjectName);
+        if (subject && subject.subject_type === 'Minor') {
+            // Determine the alternate group
+            const alternateGroup = item.section_group === 'Group 1' ? 'Group 2' : 'Group 1';
 
-        //FOR ACTIVITY HISTORY
-        axios.post("http://localhost:8082/api/activity/adding",{
-          user_id : currentUser,
-          action : 'Update',
-          details : `${item.section_name} - ${item.section_group}`,
-          type : 'schedule'
+            // Check if the section has other groups
+            const sectionHasOtherGroups = sections.some(sec =>
+                sec.section_name === item.section_name &&
+                sec.section_group !== item.section_group
+            );
+
+            if (sectionHasOtherGroups) {
+                // Determine if we need to check the alternate group availability
+                const hasTimeChanged = item.day !== meetingDay || item.start_time !== startTime || item.end_time !== endTime;
+                let isAlternateGroupAvailable = true;
+
+                if (hasTimeChanged) {
+                    // Check if the alternate group is available
+                    isAlternateGroupAvailable = !schedules.some(schedule =>
+                        schedule.section_name === item.section_name &&
+                        schedule.section_group === alternateGroup &&
+                        schedule.day === meetingDay &&
+                        (
+                            (startTime >= schedule.start_time && startTime < schedule.end_time) ||
+                            (endTime > schedule.start_time && endTime <= schedule.end_time) ||
+                            (startTime <= schedule.start_time && endTime >= schedule.end_time)
+                        )
+                    );
+                }
+
+                if (isAlternateGroupAvailable) {
+                    // Update the alternate group schedule if available
+                    const alternateGroupSchedule = schedules.find(schedule =>
+                        schedule.section_name === item.section_name &&
+                        schedule.section_group === alternateGroup &&
+                        schedule.subject === subjectName
+                    );
+
+                    if (alternateGroupSchedule) {
+                        await axios.put(`http://localhost:8082/api/schedule/update/${alternateGroupSchedule.schedule_id}`, updatedItem);
+                        await axios.post('http://localhost:8082/api/activity/adding', {
+                            user_id: currentUser,
+                            action: 'Update',
+                            details: `${item.section_name} - ${alternateGroup}`,
+                            type: 'schedule'
+                        });
+                    }
+                } else if (!hasTimeChanged) {
+                    console.log("hello");
+                    // If the time hasn't changed, update the alternate group even if it's not available
+                    const alternateGroupSchedule = schedules.find(schedule =>
+                        schedule.section_name === item.section_name &&
+                        schedule.section_group === alternateGroup &&
+                        schedule.subject === subjectName
+                    );
+
+                    if (alternateGroupSchedule) {
+                        await axios.put(`http://localhost:8082/api/schedule/update/${alternateGroupSchedule.schedule_id}`, {
+                            ...updatedItem,
+                            startTime: alternateGroupSchedule.start_time,
+                            endTime: alternateGroupSchedule.end_time,
+                            day: alternateGroupSchedule.day,
+                        });
+                        await axios.post('http://localhost:8082/api/activity/adding', {
+                            user_id: currentUser,
+                            action: 'Update',
+                            details: `${item.section_name} - ${alternateGroup}`,
+                            type: 'schedule'
+                        });
+                    }
+                }
+            }
+        }
+
+        // Update the original item
+        await axios.put(`http://localhost:8082/api/schedule/update/${item.schedule_id}`, updatedItem);
+
+        // Add to activity history for the original item
+        await axios.post('http://localhost:8082/api/activity/adding', {
+            user_id: currentUser,
+            action: 'Update',
+            details: `${item.section_name} - ${item.section_group}`,
+            type: 'schedule'
         });
 
         toast.success('Item updated successfully!');
         onItemUpdated(updatedItem);
         onClose();
-      } else {
-        toast.error('Failed to update item');
-      }
     } catch (error) {
-      console.error('Error updating item:', error);
-      toast.error('Failed to update item');
+        console.error('Error updating item:', error);
+        toast.error('Failed to update item');
     }
-  };
+};
+
+
+
+
 
 
   //------FILTERING------//
@@ -406,20 +550,25 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
                   Subject has reached meeting quota</p>}
               </div>
             </div>
-            <div className='form-content'>
-              <div>
-                <label>Course Type</label>
-                <select value={courseType} className={courseError ? 'error-border' : ''} onChange={(e) => setCourseType(e.target.value)} >
-                  <option>Lecture</option>
-                  <option>Laboratory</option>
-                </select>
-              </div>
-              <div>
-                {courseError && <p className="error-message">
-                  <FontAwesomeIcon icon={faWarning} className='warning-icon' />
-                  This course type is already created</p>}
-              </div>
-            </div>
+            {
+                subjectName === '' || subjects.find(subject => subject.subject_name === subjectName)?.subject_type === 'Major'
+                  ? 
+                  <div className='form-content'>
+                    <div>
+                      <label>Course Type</label>
+                      <select value={courseType} className={courseError ? 'error-border' : ''} onChange={(e) => setCourseType(e.target.value)} >
+                        <option>Lecture</option>
+                        <option value="Laboratory">Laboratory</option>
+                      </select>
+                    </div>
+                    <div>
+                      {courseError && <p className="error-message">
+                        <FontAwesomeIcon icon={faWarning} className='warning-icon' />
+                        This course type is already created</p>}
+                    </div>
+                  </div>
+                  : null
+              }
             <div className='form-content'>
               <div>
                 <label>Room #</label>

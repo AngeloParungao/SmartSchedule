@@ -33,7 +33,7 @@ function Scheduling() {
   const [schedules, setSchedules] = useState([]);
   const [sections, setSections] = useState([]);
   const [selectedSection, setSelectedSection] = useState('');
-  const [selectedGroup, setSelectedGroup] = useState('Group 1');
+  const [selectedGroup, setSelectedGroup] = useState('');
   const [showAddItemModal, setShowAddItemModal] = useState(false);
 
   const currentUser = JSON.parse(localStorage.getItem('userId'));
@@ -42,6 +42,21 @@ function Scheduling() {
     fetchSections();
     fetchSchedules();
   }, []);
+
+
+  useEffect(() => {
+      // Update the default group selection whenever the selectedSection or sections change
+      const sectionGroups = sections
+      .filter(section => section.section_name === selectedSection)
+      .map(section => section.section_group)
+      .filter((value, index, self) => self.indexOf(value) === index) // Ensure unique groups
+
+      // Set default group if available
+      if (sectionGroups.length > 0) {
+      setSelectedGroup(sectionGroups.includes('Group 1') ? 'Group 1' : sectionGroups[0]);
+      }
+  }, [selectedSection, sections]);
+
 
   const fetchSections = async () => {
     try {
@@ -220,7 +235,7 @@ function Scheduling() {
 
                     // Find the schedule item for the current time and day
                     const scheduleItem = schedules.find(
-                      (item) =>
+                      item =>
                         item.start_time === time.startTime &&
                         item.day === day &&
                         item.section_name === selectedSection &&

@@ -47,6 +47,19 @@ function Draft() {
         fetchInstructors();
     }, []);
 
+    useEffect(() => {
+        // Update the default group selection whenever the selectedSection or sections change
+        const sectionGroups = sections
+        .filter(section => section.section_name === selectedSection)
+        .map(section => section.section_group)
+        .filter((value, index, self) => self.indexOf(value) === index) // Ensure unique groups
+
+        // Set default group if available
+        if (sectionGroups.length > 0) {
+        setSelectedGroup(sectionGroups.includes('Group 1') ? 'Group 1' : sectionGroups[0]);
+        }
+    }, [selectedSection, sections]);
+
     const fetchSchedules = async () => {
         try {
             const response = await axios.get(`http://localhost:8082/api/schedule/fetch?creator_id=${currentUser}`);
