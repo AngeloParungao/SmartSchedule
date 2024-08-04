@@ -235,87 +235,109 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
 
   
   const checkRealTimeErrors = () => {
-    const timeConflict = (schedule) => {
-      if (schedule.schedule_id === item.schedule_id) return false; // Exclude the current schedule
-
-      const newStartTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
-      const newEndTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
-      const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
-      const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
-
-      // Check if the schedule matches the selected section and group
-      if (
-        schedule.section_name === item.section &&
-        schedule.section_group === item.group &&
-        schedule.day === meetingDay
-      ) {
-        return (
-          (newStartTimeInMinutes >= start && newStartTimeInMinutes < end) ||
-          (newEndTimeInMinutes > start && newEndTimeInMinutes <= end) ||
-          (newStartTimeInMinutes <= start && newEndTimeInMinutes >= end)
-        );
-      }
-      return false;
+    const parseTimeToMinutes = (time) => {
+        const [hours, minutes] = time.split(':').map(Number);
+        return hours * 60 + minutes;
     };
 
-    const hasTimeConflict = schedules.some(timeConflict);
+    const startTimeInMinutes = parseTimeToMinutes(startTime);
+    const endTimeInMinutes = parseTimeToMinutes(endTime);
+    
+    const subject = subjects.find(subject => subject.subject_name === subjectName);
+    const isMinor = subject && subject.subject_type === 'Minor';
+    const alternateGroup = isMinor ? (item.section_group === 'Group 1' ? 'Group 2' : 'Group 1') : null;
+
+    const checkTimeConflict = (schedule) => {
+        const start = parseTimeToMinutes(schedule.start_time);
+        const end = parseTimeToMinutes(schedule.end_time);
+
+        if (schedule.schedule_id === item.schedule_id) {
+            return false; // Skip checking the current schedule
+        }
+
+        // Check for conflicts with both groups if minor subject
+        if (isMinor) {
+            const inCurrentGroup = schedule.section_group === item.section_group &&
+                                   schedule.section_name === item.section_name &&
+                                   schedule.day === meetingDay;
+
+            const inAlternateGroup = schedule.section_group === alternateGroup &&
+                                     schedule.section_name === item.section_name &&
+                                     schedule.day === meetingDay;
+
+            const overlaps = (startTimeInMinutes >= start && startTimeInMinutes < end) ||
+                             (endTimeInMinutes > start && endTimeInMinutes <= end) ||
+                             (startTimeInMinutes <= start && endTimeInMinutes >= end);
+
+            return (inCurrentGroup || inAlternateGroup) && overlaps;
+        }
+
+        // For non-minor subjects
+        return schedule.section_name === item.section_name &&
+               schedule.section_group === item.section_group &&
+               schedule.day === meetingDay &&
+               ((startTimeInMinutes >= start && startTimeInMinutes < end) ||
+                (endTimeInMinutes > start && endTimeInMinutes <= end) ||
+                (startTimeInMinutes <= start && endTimeInMinutes >= end));
+    };
+
+    const hasTimeConflict = schedules.some(checkTimeConflict);
     setTimeError(hasTimeConflict);
 
-    const instructorAvailability = schedules.some(schedule =>
-      schedule.schedule_id !== item.schedule_id &&
-      schedule.instructor === instructorName &&
-      schedule.day === meetingDay &&
-      (
-        (startTime >= schedule.start_time && startTime < schedule.end_time) ||
-        (endTime > schedule.start_time && endTime <= schedule.end_time) ||
-        (startTime <= schedule.start_time && endTime >= schedule.end_time)
-      )
-    );
+    const checkAvailability = (schedule, type) => {
+        return schedule.schedule_id !== item.schedule_id &&
+               (!isMinor || schedule.section_group !== alternateGroup) &&
+               schedule[type] === (type === 'instructor' ? instructorName : roomName) &&
+               schedule.day === meetingDay &&
+               (
+                 (startTimeInMinutes >= parseTimeToMinutes(schedule.start_time) && startTimeInMinutes < parseTimeToMinutes(schedule.end_time)) ||
+                 (endTimeInMinutes > parseTimeToMinutes(schedule.start_time) && endTimeInMinutes <= parseTimeToMinutes(schedule.end_time)) ||
+                 (startTimeInMinutes <= parseTimeToMinutes(schedule.start_time) && endTimeInMinutes >= parseTimeToMinutes(schedule.end_time))
+               );
+    };
+
+    const instructorAvailability = schedules.some(schedule => checkAvailability(schedule, 'instructor'));
     setInstructorError(instructorAvailability);
 
-    const roomAvailability = schedules.some(schedule =>
-      schedule.schedule_id !== item.schedule_id &&
-      schedule.room === roomName &&
-      schedule.day === meetingDay &&
-      (
-        (startTime >= schedule.start_time && startTime < schedule.end_time) ||
-        (endTime > schedule.start_time && endTime <= schedule.end_time) ||
-        (startTime <= schedule.start_time && endTime >= schedule.end_time)
-      )
-    );
+    const roomAvailability = schedules.some(schedule => checkAvailability(schedule, 'room'));
     setRoomError(roomAvailability);
 
-    const startTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
-    const endTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
-    const newDuration = (endTimeInMinutes - startTimeInMinutes) / 60;
-
     const subjectSectionSchedules = schedules.filter(schedule =>
-      schedule.schedule_id !== item.schedule_id && // Exclude the current schedule
-      schedule.subject === subjectName &&
-      schedule.section_name === item.section &&
-      schedule.section_group === item.group
+        schedule.schedule_id !== item.schedule_id &&
+        (!isMinor || schedule.section_group !== alternateGroup) &&
+        schedule.subject === subjectName &&
+        schedule.section_name === item.section_name &&
+        schedule.section_group === item.section_group
     );
 
     const totalHours = subjectSectionSchedules.reduce((sum, schedule) => {
-      const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
-      const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
-      return sum + (end - start) / 60;
+        const start = parseTimeToMinutes(schedule.start_time);
+        const end = parseTimeToMinutes(schedule.end_time);
+        return sum + (end - start) / 60;
     }, 0);
 
     const numberOfMeetings = subjectSectionSchedules.length;
 
-    const exceedsLimits = totalHours + newDuration > 5 || numberOfMeetings >= 2;
+    const exceedsLimits = totalHours + (endTimeInMinutes - startTimeInMinutes) / 60 > 5 || numberOfMeetings >= 2;
     setSubjectError(exceedsLimits);
 
-    const hasLecture = subjectSectionSchedules.some(schedule => schedule.class_type === 'Lecture');
-    const hasLaboratory = subjectSectionSchedules.some(schedule => schedule.class_type === 'Laboratory');
-
-    const alreadyExists = (
-      (courseType === 'Lecture' && (hasLecture || item.class_type === 'Laboratory')) || 
-      (courseType === 'Laboratory' && (hasLaboratory || item.class_type === 'Lecture'))
-    );
+    
+    const alreadyExists = subjectSectionSchedules.some(schedule => {
+      // Exclude the current item being edited
+      if (schedule.schedule_id === item.schedule_id) return false;
+    
+      // Check if the course types are conflicting
+      const isLectureConflict = courseType === 'Lecture' && schedule.class_type === 'Laboratory';
+      const isLaboratoryConflict = courseType === 'Laboratory' && schedule.class_type === 'Lecture';
+    
+      return isLectureConflict || isLaboratoryConflict;
+    });
+    
     setCourseError(alreadyExists);
-  };
+};
+
+
+  
 
 
   const handleSubmit = async (e) => {
@@ -627,7 +649,11 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
                   required
                 />
               </div>
-              <div></div>
+              <div>
+                  {timeError && <p className="error-message">
+                    <FontAwesomeIcon icon={faWarning} className='warning-icon' />
+                    Time not available for this section</p>}
+                </div>
             </div>
             <div className='form-content'>
               <div>
@@ -641,11 +667,7 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
                   required
                 />
               </div>
-              <div>
-                {timeError && <p className="error-message">
-                  <FontAwesomeIcon icon={faWarning} className='warning-icon' />
-                  The class overlaps with another class</p>}
-              </div>
+              <div></div>
             </div>
             <button type="submit" className='add-sched'>Save</button>
           </div>
