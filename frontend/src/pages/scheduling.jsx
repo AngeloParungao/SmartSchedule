@@ -173,6 +173,18 @@ function Scheduling() {
     }
   };
 
+  const isDarkBackground = (backgroundColor) => {
+    // Convert hex to RGB
+    let r = parseInt(backgroundColor.slice(1, 3), 16);
+    let g = parseInt(backgroundColor.slice(3, 5), 16);
+    let b = parseInt(backgroundColor.slice(5, 7), 16);
+    
+    // Using luminance formula to determine if color is dark
+    let luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    
+    return luminance < 0.5;
+  };
+
   return (
     <div>
       <Toaster position="bottom-right" reverseOrder={false} />
@@ -253,9 +265,24 @@ function Scheduling() {
                       <td key={`${time.startTime}-${day}`} rowSpan={rowSpan} style={{ backgroundColor: scheduleItem?.background_color }} className='sched'>
                         {scheduleItem && (
                           <>
-                            <div className='subject-name'>{scheduleItem.subject}</div>
-                            <div className='instructor-name'>{scheduleItem.instructor}</div>
-                            <div className='room-name'>({scheduleItem.room})</div>
+                            <div
+                              className='subject-name'
+                              style={{ color: isDarkBackground(scheduleItem.background_color) ? 'white' : 'black' }}
+                            >
+                              {scheduleItem.subject}
+                            </div>
+                            <div
+                              className='instructor-name'
+                              style={{ color: isDarkBackground(scheduleItem.background_color) ? 'white' : 'black' }}
+                            >
+                              {scheduleItem.instructor}
+                            </div>
+                            <div
+                              className='room-name'
+                              style={{ color: isDarkBackground(scheduleItem.background_color) ? 'white' : 'black' }}
+                            >
+                              ({scheduleItem.room})
+                            </div>
                           </>
                         )}
                       </td>
@@ -292,7 +319,7 @@ function Scheduling() {
       {showDeleteItemModal && (
         <DeleteItemModal
           onClose={handleCloseDeleteModal}
-          schedules={schedules.filter(schedule => schedule.section_name === selectedSection && schedule.section_group === selectedGroup)}
+          schedule={schedules.filter(schedule => schedule.section_name === selectedSection && schedule.section_group === selectedGroup)}
           onDeleteItem={handleDeleteItem}
         />
       )}
@@ -319,6 +346,18 @@ function UpdateItemModal({ onClose, schedules, onEditItemClick }) {
      return a.start_time.localeCompare(b.start_time);
    });
 
+   const isDarkBackground = (backgroundColor) => {
+    // Convert hex to RGB
+    let r = parseInt(backgroundColor.slice(1, 3), 16);
+    let g = parseInt(backgroundColor.slice(3, 5), 16);
+    let b = parseInt(backgroundColor.slice(5, 7), 16);
+    
+    // Using luminance formula to determine if color is dark
+    let luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    
+    return luminance < 0.5;
+  };
+
   return (
     <div className="update-screen">
       <div className="update-container">
@@ -337,13 +376,13 @@ function UpdateItemModal({ onClose, schedules, onEditItemClick }) {
               onClick={() => onEditItemClick(schedule)}
             >
               <div className='update-details-left'>
-                <span>{schedule.instructor}</span>
-                <span>{schedule.subject}</span>
+                <span style={{ color: isDarkBackground(schedule.background_color) ? 'white' : 'black' }}>{schedule.instructor}</span>
+                <span style={{ color: isDarkBackground(schedule.background_color) ? 'white' : 'black' }}>{schedule.subject}</span>
               </div>
               <div className='update-details-right'>
-                <span>{schedule.room}</span>
-                <span>{schedule.day}</span>
-                <span>({schedule.start_time.slice(0,2) % 12 || 12}:{schedule.start_time.slice(3,5)} {schedule.start_time.slice(0, 2)>12? " PM" :  ' AM'}-{schedule.end_time.slice(0, 2) % 12 || 12}:{schedule.end_time.slice(3,5)} {schedule.end_time.slice(0, 2) < 12 ? " AM" : " PM"})</span>
+                <span style={{ color: isDarkBackground(schedule.background_color) ? 'white' : 'black' }}>{schedule.room}</span>
+                <span style={{ color: isDarkBackground(schedule.background_color) ? 'white' : 'black' }}>{schedule.day}</span>
+                <span style={{ color: isDarkBackground(schedule.background_color) ? 'white' : 'black' }}>({schedule.start_time.slice(0,2) % 12 || 12}:{schedule.start_time.slice(3,5)} {schedule.start_time.slice(0, 2)>12? " PM" :  ' AM'}-{schedule.end_time.slice(0, 2) % 12 || 12}:{schedule.end_time.slice(3,5)} {schedule.end_time.slice(0, 2) < 12 ? " AM" : " PM"})</span>
               </div>
             </div>
           ))}

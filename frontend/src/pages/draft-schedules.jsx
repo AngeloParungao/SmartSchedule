@@ -262,7 +262,17 @@ function Draft() {
         }
     };
     
-    
+    const isDarkBackground = (backgroundColor) => {
+        // Convert hex to RGB
+        let r = parseInt(backgroundColor.slice(1, 3), 16);
+        let g = parseInt(backgroundColor.slice(3, 5), 16);
+        let b = parseInt(backgroundColor.slice(5, 7), 16);
+        
+        // Using luminance formula to determine if color is dark
+        let luminance = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+        
+        return luminance < 0.5;
+      };
 
     return (
         <div>
@@ -390,10 +400,10 @@ function Draft() {
                                             <td key={`${time.startTime}-${day}`} rowSpan={rowSpan} style={{ backgroundColor: scheduleItem?.background_color }} className='sched'>
                                                 {scheduleItem && (
                                                     <>
-                                                        <div className='subject-name'>{scheduleItem.subject}</div>
-                                                        <div className='instructor-name'>{scheduleItem.instructor}</div>
-                                                        {category === 'instructor' && <div className='section-name'>{`${scheduleItem.section_name} - ${scheduleItem.section_group.slice(0,1)}${scheduleItem.section_group.slice(6,7)}`}</div>}
-                                                        <div className='room-name'>({scheduleItem.room})</div>
+                                                        <div className='subject-name' style={{ color: isDarkBackground(scheduleItem.background_color) ? 'white' : 'black' }}>{scheduleItem.subject}</div>
+                                                        <div className='instructor-name' style={{ color: isDarkBackground(scheduleItem.background_color) ? 'white' : 'black' }}>{scheduleItem.instructor}</div>
+                                                        {category === 'instructor' && <div className='section-name' style={{ color: isDarkBackground(scheduleItem.background_color) ? 'white' : 'black' }}>{`${scheduleItem.section_name} - ${scheduleItem.section_group.slice(0,1)}${scheduleItem.section_group.slice(6,7)}`}</div>}
+                                                        <div className='room-name' style={{ color: isDarkBackground(scheduleItem.background_color) ? 'white' : 'black' }}>({scheduleItem.room})</div>
                                                     </>
                                                 )}
                                             </td>
