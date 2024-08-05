@@ -235,7 +235,7 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
 
   
   const checkRealTimeErrors = () => {
-    const parseTimeToMinutes = (time) => {
+    const parseTimeToMinutes = (time) => {  
         const [hours, minutes] = time.split(':').map(Number);
         return hours * 60 + minutes;
     };
@@ -284,22 +284,28 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
     const hasTimeConflict = schedules.some(checkTimeConflict);
     setTimeError(hasTimeConflict);
 
-    const checkAvailability = (schedule, type) => {
-        return schedule.schedule_id !== item.schedule_id &&
-               (!isMinor || schedule.section_group !== alternateGroup) &&
-               schedule[type] === (type === 'instructor' ? instructorName : roomName) &&
-               schedule.day === meetingDay &&
-               (
-                 (startTimeInMinutes >= parseTimeToMinutes(schedule.start_time) && startTimeInMinutes < parseTimeToMinutes(schedule.end_time)) ||
-                 (endTimeInMinutes > parseTimeToMinutes(schedule.start_time) && endTimeInMinutes <= parseTimeToMinutes(schedule.end_time)) ||
-                 (startTimeInMinutes <= parseTimeToMinutes(schedule.start_time) && endTimeInMinutes >= parseTimeToMinutes(schedule.end_time))
-               );
-    };
-
-    const instructorAvailability = schedules.some(schedule => checkAvailability(schedule, 'instructor'));
+    const instructorAvailability = schedules.some(schedule =>
+      schedule.schedule_id !== item.schedule_id &&
+      schedule.instructor === instructorName &&
+      schedule.day === meetingDay &&
+      (
+        (startTime >= schedule.start_time && startTime < schedule.end_time) ||
+        (endTime > schedule.start_time && endTime <= schedule.end_time) ||
+        (startTime <= schedule.start_time && endTime >= schedule.end_time)
+      )
+    );
     setInstructorError(instructorAvailability);
 
-    const roomAvailability = schedules.some(schedule => checkAvailability(schedule, 'room'));
+    const roomAvailability = schedules.some(schedule =>
+      schedule.schedule_id !== item.schedule_id &&
+      schedule.room === roomName &&
+      schedule.day === meetingDay &&
+      (
+        (startTime >= schedule.start_time && startTime < schedule.end_time) ||
+        (endTime > schedule.start_time && endTime <= schedule.end_time) ||
+        (startTime <= schedule.start_time && endTime >= schedule.end_time)
+      )
+    );
     setRoomError(roomAvailability);
 
     const subjectSectionSchedules = schedules.filter(schedule =>
@@ -321,19 +327,19 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
     const exceedsLimits = totalHours + (endTimeInMinutes - startTimeInMinutes) / 60 > 5 || numberOfMeetings >= 2;
     setSubjectError(exceedsLimits);
 
-    
-    const alreadyExists = subjectSectionSchedules.some(schedule => {
+
+     // Check for existing course type conflicts
+     const alreadyExists = subjectSectionSchedules.some(schedule => {
       // Exclude the current item being edited
       if (schedule.schedule_id === item.schedule_id) return false;
-    
-      // Check if the course types are conflicting
-      const isLectureConflict = courseType === 'Lecture' && schedule.class_type === 'Laboratory';
-      const isLaboratoryConflict = courseType === 'Laboratory' && schedule.class_type === 'Lecture';
-    
+
+      const isLectureConflict = courseType === 'Lecture' && schedule.class_type === 'Lecture';
+      const isLaboratoryConflict = courseType === 'Laboratory' && schedule.class_type === 'Laboratory';
+
       return isLectureConflict || isLaboratoryConflict;
-    });
-    
-    setCourseError(alreadyExists);
+  });
+
+  setCourseError(alreadyExists);
 };
 
 
