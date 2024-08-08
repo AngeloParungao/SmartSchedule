@@ -158,14 +158,14 @@
 }
 
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 480px) {
     .content{
         position: relative;
         display: flex;
         align-items: center;
         background-color: rgba(255, 255, 255, 0.9);
-        height: 55%;
-        width: 75%;
+        height: 50%;
+        width: 80%;
         border-radius: 0.7rem;
         box-shadow: 0 1rem 25px rgba(0, 0, 0, 0.5);
     }
@@ -219,5 +219,14 @@
         border-radius: 1.3rem;
         border: none;
         cursor: pointer;
+    }
+}
+
+@media screen and (orientation: landscape) {
+    .content{
+        height: 90%;
+        width: 50%;
+        border-radius: 0.7rem;
+        box-shadow: 0 1rem 25px rgba(0, 0, 0, 0.5);
     }
 }

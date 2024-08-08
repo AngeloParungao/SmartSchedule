@@ -115,7 +115,7 @@
   .color-circle.red { background-color: rgb(202, 102, 102) }
   .color-circle.green { background-color: rgb(85, 129, 85)}
 
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: 700px) {
     .setting-header{
         font-weight: 400;
         margin-left: 0rem;
@@ -148,6 +148,55 @@
       margin: -2rem -2rem -0.3rem -2rem;
     }
 
+
+    .color-options {
+      display: flex;
+      justify-content: space-around;
+      margin: 0.75rem 0;
+    }
+    
+    .color-circle {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+  }
+
+  @media screen and (min-width: 320px) and (max-width: 480px) and (orientation: portrait){
+    .settings-container{
+      height: 100svh;
+    }
+  }
+
+  @media screen and (max-height: 480px) and (orientation: landscape){
+    .setting-header{
+      margin-left: 0;
+      height: 3rem;
+    }
+  
+    .setting-header span{
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-left: 5rem;
+    }
+  
+    .settings-card, .user-preference-card {
+      background: #f0f0f0;
+      border-radius: 0.8rem;
+      padding: 2rem;
+      width: 18rem;
+      height: 17rem;
+      box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.35);
+    }  
+
+    .settings-card h3, .user-preference-card h3 {
+      text-align: center;
+      background: #c0d7e8;
+      padding: 0.7rem;
+      border-radius: 10px 10px 0 0;
+      margin: -2rem -2rem -0.3rem -2rem;
+    }
 
     .color-options {
       display: flex;

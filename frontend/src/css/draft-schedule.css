@@ -47,7 +47,7 @@
 .draft-buttons{
     position: absolute;
     display: flex;
-    right: 5rem;
+    right: 1rem;
     gap: 1rem;
 }
 
@@ -68,11 +68,15 @@
     color: #004085;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 700px) {
     .draft-header{
+        margin-left: 0;
+        height: 4rem;
+    }
+    
+    .draft-header span{
         font-weight: 400;
         margin-left: 1.5rem;
-        height: 4rem;
     }
 
     .draft-controls {
@@ -86,24 +90,24 @@
     }
     
     .category-selector label{
-        font-size: 0.65rem;
+        font-size: 0.9rem;
     }
     
     .draft-dropdown {
-        font-size: 0.55rem;
-        padding: 0.3rem;
+        font-size: 0.75rem;
+        padding: 0.35rem;
     }
 
     .draft-buttons{
         flex-direction: column;
         margin-top: -2.5rem;
-        right: 1rem;
+        right: 1.5rem;
         gap: 0.5rem;
     }
     
     .draft-buttons button{
-        font-size: 0.6rem;
-        padding: 0.4rem 0.6rem;
+        font-size: 0.7rem;
+        padding: 0.6rem 0.6rem;
         border-radius:0.5rem; 
         border: none;
         cursor: pointer;
@@ -117,5 +121,47 @@
     .print-all {
         background-color: #cce5ff;
         color: #004085;
+    }
+  }
+
+  @media screen and (min-width: 320px) and (max-width: 480px) and (orientation: portrait){
+    .draft-container{
+      height: 100svh;
+    }
+  
+    .activity-log-wrapper {
+      width: 90%;
+      height: 90%;
+      margin-left: 0;  
+    }
+
+    .category-selector{
+        margin-top: 0.5rem;
+        margin-left: -1rem;
+    }
+
+    .category-selector label{
+        font-size: 0.75rem;
+    }
+
+    .draft-dropdown {
+        font-size: 0.55rem;
+        padding: 0.25rem;
+    }
+
+    .draft-buttons{
+        gap: 0.8rem;
+    }
+
+    .draft-buttons button{
+        font-size: 0.55rem;
+        padding: 0.4rem 0.6rem;
+        border-radius:0.5rem; 
+        border: none;
+    }
+
+    .print ,
+    .print-all {
+        font-weight: 500;
     }
   }

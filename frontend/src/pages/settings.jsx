@@ -48,7 +48,9 @@ function Settings() {
       <Sidebar />
       <div className='settings-container'>
         <div className="setting-header">
-          Settings
+          <span>
+            Settings  
+          </span>
         </div>
         <div className='setting-content'>
           <div className="settings-card">

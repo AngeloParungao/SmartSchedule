@@ -39,7 +39,7 @@ function Sidebar(){
         document.querySelector('.sidebar-action').style.borderRadius = '0';
         document.getElementById('bars').style.display = 'block';
         document.getElementById('x-mark').style.display = 'none';
-        document.querySelector('.sidebar').style.marginLeft = '-4rem';
+        document.querySelector('.sidebar').style.marginLeft = '-6rem';
     }
 
     const logout = () =>{

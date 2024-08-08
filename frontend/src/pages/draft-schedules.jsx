@@ -311,7 +311,7 @@ function Draft() {
                         </div>
                     ) : (
                         <div className="category-selector">
-                            <label htmlFor="section">Select Section: </label>
+                            <label htmlFor="section">Section: </label>
                             <select
                                 name="section"
                                 value={selectedSection}
@@ -324,7 +324,7 @@ function Draft() {
                                     </option>
                                 ))}
                             </select>
-                            <label htmlFor="group">Select Group: </label>
+                            <label htmlFor="group">Group: </label>
                             <select
                                 name="group"
                                 value={selectedGroup}
