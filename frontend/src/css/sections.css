@@ -5,8 +5,7 @@
     justify-content: space-between;
     gap: 1rem;
     height: calc(100vh - 5rem);
-    width: calc(100vw - 6rem);
-    margin-left: 6rem;
+    width: 100%;
     padding: 1rem;
     font-family: 'Poppins' , serif;
     background-color: var(--background-color);
@@ -29,6 +28,7 @@ h2{
     padding: 1rem;
     background-color: rgb(233, 233, 233);
     border-radius: 0.5rem;
+    margin-left: 6rem;
 }
 
 .section-form div{
@@ -162,7 +162,7 @@ h2{
     padding: 0.5rem;
 }
 
-#search{
+#search-section{
     height: 2.5rem;
     width: 20rem;
     padding-left: 2.5rem;
@@ -170,7 +170,7 @@ h2{
     border-radius: 1.5rem;
 }
 
-#search::placeholder{
+#search-section::placeholder{
     color: rgb(148, 148, 148);
 }
 
@@ -222,4 +222,101 @@ h2{
 
 #delete-btn:hover {
     background-color: #e76f6f;
+}
+
+@media screen and (max-width: 1000px){
+    .sections-container{
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .section-form{
+        margin-left: 6rem;
+    }
+
+    .table-wrapper,
+    .upper-table{
+        margin-left: 6rem;
+    }
+}
+
+@media screen and (min-width: 480px) and (max-width: 700px){
+    .section-form{
+        margin-left: 0;
+    }
+    
+    .table-wrapper,
+    .upper-table {
+        margin-left: 0;
+    }
+
+    .table-wrapper{
+        display: flex;
+        justify-content: center;
+        max-height: 40rem;
+    }
+}
+
+@media screen and (min-width: 320px) and (max-width: 480px) and (orientation: portrait){
+    .sections-container{
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+    }
+
+    .section-form{
+        margin-left: 0;
+    }
+
+    .table-wrapper,
+    .upper-table {
+        margin-left: 0;
+    }
+
+    .table-wrapper{
+        display: flex;
+        justify-content: center;
+        max-height: 30rem;
+    }
+
+    .sections-table{
+        width: 98%;
+    }
+
+    .sections-table th,
+    .sections-table td {
+        padding: 0.5rem;
+        text-align: center;
+        border: 0.1rem solid rgb(201, 200, 200);
+        border-collapse: collapse;
+    }
+
+    .sections-table th:nth-child(1),
+    .sections-table th:nth-child(7) {
+        width: 2rem; /* Fixed width for small cells */
+    }
+
+
+    .sections-table th {
+        background-color: rgb(216, 216, 216);
+        font-size: 0.5rem;
+    }
+
+    .sections-table td{
+        font-size: 0.6rem;
+    }
+
+    #search-section{
+        height: 2rem;
+        width: 12rem;
+    }
+
+    #select-all-btn {
+        font-size: 0.6rem;
+    }
+    
+    #delete-btn {
+        font-size: 0.6rem
+    }
 }

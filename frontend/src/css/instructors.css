@@ -5,8 +5,7 @@
     justify-content: space-between;
     gap: 1rem;
     height: calc(100vh - 5rem);
-    width: calc(100vw - 6rem);
-    margin-left: 6rem;
+    width: 100%;
     padding: 1rem;
     font-family: 'Poppins' , serif;
     background-color: var(--background-color);
@@ -29,6 +28,7 @@ h2{
     padding: 1rem;
     background-color: rgb(233, 233, 233);
     border-radius: 0.5rem;
+    margin-left: 6rem;
 }
 
 .instructor-form div{
@@ -161,7 +161,7 @@ h2{
     padding: 0.5rem;
 }
 
-#search{
+#search-instructor{
     height: 2.5rem;
     width: 20rem;
     padding-left: 2.5rem;
@@ -169,7 +169,7 @@ h2{
     border-radius: 1.5rem;
 }
 
-#search::placeholder{
+#search-instructor::placeholder{
     color: rgb(148, 148, 148);
 }
 
@@ -221,4 +221,101 @@ h2{
 
 #delete-btn:hover {
     background-color: #e76f6f;
+}
+
+@media screen and (max-width: 1000px){
+    .instructors-container{
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+    }
+
+    .instructor-form{
+        margin-left: 6rem;
+    }
+
+    .table-wrapper,
+    .upper-table{
+        margin-left: 6rem;
+    }
+}
+
+@media screen and (min-width: 480px) and (max-width: 700px){
+    .instructor-form{
+        margin-left: 0;
+    }
+    
+    .table-wrapper,
+    .upper-table {
+        margin-left: 0;
+    }
+
+    .table-wrapper{
+        display: flex;
+        justify-content: center;
+        max-height: 40rem;
+    }
+}
+
+@media screen and (min-width: 320px) and (max-width: 480px) and (orientation: portrait){
+    .instructors-container{
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+    }
+
+    .instructor-form{
+        margin-left: 0;
+    }
+
+    .table-wrapper,
+    .upper-table {
+        margin-left: 0;
+    }
+
+    .table-wrapper{
+        display: flex;
+        justify-content: center;
+        max-height: 30rem;
+    }
+
+    .intructors-table{
+        width: 98%;
+    }
+
+    .instructors-table th,
+    .instructors-table td {
+        padding: 0.5rem;
+        text-align: center;
+        border: 0.1rem solid rgb(201, 200, 200);
+        border-collapse: collapse;
+    }
+
+    .instructors-table th:nth-child(1),
+    .instructors-table th:nth-child(5) {
+        width: 3rem; /* Fixed width for small cells */
+    }
+
+
+    .instructors-table th {
+        background-color: rgb(216, 216, 216);
+        font-size: 0.7rem;
+    }
+
+    .instructors-table td{
+        font-size: 0.6rem;
+    }
+
+    #search-instructor{
+        height: 2rem;
+        width: 12rem;
+    }
+
+    #select-all-btn {
+        font-size: 0.6rem;
+    }
+    
+    #delete-btn {
+        font-size: 0.6rem
+    }
 }

@@ -262,7 +262,7 @@ function Subjects() {
                     <div className='upper-table'>
                         <FontAwesomeIcon icon={faSearch} className='search-icon' />
                         <input
-                            id='search'
+                            id='search-subject'
                             type="text"
                             placeholder='Search'
                             value={searchTerm}

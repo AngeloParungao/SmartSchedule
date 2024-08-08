@@ -197,7 +197,7 @@ function Rooms() {
                     <div className='upper-table'>
                         <FontAwesomeIcon icon={faSearch} className='search-icon'/>
                         <input 
-                            id='search'
+                            id='search-room'
                             type="text" 
                             placeholder='Search' 
                             value={searchTerm} 

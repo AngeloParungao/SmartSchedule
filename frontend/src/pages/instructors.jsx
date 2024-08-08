@@ -263,7 +263,7 @@ function Instructors() {
                     <div className='upper-table'>
                         <FontAwesomeIcon icon={faSearch} className='search-icon'/>
                         <input 
-                            id='search'
+                            id='search-instructor'
                             type="text" 
                             placeholder='Search' 
                             value={searchTerm} 

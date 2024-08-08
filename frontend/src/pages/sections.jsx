@@ -245,7 +245,7 @@ function Sections(){
                     <div className='upper-table'>
                         <FontAwesomeIcon icon={faSearch} className='search-icon' />
                         <input
-                            id='search'
+                            id='search-section'
                             type="text"
                             placeholder='Search'
                             value={searchTerm}

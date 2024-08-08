@@ -4,6 +4,10 @@
     font-style: 'Poppins', serif;
 }
 
+body{
+  background-color: var(--background-color);
+}
+
 body.theme-dark {
   --background-color: #686868;
   --modal-color: #686868;
