@@ -145,8 +145,8 @@ function Instructors() {
     };
 
     const handleDeleteSelected = () => {
-            setIsPasswordPromptOpen(true);
-        };
+        setIsPasswordPromptOpen(true);
+    };
 
     const handlePasswordSubmit = (password) => {
         if (password === user.password) {
