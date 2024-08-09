@@ -195,23 +195,31 @@ function Scheduling() {
           <div>
             <label htmlFor="">Year & Section</label>
             <select className="section-dropdown" value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)}>
-              {Array.from(new Set(sections.map(section => section.section_name))).map((section, index) => (
-                <option key={index} value={section}>
-                  {section}
-                </option>
-              ))}
+              {
+                sections.length === 0 ?
+                (<option value="Section">Section</option>) :
+                (Array.from(new Set(sections.map(section => section.section_name))).map((section, index) => (
+                  <option key={index} value={section}>
+                    {section}
+                  </option>
+                )))
+              }
             </select>
             <select className="group-dropdown" value={selectedGroup} onChange={(e) => setSelectedGroup(e.target.value)}>
-            {sections.map((section, index) => {
-              if (section.section_name === selectedSection) {
-                return (
-                  <option key={index} value={section.section_group}>
-                    {section.section_group}
-                  </option>
-                );
-              }
-              return null;
-            })}
+            {
+              sections.length === 0 ? 
+              (<option value={"Group"}>Group</option>) :
+              (sections.map((section, index) => {
+                if (section.section_name === selectedSection) {
+                  return (
+                    <option key={index} value={section.section_group}>
+                      {section.section_group}
+                    </option>
+                  );
+                }
+                return null;
+                }))
+            }
             </select>
           </div>
           <div className='scheduling-btns'>

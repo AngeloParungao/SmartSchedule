@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../assets/components/sidebar';
 import Navbar from '../assets/components/scheduling-navbar';
+import PasswordPrompt from '../assets/components/password-prompt';
 import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,6 +9,9 @@ import { faPenToSquare, faSearch } from '@fortawesome/free-solid-svg-icons';
 import '../css/subjects.css';
 
 function Subjects() {
+    const [user, setUser] = useState([]);
+    const [isPasswordPromptOpen, setIsPasswordPromptOpen] = useState(false);
+
     const [subjectName, setSubjectName] = useState('');
     const [subjectCode, setSubjectCode] = useState('');
     const [yearLvl, setYearLvl] = useState('1st Year');
@@ -22,10 +26,25 @@ function Subjects() {
 
     const currentUser = JSON.parse(localStorage.getItem('userId'));
 
+    useEffect(() => {
+        axios.get("http://localhost:8082/api/auth/fetch")
+            .then(res => {
+                const foundUser = res.data.find(user => user.user_id === currentUser);
+                if (foundUser) {
+                    setUser(foundUser);
+                }
+            })
+            .catch(err => {
+                console.error('Failed to fetch users:', err);
+                toast.error("Failed to fetch users");
+            });
+    }, []);
+
 
     useEffect(() => {
         fetchSubjects();
     }, []);
+
 
     const fetchSubjects = async () => {
         try {
@@ -119,27 +138,35 @@ function Subjects() {
         }
     };
 
-
-
     const handleDeleteSelected = () => {
-        axios.delete("http://localhost:8082/api/subjects/delete", {
-            data: { subjectIds: selectedSubjectIds }
-        })
-        .then(res => {
-            //FOR ACTIVITY HISTORY
-            const number = selectedSubjectIds.length;
-            axios.post("http://localhost:8082/api/activity/adding",{
-                user_id : currentUser,
-                action : 'Delete',
-                details : `${number}`,
-                type : 'subject'
-            });
+        setIsPasswordPromptOpen(true);
+    };
 
-            toast.success("Deleted Successfully!");
-            fetchSubjects();
-            setSelectedSubjectIds([]);
-        })
-        .catch(err => toast.error("Error Deleting Subjects"));
+    const handlePasswordSubmit = (password) => {
+        if (password === user.password) {
+            // Proceed with deletion
+            axios.delete("http://localhost:8082/api/subjects/delete", {
+                data: { subjectIds: selectedSubjectIds }
+            })
+            .then(res => {
+                //FOR ACTIVITY HISTORY
+                const number = selectedSubjectIds.length;
+                axios.post("http://localhost:8082/api/activity/adding",{
+                    user_id : currentUser,
+                    action : 'Delete',
+                    details : `${number}`,
+                    type : 'subject'
+                });
+
+                toast.success("Deleted Successfully!");
+                fetchSubjects();
+                setSelectedSubjectIds([]);
+            })
+            .catch(err => toast.error("Error Deleting Subjects"));
+        }
+        else{
+            toast.error("Incorrect password");
+        }
     };
 
 
@@ -271,6 +298,11 @@ function Subjects() {
                         <div className='btns'>
                             <button id="select-all-btn" onClick={handleSelectAll}>Select All</button>
                             <button id="delete-btn" onClick={handleDeleteSelected}>Remove Subject/s</button>
+                            <PasswordPrompt 
+                                isOpen={isPasswordPromptOpen} 
+                                onRequestClose={() => setIsPasswordPromptOpen(false)}
+                                onSubmit={handlePasswordSubmit} 
+                            />
                         </div>
                     </div>
                     <div className='table-wrapper'>

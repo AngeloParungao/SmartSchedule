@@ -318,12 +318,16 @@ function Draft() {
                                 onChange={(e) => setSelectedSection(e.target.value)}
                                 className='draft-dropdown'
                             >
-                                {Array.from(new Set(sections.map(section => section.section_name))).map((section, index) => (
+                                {
+                                    sections.length === 0 ?
+                                    (<option value="Section">Section</option>) :
+                                    (Array.from(new Set(sections.map(section => section.section_name))).map((section, index) => (
                                     <option key={index} value={section}>
                                         {section}
                                     </option>
-                                ))}
-                            </select>
+                                    )))
+                                }
+                            </select>   
                             <label htmlFor="group">Group: </label>
                             <select
                                 name="group"
@@ -331,16 +335,20 @@ function Draft() {
                                 onChange={(e) => setSelectedGroup(e.target.value)}
                                 className='draft-dropdown'
                             >
-                                {sections.map((section, index) => {
-                                    if (section.section_name === selectedSection) {
+                                {
+                                    sections.length === 0 ? 
+                                    (<option value={"Group"}>Group</option>) :
+                                    (sections.map((section, index) => {
+                                        if (section.section_name === selectedSection) {
                                         return (
                                             <option key={index} value={section.section_group}>
-                                                {section.section_group}
+                                            {section.section_group}
                                             </option>
                                         );
-                                    }
-                                    return null;
-                                })}
+                                        }
+                                        return null;
+                                        }))
+                                }
                             </select>
                             <div className='draft-buttons'>
                                 <button className='print' onClick={() => generatePDF()}>Save as PDF</button>

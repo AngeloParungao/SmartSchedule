@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import PasswordPrompt from '../assets/components/password-prompt';
 import { toast } from 'react-hot-toast';
 import '../css/scheduling.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 function DeleteItemModal({ onClose, schedule, onDeleteItem }) {
+  const [user, setUser] = useState([]);
+  const [isPasswordPromptOpen, setIsPasswordPromptOpen] = useState(false);
+
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [subjects, setSubjects] = useState([]);
@@ -14,11 +18,29 @@ function DeleteItemModal({ onClose, schedule, onDeleteItem }) {
   // Fetch the current user ID from local storage
   const currentUser = JSON.parse(localStorage.getItem("userId"));
 
+  //VALIDATION OF USER
+  useEffect(() => {
+    axios.get("http://localhost:8082/api/auth/fetch")
+        .then(res => {
+            const foundUser = res.data.find(user => user.user_id === currentUser);
+            if (foundUser) {
+                setUser(foundUser);
+            }
+        })
+        .catch(err => {
+            console.error('Failed to fetch users:', err);
+            toast.error("Failed to fetch users");
+        });
+}, []);
+
+
   // Fetch subjects when the component mounts
   useEffect(() => {
     fetchSubjects();
     fetchSchedules();
   }, []);
+
+
 
   // Function to fetch subjects
   const fetchSubjects = async () => {
@@ -76,14 +98,17 @@ function DeleteItemModal({ onClose, schedule, onDeleteItem }) {
     );
   };
 
-  // Handle deletion of selected items
-  const handleDelete = () => {
-    if (selectedItems.length === 0) {
-      toast.error("None is selected");
-      return;
-    }
 
-    if (window.confirm("Are you sure you want to delete selected items?")) {
+  const handleDelete = () => {
+    setIsPasswordPromptOpen(true);
+  };
+
+  const handlePasswordSubmit = (password) => {
+    if (password === user.password) {
+      if (selectedItems.length === 0) {
+        toast.error("None is selected");
+        return;
+      }
       // Prepare items to delete
       const itemsToDelete = new Set(selectedItems);
 
@@ -127,6 +152,9 @@ function DeleteItemModal({ onClose, schedule, onDeleteItem }) {
       // Call the delete function with all items
       onDeleteItem(itemsToDeleteArray);
     }
+    else{
+        toast.error("Incorrect password");
+    }
   };
 
   const isDarkBackground = (backgroundColor) => {
@@ -156,6 +184,11 @@ function DeleteItemModal({ onClose, schedule, onDeleteItem }) {
           <button onClick={onClose} className="delete-close-btn">
             <FontAwesomeIcon icon={faXmark} />
           </button>
+          <PasswordPrompt 
+            isOpen={isPasswordPromptOpen} 
+            onRequestClose={() => setIsPasswordPromptOpen(false)}
+            onSubmit={handlePasswordSubmit} 
+          />
         </div>
         <div className="delete-body">
           {sortedSchedules.map(schedule => (
