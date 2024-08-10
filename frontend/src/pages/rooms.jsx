@@ -39,6 +39,7 @@ function Rooms() {
 
 
     useEffect(() => {
+        toast.dismiss();
         fetchRooms();
     }, []);
 

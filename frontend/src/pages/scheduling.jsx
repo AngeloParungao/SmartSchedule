@@ -4,9 +4,9 @@ import Navbar from '../assets/components/scheduling-navbar';
 import axios from 'axios';
 import { Toaster, toast } from 'react-hot-toast';
 import '../css/scheduling.css';
-import AddItemModal from './AddItemModal';
-import DeleteItemModal from './DeleteItemModal';
-import EditItemModal from './EditItemModal';
+import AddItemModal from '../assets/components/AddItemModal';
+import DeleteItemModal from '../assets/components/DeleteItemModal';
+import EditItemModal from '../assets/components/EditItemModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
@@ -39,6 +39,7 @@ function Scheduling() {
   const currentUser = JSON.parse(localStorage.getItem('userId'));
   
   useEffect(() => {
+    toast.dismiss();
     fetchSections();
     fetchSchedules();
   }, []);

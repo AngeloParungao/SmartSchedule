@@ -9,6 +9,7 @@ function Settings() {
   const [theme, setTheme] = useState('');
 
   useEffect(() => {
+    toast.dismiss();
     if (userId) {
       const savedTheme = localStorage.getItem(`theme-${userId}`);
       if (savedTheme) {

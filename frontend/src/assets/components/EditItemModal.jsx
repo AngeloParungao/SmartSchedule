@@ -2,23 +2,23 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import ReactPaginate from 'react-paginate';
-import '../css/scheduling.css';
+import '../../css/scheduling.css'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faAngleLeft, 
   faAngleRight, 
-  faWarning, 
+  faWarning , 
   faLightbulb, 
   faUser, 
   faDoorOpen, 
-  faBook, 
-  faSearch, 
-  faXmark 
+  faBook, faSearch 
 } from '@fortawesome/free-solid-svg-icons';
 
 
 
-function AddItemModal({ onClose, section, group, onItemAdded }) {
+
+
+function EditItemModal({ onClose, item, onItemUpdated }) {
 
   // State variables to manage schedules, instructors, subjects, sections, and rooms data
   const [schedules, setSchedules] = useState([]);
@@ -52,7 +52,8 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
   const [recommendations, setRecommendations] = useState([]);
 
   // Fetch the current user ID from local storage
-  const currentUser = JSON.parse(localStorage.getItem('userId'));
+  const currentUser = JSON.parse(localStorage.getItem("userId"));
+
 
   // Fetch data when the component mounts
   useEffect(() => {
@@ -63,10 +64,28 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
     fetchRooms();
   }, []);
 
+
+  useEffect(() => {
+      setSubjectName(item.subject);
+      setInstructorName(item.instructor);
+      setRoomName(item.room);
+      setSelectedColor(item.background_color);
+      setMeetingDay(item.day);
+      setStartTime(item.start_time);
+      setEndTime(item.end_time);
+      setCourseType(item.class_type);
+  }, [item]);
+
+
+
   // Generate recommendations whenever relevant fields change
   useEffect(() => {
-    generateRecommendations(schedules);
-  }, [instructorName, subjectName, roomName, courseType, meetingDay]);
+    if (instructorName && subjectName && roomName && courseType && meetingDay && startTime && endTime) {
+      generateRecommendations(schedules);
+    }
+  }, [instructorName, subjectName, roomName, courseType, meetingDay, startTime, endTime, schedules]);
+
+
 
   // Check for real-time errors whenever relevant fields change
   useEffect(() => {
@@ -74,7 +93,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
   }, [instructorName, subjectName, roomName, meetingDay, startTime, endTime, courseType]);
 
 
-  
+
   // Fetch schedules from the API
   const fetchSchedules = async () => {
     try {
@@ -85,6 +104,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
       toast.error('Failed to fetch schedules');
     }
   };
+
 
   // Fetch instructors from the API
   const fetchInstructors = async () => {
@@ -108,6 +128,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
     }
   };
 
+
   // Fetch subjects from the API
   const fetchSubjects = async () => {
     try {
@@ -119,10 +140,11 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
     }
   };
 
+
   // Fetch rooms from the API
   const fetchRooms = async () => {
     try {
-      const response = await axios.get('http://localhost:8082/api/rooms/fetch');
+      const response = await axios.get(`http://localhost:8082/api/rooms/fetch?creator_id=${currentUser}`);
       setRooms(response.data);
     } catch (error) {
       console.error('Error fetching rooms:', error);
@@ -130,19 +152,21 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
     }
   };
 
+
   // Generate recommendations based on availability of instructors, rooms, and sections
   const generateRecommendations = (schedules) => {
-    if (!instructorName || !roomName) {
+    if (!instructorName || !roomName || !meetingDay || !startTime || !endTime || !item) {
       setRecommendations([]);
       return;
     }
-
+  
     const subject = subjects.find(subject => subject.subject_name === subjectName);
     const duration = courseType === 'Laboratory' || (subject && subject.subject_type === 'Minor') ? 3 : 2;
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const availableSlots = [];
-
+  
     days.forEach(day => {
+
       if (meetingDay && meetingDay !== day) {
         return;
       }
@@ -150,43 +174,43 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
       for (let hour = 7; hour <= 20 - duration; hour++) {
         const start = `${hour.toString().padStart(2, '0')}:00:00`;
         const end = `${(hour + duration).toString().padStart(2, '0')}:00:00`;
-
+  
+        const isConflict = (schedule, start, end) => {
+          const scheduleStart = schedule.start_time;
+          const scheduleEnd = schedule.end_time;
+          return (
+            (start >= scheduleStart && start < scheduleEnd) ||
+            (end > scheduleStart && end <= scheduleEnd) ||
+            (start <= scheduleStart && end >= scheduleEnd)
+          );
+        };
+  
         const instructorAvailable = !schedules.some(schedule =>
+          schedule.instructor === item.instructor &&
           schedule.instructor === instructorName &&
           schedule.day === day &&
-          (
-            (start >= schedule.start_time && start < schedule.end_time) ||
-            (end > schedule.start_time && end <= schedule.end_time) ||
-            (start <= schedule.start_time && end >= schedule.end_time)
-          )
+          isConflict(schedule, start, end)
         );
-
+  
         const roomAvailable = !schedules.some(schedule =>
+          schedule.room === item.room &&
           schedule.room === roomName &&
           schedule.day === day &&
-          (
-            (start >= schedule.start_time && start < schedule.end_time) ||
-            (end > schedule.start_time && end <= schedule.end_time) ||
-            (start <= schedule.start_time && end >= schedule.end_time)
-          )
+          isConflict(schedule, start, end)
         );
-
+  
         const sectionAvailable = !schedules.some(schedule =>
-          schedule.section_name === section &&
-          schedule.section_group === group &&
+          schedule.section_name === item.section_name &&
+          schedule.section_group === item.section_group &&
           schedule.day === day &&
-          (
-            (start >= schedule.start_time && start < schedule.end_time) ||
-            (end > schedule.start_time && end <= schedule.end_time) ||
-            (start <= schedule.start_time && end >= schedule.end_time)
-          )
+          isConflict(schedule, start, end)
         );
-
+  
         const subject = subjects.find(subject => subject.subject_name === subjectName);
         const alternateGroupAvailable = subject && subject.subject_type === 'Minor' ? 
           !schedules.some(schedule =>
-            schedule.section_name === section &&
-            schedule.section_group === (group === 'Group 1' ? 'Group 2' : 'Group 1') &&
+            schedule.section_name === item.section_name &&
+            schedule.section_group === (item.section_group === 'Group 1' ? 'Group 2' : 'Group 1') &&
             schedule.day === day &&
             (
               (start >= schedule.start_time && start < schedule.end_time) ||
@@ -204,37 +228,64 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
         }
       }
     });
-
+  
     setRecommendations(availableSlots);
   };
+  
 
-  // Check for real-time errors based on the current schedules and form inputs
+  
   const checkRealTimeErrors = () => {
-    const timeConflict = (schedule) => {
-      const newStartTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
-      const newEndTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
-      const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
-      const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
-
-      // Check if the schedule matches the selected section and group
-      if (
-        schedule.section_name === section &&
-        schedule.section_group === group &&
-        schedule.day === meetingDay
-      ) {
-        return (
-          (newStartTimeInMinutes >= start && newStartTimeInMinutes < end) ||
-          (newEndTimeInMinutes > start && newEndTimeInMinutes <= end) ||
-          (newStartTimeInMinutes <= start && newEndTimeInMinutes >= end)
-        );
-      }
-      return false;
+    const parseTimeToMinutes = (time) => {  
+        const [hours, minutes] = time.split(':').map(Number);
+        return hours * 60 + minutes;
     };
 
-    const hasTimeConflict = schedules.some(timeConflict);
+    const startTimeInMinutes = parseTimeToMinutes(startTime);
+    const endTimeInMinutes = parseTimeToMinutes(endTime);
+    
+    const subject = subjects.find(subject => subject.subject_name === subjectName);
+    const isMinor = subject && subject.subject_type === 'Minor';
+    const alternateGroup = isMinor ? (item.section_group === 'Group 1' ? 'Group 2' : 'Group 1') : null;
+
+    const checkTimeConflict = (schedule) => {
+        const start = parseTimeToMinutes(schedule.start_time);
+        const end = parseTimeToMinutes(schedule.end_time);
+
+        if (schedule.schedule_id === item.schedule_id) {
+            return false; // Skip checking the current schedule
+        }
+
+        // Check for conflicts with both groups if minor subject
+        if (isMinor) {
+            const inCurrentGroup = schedule.section_group === item.section_group &&
+                                   schedule.section_name === item.section_name &&
+                                   schedule.day === meetingDay;
+
+            const inAlternateGroup = schedule.section_group === alternateGroup &&
+                                     schedule.section_name === item.section_name &&
+                                     schedule.day === meetingDay;
+
+            const overlaps = (startTimeInMinutes >= start && startTimeInMinutes < end) ||
+                             (endTimeInMinutes > start && endTimeInMinutes <= end) ||
+                             (startTimeInMinutes <= start && endTimeInMinutes >= end);
+
+            return (inCurrentGroup || inAlternateGroup) && overlaps;
+        }
+
+        // For non-minor subjects
+        return schedule.section_name === item.section_name &&
+               schedule.section_group === item.section_group &&
+               schedule.day === meetingDay &&
+               ((startTimeInMinutes >= start && startTimeInMinutes < end) ||
+                (endTimeInMinutes > start && endTimeInMinutes <= end) ||
+                (startTimeInMinutes <= start && endTimeInMinutes >= end));
+    };
+
+    const hasTimeConflict = schedules.some(checkTimeConflict);
     setTimeError(hasTimeConflict);
 
     const instructorAvailability = schedules.some(schedule =>
+      schedule.schedule_id !== item.schedule_id &&
       schedule.instructor === instructorName &&
       schedule.day === meetingDay &&
       (
@@ -246,6 +297,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
     setInstructorError(instructorAvailability);
 
     const roomAvailability = schedules.some(schedule =>
+      schedule.schedule_id !== item.schedule_id &&
       schedule.room === roomName &&
       schedule.day === meetingDay &&
       (
@@ -256,122 +308,166 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
     );
     setRoomError(roomAvailability);
 
-    const startTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
-    const endTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
-    const newDuration = (endTimeInMinutes - startTimeInMinutes) / 60;
-  
     const subjectSectionSchedules = schedules.filter(schedule =>
-      schedule.subject === subjectName &&
-      schedule.section_name === section &&
-      schedule.section_group === group
+        schedule.schedule_id !== item.schedule_id &&
+        (!isMinor || schedule.section_group !== alternateGroup) &&
+        schedule.subject === subjectName &&
+        schedule.section_name === item.section_name &&
+        schedule.section_group === item.section_group
     );
-  
+
     const totalHours = subjectSectionSchedules.reduce((sum, schedule) => {
-      const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
-      const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
-      return sum + (end - start) / 60;
+        const start = parseTimeToMinutes(schedule.start_time);
+        const end = parseTimeToMinutes(schedule.end_time);
+        return sum + (end - start) / 60;
     }, 0);
-  
+
     const numberOfMeetings = subjectSectionSchedules.length;
-  
-    const exceedsLimits = totalHours + newDuration > 5 || numberOfMeetings >= 2;
+
+    const exceedsLimits = totalHours + (endTimeInMinutes - startTimeInMinutes) / 60 > 5 || numberOfMeetings >= 2;
     setSubjectError(exceedsLimits);
-  
-    const hasLecture = subjectSectionSchedules.some(schedule => schedule.class_type === 'Lecture');
-    const hasLaboratory = subjectSectionSchedules.some(schedule => schedule.class_type === 'Laboratory');
-  
-    const alreadyExists = (courseType === 'Lecture' && hasLecture) || (courseType === 'Laboratory' && hasLaboratory);
-    setCourseError(alreadyExists);
-  };
-      
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-    
-      if (instructorError || roomError || subjectError || courseError || timeError) {
-        toast.error("Error in adding");
-        return;
-      } else {
-        const newItem = {
-          subjectName,
-          instructorName,
-          roomName,
-          selectedColor,
-          meetingDay,
-          startTime,
-          endTime,
-          courseType,
-          section,
-          group,
-          currentUser
-        };
-    
-        try {
-          // Check if subject type is 'Minor'
-          const subject = subjects.find(subject => subject.subject_name === subjectName);
-          if (subject && subject.subject_type === 'Minor') {
-            // Find the alternate group
-            const alternateGroup = group === 'Group 1' ? 'Group 2' : 'Group 1';
-            
-            // Check if the section has other groups
-            const sectionHasOtherGroups = sections.some(sec =>
-              sec.section_name === section &&
-              sec.section_group !== group
-            );
-    
-            if (sectionHasOtherGroups) {
-              // Check if alternate group is available
-              const isAlternateGroupAvailable = !schedules.some(schedule =>
-                schedule.section_name === section &&
-                schedule.section_group === alternateGroup &&
-                schedule.day === meetingDay &&
-                (
-                  (startTime >= schedule.start_time && startTime < schedule.end_time) ||
-                  (endTime > schedule.start_time && endTime <= schedule.end_time) ||
-                  (startTime <= schedule.start_time && endTime >= schedule.end_time)
-                )
-              );
-    
-              if (isAlternateGroupAvailable /*&& window.confirm(`Do you want to also add this to this section's other group (${alternateGroup})?`)*/) {
-                // Add the same item to the alternate group
-                const alternateItem = { ...newItem, group: alternateGroup };
-                await axios.post('http://localhost:8082/api/schedule/adding', alternateItem);
-                await axios.post('http://localhost:8082/api/activity/adding', {
-                  user_id: currentUser,
-                  action: 'Add',
-                  details: `${section} - ${alternateGroup}`,
-                  type: 'schedule'
-                });
-              }
-            } 
-          }
-    
-          // Add the item to the original group
-          await axios.post('http://localhost:8082/api/schedule/adding', newItem);
-    
-          // Add to activity history for the original item
-          await axios.post('http://localhost:8082/api/activity/adding', {
-            user_id: currentUser,
-            action: 'Add',
-            details: `${section} - ${group}`,
-            type: 'schedule'
-          });
-    
-          toast.success('Item added successfully!');
-          onItemAdded(newItem);
-          onClose();
-        } catch (error) {
-          console.error('Error adding item:', error);
-          toast.error('Failed to add item');
-        }
-      }
-    };
-    
-    
-    
+
+
+     // Check for existing course type conflicts
+     const alreadyExists = subjectSectionSchedules.some(schedule => {
+      // Exclude the current item being edited
+      if (schedule.schedule_id === item.schedule_id) return false;
+
+      const isLectureConflict = courseType === 'Lecture' && schedule.class_type === 'Lecture';
+      const isLaboratoryConflict = courseType === 'Laboratory' && schedule.class_type === 'Laboratory';
+
+      return isLectureConflict || isLaboratoryConflict;
+  });
+
+  setCourseError(alreadyExists);
+};
+
+
   
 
-    //------FILTERING------//
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validate form fields
+    if (instructorError || roomError || subjectError || courseError || timeError) {
+        toast.error("Error in updating");
+        return;
+    }
+
+    const updatedItem = {
+        subjectName,
+        instructorName,
+        roomName,
+        selectedColor,
+        meetingDay,
+        startTime,
+        endTime,
+        courseType,
+    };
+
+    try {
+        // Check if the subject type is 'Minor'
+        const subject = subjects.find(subject => subject.subject_name === subjectName);
+        if (subject && subject.subject_type === 'Minor') {
+            // Determine the alternate group
+            const alternateGroup = item.section_group === 'Group 1' ? 'Group 2' : 'Group 1';
+
+            // Check if the section has other groups
+            const sectionHasOtherGroups = sections.some(sec =>
+                sec.section_name === item.section_name &&
+                sec.section_group !== item.section_group
+            );
+
+            if (sectionHasOtherGroups) {
+                // Determine if we need to check the alternate group availability
+                const hasTimeChanged = item.day !== meetingDay || item.start_time !== startTime || item.end_time !== endTime;
+                let isAlternateGroupAvailable = true;
+
+                if (hasTimeChanged) {
+                    // Check if the alternate group is available
+                    isAlternateGroupAvailable = !schedules.some(schedule =>
+                        schedule.section_name === item.section_name &&
+                        schedule.section_group === alternateGroup &&
+                        schedule.day === meetingDay &&
+                        (
+                            (startTime >= schedule.start_time && startTime < schedule.end_time) ||
+                            (endTime > schedule.start_time && endTime <= schedule.end_time) ||
+                            (startTime <= schedule.start_time && endTime >= schedule.end_time)
+                        )
+                    );
+                }
+
+                if (isAlternateGroupAvailable) {
+                    // Update the alternate group schedule if available
+                    const alternateGroupSchedule = schedules.find(schedule =>
+                        schedule.section_name === item.section_name &&
+                        schedule.section_group === alternateGroup &&
+                        schedule.subject === subjectName
+                    );
+
+                    if (alternateGroupSchedule) {
+                        await axios.put(`http://localhost:8082/api/schedule/update/${alternateGroupSchedule.schedule_id}`, updatedItem);
+                        await axios.post('http://localhost:8082/api/activity/adding', {
+                            user_id: currentUser,
+                            action: 'Update',
+                            details: `${item.section_name} - ${alternateGroup}`,
+                            type: 'schedule'
+                        });
+                    }
+                } else if (!hasTimeChanged) {
+                    console.log("hello");
+                    // If the time hasn't changed, update the alternate group even if it's not available
+                    const alternateGroupSchedule = schedules.find(schedule =>
+                        schedule.section_name === item.section_name &&
+                        schedule.section_group === alternateGroup &&
+                        schedule.subject === subjectName
+                    );
+
+                    if (alternateGroupSchedule) {
+                        await axios.put(`http://localhost:8082/api/schedule/update/${alternateGroupSchedule.schedule_id}`, {
+                            ...updatedItem,
+                            startTime: alternateGroupSchedule.start_time,
+                            endTime: alternateGroupSchedule.end_time,
+                            day: alternateGroupSchedule.day,
+                        });
+                        await axios.post('http://localhost:8082/api/activity/adding', {
+                            user_id: currentUser,
+                            action: 'Update',
+                            details: `${item.section_name} - ${alternateGroup}`,
+                            type: 'schedule'
+                        });
+                    }
+                }
+            }
+        }
+
+        // Update the original item
+        await axios.put(`http://localhost:8082/api/schedule/update/${item.schedule_id}`, updatedItem);
+
+        // Add to activity history for the original item
+        await axios.post('http://localhost:8082/api/activity/adding', {
+            user_id: currentUser,
+            action: 'Update',
+            details: `${item.section_name} - ${item.section_group}`,
+            type: 'schedule'
+        });
+
+        toast.success('Item updated successfully!');
+        onItemUpdated(updatedItem);
+        onClose();
+    } catch (error) {
+        console.error('Error updating item:', error);
+        toast.error('Failed to update item');
+    }
+};
+
+
+
+
+
+
+  //------FILTERING------//
 
     //------instructors-------//
     const [selectedTag, setSelectedTag] = useState('');
@@ -410,83 +506,79 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
 
     //------rooms-------//
     const filteredRooms = rooms.filter(room => room.room_type === courseType);
-  
 
-    
-    return (
-      <div className="modal">
-        <div className="modal-content">
-          <div className='upper'>
-            <button className="close-btn" onClick={onClose}>
-              <FontAwesomeIcon icon={faXmark}/>
-            </button>
-          </div>
-          <form className='schedule-form' onSubmit={handleSubmit}>
-            <div className='recommendation'>
-                <span>
-                  <FontAwesomeIcon icon={faLightbulb} className='lightbulb' />
-                  Recommendation
-                </span>
-                  {recommendations.length > 0 ? (
-                    recommendations.map((rec, index) => (
-                      <div key={index} onClick={() => {
-                        setMeetingDay(rec.day);
-                        setStartTime(rec.start);
-                        setEndTime(rec.end);
-                      }}>
-                        <span id='day'>
-                          {rec.day}
-                        </span>
-                        : 
-                        <span id='time'>
-                        {`${rec.start.slice(0, 2) % 12 || 12}:${rec.start.slice(3, 5)} ${rec.start.slice(0, 2) >= 12 ? 'PM' : 'AM'} - ${rec.end.slice(0, 2) % 12 || 12}:${rec.end.slice(3, 5)} ${rec.end.slice(0, 2) >= 12 ? 'PM' : 'AM'}`}
-                        </span>
-                      </div>
-                    ))
-                  ) : (
-                    <p>No recommendations available</p>
-                  )}
+  return (
+    <div className="modal">
+      <div className="modal-content">
+        <div className='upper'>
+          <button className="close-btn" onClick={onClose}>X</button>
+        </div>
+        <form className='schedule-form' onSubmit={handleSubmit}>
+          <div className='recommendation'>
+              <span>
+                <FontAwesomeIcon icon={faLightbulb} className='lightbulb' />
+                Recommendation
+              </span>
+                {recommendations.length > 0 ? (
+                  recommendations.map((rec, index) => (
+                    <div key={index} onClick={() => {
+                      setMeetingDay(rec.day);
+                      setStartTime(rec.start);
+                      setEndTime(rec.end);
+                    }}>
+                      <span id='day'>
+                        {rec.day}
+                      </span>
+                       : 
+                      <span id='time'>
+                      {`${rec.start.slice(0, 2) % 12 || 12}:${rec.start.slice(3, 5)} ${rec.start.slice(0, 2) >= 12 ? 'PM' : 'AM'} - ${rec.end.slice(0, 2) % 12 || 12}:${rec.end.slice(3, 5)} ${rec.end.slice(0, 2) >= 12 ? 'PM' : 'AM'}`}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p>No recommendations available</p>
+                )}
+            </div>
+          <div className='form'>
+            <div className='form-content'>
+              <div>
+                <label>Instructor</label>
+                <input
+                  type="text"
+                  name="instructorName"
+                  placeholder="Instructor Name"
+                  value={instructorName}
+                  onChange={(e) => setInstructorName(e.target.value)}
+                  className={instructorError ? 'error-border' : ''}
+                  required
+                />
               </div>
-            <div className='form'>
-              <div className='form-content'>
-                <div>
-                  <label>Instructor</label>
-                  <input
-                    type="text"
-                    name="instructorName"
-                    placeholder="Instructor Name"
-                    value={instructorName}
-                    onChange={(e) => setInstructorName(e.target.value)}
-                    className={instructorError ? 'error-border' : ''}
-                    required
-                  />
-                </div>
-                <div>
-                  {instructorError && <p className="error-message">
-                    <FontAwesomeIcon icon={faWarning} className='warning-icon' />
-                    Instructor is not available during this time slot.</p>}
-                </div>
+              <div>
+                {instructorError && <p className="error-message">
+                  <FontAwesomeIcon icon={faWarning} className='warning-icon' />
+                  Instructor is not available during this time slot.</p>}
               </div>
-              <div className='form-content'>
-                <div>
-                  <label>Course Title</label>
-                  <input
-                    type="text"
-                    name="subjectName"
-                    placeholder="Subject Name"
-                    value={subjectName}
-                    onChange={(e) => setSubjectName(e.target.value)}
-                    className={subjectError ? 'error-border' : ''}
-                    required
-                  />
-                </div>
-                <div>
-                  {subjectError && <p className="error-message">
-                    <FontAwesomeIcon icon={faWarning} className='warning-icon' />
-                    Subject has reached meeting quota</p>}
-                </div>
+            </div>
+            <div className='form-content'>
+              <div>
+                <label>Course Title</label>
+                <input
+                  type="text"
+                  name="subjectName"
+                  placeholder="Subject Name"
+                  value={subjectName}
+                  onChange={(e) => setSubjectName(e.target.value)}
+                  className={subjectError ? 'error-border' : ''}
+                  required
+                />
               </div>
-              {
+              <div>
+                {subjectError && <p className="error-message">
+                  <FontAwesomeIcon icon={faWarning} className='warning-icon' />
+                  Subject has reached meeting quota</p>}
+              </div>
+            </div>
+            {
                 subjectName === '' || subjects.find(subject => subject.subject_name === subjectName)?.subject_type === 'Major'
                   ? 
                   <div className='form-content'>
@@ -505,37 +597,39 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
                   </div>
                   : null
               }
-              <div className='form-content'>
-                <div>
-                  <label>Room #</label>
-                  <input
-                    type="text"
-                    name="roomName"
-                    placeholder="Room"
-                    value={roomName}
-                    onChange={(e) => setRoomName(e.target.value)}
-                    className={roomError ? 'error-border' : ''}
-                    required
-                  />
-                </div>
-                <div>
-                  {roomError && <p className="error-message">
-                    <FontAwesomeIcon icon={faWarning} className='warning-icon' />
-                    Room is not available during this time slot.</p>}
-                </div>
+            <div className='form-content'>
+              <div>
+                <label>Room #</label>
+                <input
+                  type="text"
+                  name="roomName"
+                  placeholder="Room"
+                  value={roomName}
+                  onChange={(e) => setRoomName(e.target.value)}
+                  className={roomError ? 'error-border' : ''}
+                  required
+                />
               </div>
-              <div className='form-content'>
-                <div>
-                  <label>Color</label>
-                  <input 
-                    type="color"
-                    value={selectedColor}
-                    onChange={(e) => setSelectedColor(e.target.value)}
-                  />
-                </div>
-                <div></div>
+              <div>
+                {roomError && <p className="error-message">
+                  <FontAwesomeIcon icon={faWarning} className='warning-icon' />
+                  Room is not available during this time slot.</p>}
               </div>
-              <div className='form-content'>
+            </div>
+            <div className='form-content'>
+              <div>
+                <label>Color</label>
+                <input
+                  type="color"
+                  name="selectedColor"
+                  value={selectedColor}
+                  onChange={(e) => setSelectedColor(e.target.value)}
+                  required
+                />
+              </div>
+              <div></div>
+            </div>
+            <div className='form-content'>
                 <div>
                   <label>Meeting Day</label>
                   <div className="days-checkboxes">
@@ -549,39 +643,45 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
                 </div>
                 <div></div>
               </div>
-              <div className='form-content'>
-                <div>
-                  <label>Start time</label>
-                  <input 
-                    type="time" 
-                    value={startTime} 
-                    className={timeError ? 'error-border' : ''}
-                    onChange={(e) => setStartTime(e.target.value)} />
-                </div>
-                <div>
+            <div className='form-content'>
+              <div>
+                <label>Start Time</label>
+                <input
+                  type="time"
+                  name="startTime"
+                  placeholder="Start Time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
                   {timeError && <p className="error-message">
                     <FontAwesomeIcon icon={faWarning} className='warning-icon' />
                     Time not available for this section</p>}
                 </div>
-              </div>
-              <div className='form-content'>
-                <div>
-                  <label>End time</label>
-                  <input 
-                    type="time" 
-                    value={endTime} 
-                    className={timeError ? 'error-border' : ''}
-                    onChange={(e) => setEndTime(e.target.value)} />
-                </div>
-                <div></div>
-              </div>
-              <button className="add-sched" type="submit">Add schedule</button>
             </div>
-          </form>
-          <div className="lists">
+            <div className='form-content'>
+              <div>
+                <label>End Time</label>
+                <input
+                  type="time"
+                  name="endTime"
+                  placeholder="End Time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  required
+                />
+              </div>
+              <div></div>
+            </div>
+            <button type="submit" className='add-sched'>Save</button>
+          </div>
+        </form>
+        <div className="lists">
             <div className="list-container">
               <div>
-                <div className='list-headings'>
+                <div className="list-headings">
                   <h4>
                     <FontAwesomeIcon icon={faUser} className='instructor-icon' />
                     Instructors
@@ -623,19 +723,19 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
               />
             </div>
             <div className="list-container">
-              <div className="list-headings">
+              <div className='list-headings'>
                 <h4>
                   <FontAwesomeIcon icon={faBook} className='subject-icon' />
                   Subjects
                 </h4>
                 <select name="yearLevel" id="yearLevel" value={selectedLevel} onChange={handleLevelChange}>
-                  <option value="">All</option>
-                  {Array.from(new Set(subjects.map(subject => subject.year_lvl))).map((year, index) => (
-                    <option key={index} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
+                    <option value="">All</option>
+                    {Array.from(new Set(subjects.map(subject => subject.year_lvl))).map((year, index) => (
+                      <option key={index} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
               </div>
               <ul>
                 {filteredSubjects.slice(currentSubjectPage * itemsPerPage, (currentSubjectPage + 1) * itemsPerPage).map(subject => (
@@ -660,7 +760,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
               />
             </div>
             <div className="list-container">
-              <div className="list-headings">
+              <div className='list-headings'>
                 <h4>
                   <FontAwesomeIcon icon={faDoorOpen} className='room-icon' />
                   Rooms
@@ -687,9 +787,9 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
               />
             </div>
           </div>
-        </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
-export default AddItemModal;
+export default EditItemModal;

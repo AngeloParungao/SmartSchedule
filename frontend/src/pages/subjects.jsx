@@ -42,6 +42,7 @@ function Subjects() {
 
 
     useEffect(() => {
+        toast.dismiss();
         fetchSubjects();
     }, []);
 

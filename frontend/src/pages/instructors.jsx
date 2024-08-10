@@ -44,6 +44,7 @@ function Instructors() {
 
     //FETCHING OF INSTRUCTORS DATA
     useEffect(() => {
+        toast.dismiss();
         fetchInstructors();
     }, []);
 

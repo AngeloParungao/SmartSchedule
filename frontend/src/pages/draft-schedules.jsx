@@ -42,6 +42,7 @@ function Draft() {
     const [selectedGroup, setSelectedGroup] = useState('');
 
     useEffect(() => {
+        toast.dismiss();
         fetchSchedules();
         fetchSections();
         fetchInstructors();

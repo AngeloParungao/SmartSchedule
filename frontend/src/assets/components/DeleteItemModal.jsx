@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import PasswordPrompt from '../assets/components/password-prompt';
+import PasswordPrompt from './password-prompt';
 import { toast } from 'react-hot-toast';
-import '../css/scheduling.css';
+import '../../css/scheduling.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 

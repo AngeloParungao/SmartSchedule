@@ -41,6 +41,7 @@ function Sections(){
 
 
     useEffect(() => {
+        toast.dismiss();
         fetchSections();
     }, []);
 

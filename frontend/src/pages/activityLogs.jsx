@@ -4,6 +4,7 @@ import Sidebar from '../assets/components/sidebar';
 import "../css/activityLogs.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faUser, faChalkboardTeacher, faBook, faDoorClosed, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import toast from 'react-hot-toast';
 
 function ActivityLog() {
   const [activity, setActivity] = useState([]);
@@ -12,6 +13,7 @@ function ActivityLog() {
   const currentUser = JSON.parse(localStorage.getItem("userId"));
 
   useEffect(() => {
+    toast.dismiss();
     fetchActivity();
   }, []);
 
