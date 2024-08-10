@@ -29,14 +29,21 @@
 .navigation a{
     font-size: 1.25vw;
     text-decoration: none;
-    color: black;
     color: var(--text-color);
+}
+
+.navigation a:hover{
+    color: rgb(177, 177, 177);
 }
 
 .navigation a.active{
     color: var(--active);
     border-bottom: 0.2rem solid var(--active);
     background-color: var(--background-color);
+}
+
+.navigation a.active:hover{
+    color: rgb(177, 177, 177);
 }
 
 .navigation-small-screen{
