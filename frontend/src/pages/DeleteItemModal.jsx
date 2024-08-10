@@ -100,15 +100,15 @@ function DeleteItemModal({ onClose, schedule, onDeleteItem }) {
 
 
   const handleDelete = () => {
+    if(selectedItems.length === 0){
+      toast.error("None is selected")
+      return;
+    }
     setIsPasswordPromptOpen(true);
   };
 
   const handlePasswordSubmit = (password) => {
     if (password === user.password) {
-      if (selectedItems.length === 0) {
-        toast.error("None is selected");
-        return;
-      }
       // Prepare items to delete
       const itemsToDelete = new Set(selectedItems);
 
@@ -136,7 +136,6 @@ function DeleteItemModal({ onClose, schedule, onDeleteItem }) {
                 ) {
                   if (!itemsToDelete.has(schedule.schedule_id)) {
                     itemsToDelete.add(schedule.schedule_id);
-                    console.log(`Added schedule ${schedule.schedule_id} to delete list.`);
                   }
                 }
               });

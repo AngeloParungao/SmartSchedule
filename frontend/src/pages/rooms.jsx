@@ -125,6 +125,10 @@ function Rooms() {
     };
 
     const handleDeleteSelected = () => {
+            if(selectedRoomIds.length === 0){
+                toast.error("None is selected")
+                return;
+            }
         setIsPasswordPromptOpen(true);
     };
 

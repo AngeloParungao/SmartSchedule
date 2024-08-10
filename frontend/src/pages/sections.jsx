@@ -138,6 +138,10 @@ function Sections(){
         }
     };
     const handleDeleteSelected = () => {
+        if(selectedSectionIds.length === 0){
+            toast.error("None is selected")
+            return;
+        }
             setIsPasswordPromptOpen(true);
         };
 

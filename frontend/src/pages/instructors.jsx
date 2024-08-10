@@ -145,6 +145,10 @@ function Instructors() {
     };
 
     const handleDeleteSelected = () => {
+        if(selectedInstructorIds.length === 0){
+            toast.error("None is selected")
+            return;
+        }
         setIsPasswordPromptOpen(true);
     };
 

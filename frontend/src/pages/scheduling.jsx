@@ -164,7 +164,7 @@ function Scheduling() {
           type : 'schedule'
       });
 
-      toast.success('Items deleted successfully');
+      toast.success('Item/s deleted successfully');
       fetchSchedules(); // Refresh the schedules
       handleCloseDeleteModal(); // Close the modal
     } catch (error) {
