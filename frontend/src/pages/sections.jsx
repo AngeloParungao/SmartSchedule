@@ -22,6 +22,7 @@ function Sections(){
     const [isUpdating, setIsUpdating] = useState(false);
     const [sectionIdToUpdate, setSectionIdToUpdate] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedOrder, setSelectedOrder] = useState('ascending');
 
     const currentUser = JSON.parse(localStorage.getItem('userId'));
 
@@ -195,13 +196,26 @@ function Sections(){
         setSectionIdToUpdate(null);
     };
 
-    const filteredSections = sections.filter(section => 
+    const filteredSections = sections
+    .filter(section => 
         section.section_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         section.section_group.toLowerCase().includes(searchTerm.toLowerCase()) ||
         section.year_lvl.toLowerCase().includes(searchTerm.toLowerCase()) ||
         section.number_of_students.toString().includes(searchTerm) ||
         section.section_tags.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    )
+    .sort((a, b) => {
+        if (selectedOrder === 'ascending') {
+            return a.year_lvl.localeCompare(b.year_lvl);
+        } else {
+            return b.year_lvl.localeCompare(a.year_lvl);
+        }
+    });
+
+
+    const handleOrderChange = (e) => {
+        setSelectedOrder(e.target.value);
+    };
 
 
     return(
@@ -282,6 +296,10 @@ function Sections(){
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
+                        <select className='order' value={selectedOrder} onChange={handleOrderChange}>
+                            <option value="ascending">Ascending</option>
+                            <option value="descending">Descending</option>
+                        </select>
                         <div className='btns'>
                             <button id="select-all-btn" onClick={handleSelectAll}>Select All</button>
                             <button id="delete-btn" onClick={handleDeleteSelected}>Remove Section/s</button>

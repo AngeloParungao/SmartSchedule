@@ -50,6 +50,10 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
   const [subjectError, setSubjectError] = useState(false);
   const [timeError, setTimeError] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
+  const [sectionCollisionTime, setSectionCollisionTime] = useState(null);
+  const [instructorCollisionTime, setInstructorCollisionTime] = useState(null);
+  const [roomCollisionTime, setRoomCollisionTime] = useState(null);
+
 
   // Fetch the current user ID from local storage
   const currentUser = JSON.parse(localStorage.getItem('userId'));
@@ -210,51 +214,100 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
 
   // Check for real-time errors based on the current schedules and form inputs
   const checkRealTimeErrors = () => {
+    // Convert the new start and end times to minutes
+    const newStartTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
+    const newEndTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
+  
+    let foundSectionCollisionTime = null;
+    let foundInstructorCollisionTime = null;
+    let foundRoomCollisionTime = null;
+  
     const timeConflict = (schedule) => {
-      const newStartTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
-      const newEndTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
-      const start = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
-      const end = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
-
-      // Check if the schedule matches the selected section and group
+      const startTimeInMinutes = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
+      const endTimeInMinutes = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
+  
       if (
         schedule.section_name === section &&
         schedule.section_group === group &&
         schedule.day === meetingDay
       ) {
-        return (
-          (newStartTimeInMinutes >= start && newStartTimeInMinutes < end) ||
-          (newEndTimeInMinutes > start && newEndTimeInMinutes <= end) ||
-          (newStartTimeInMinutes <= start && newEndTimeInMinutes >= end)
+        const isConflict = (
+          (newStartTimeInMinutes >= startTimeInMinutes && newStartTimeInMinutes < endTimeInMinutes) ||
+          (newEndTimeInMinutes > startTimeInMinutes && newEndTimeInMinutes <= endTimeInMinutes) ||
+          (newStartTimeInMinutes <= startTimeInMinutes && newEndTimeInMinutes >= endTimeInMinutes)
         );
+  
+        if (isConflict) {
+          foundSectionCollisionTime = {
+            start: schedule.start_time,
+            end: schedule.end_time,
+          };
+          return true;
+        }
       }
       return false;
     };
-
-    const hasTimeConflict = schedules.some(timeConflict);
-    setTimeError(hasTimeConflict);
-
-    const instructorAvailability = schedules.some(schedule =>
-      schedule.instructor === instructorName &&
-      schedule.day === meetingDay &&
-      (
-        (startTime >= schedule.start_time && startTime < schedule.end_time) ||
-        (endTime > schedule.start_time && endTime <= schedule.end_time) ||
-        (startTime <= schedule.start_time && endTime >= schedule.end_time)
-      )
-    );
-    setInstructorError(instructorAvailability);
-
-    const roomAvailability = schedules.some(schedule =>
-      schedule.room === roomName &&
-      schedule.day === meetingDay &&
-      (
-        (startTime >= schedule.start_time && startTime < schedule.end_time) ||
-        (endTime > schedule.start_time && endTime <= schedule.end_time) ||
-        (startTime <= schedule.start_time && endTime >= schedule.end_time)
-      )
-    );
-    setRoomError(roomAvailability);
+  
+    const instructorConflict = (schedule) => {
+      const startTimeInMinutes = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
+      const endTimeInMinutes = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
+  
+      if (
+        schedule.instructor === instructorName &&
+        schedule.day === meetingDay
+      ) {
+        const isConflict = (
+          (newStartTimeInMinutes >= startTimeInMinutes && newStartTimeInMinutes < endTimeInMinutes) ||
+          (newEndTimeInMinutes > startTimeInMinutes && newEndTimeInMinutes <= endTimeInMinutes) ||
+          (newStartTimeInMinutes <= startTimeInMinutes && newEndTimeInMinutes >= endTimeInMinutes)
+        );
+  
+        if (isConflict) {
+          foundInstructorCollisionTime = {
+            start: schedule.start_time,
+            end: schedule.end_time,
+          };
+          return true;
+        }
+      }
+      return false;
+    };
+  
+    const roomConflict = (schedule) => {
+      const startTimeInMinutes = parseInt(schedule.start_time.split(':')[0]) * 60 + parseInt(schedule.start_time.split(':')[1]);
+      const endTimeInMinutes = parseInt(schedule.end_time.split(':')[0]) * 60 + parseInt(schedule.end_time.split(':')[1]);
+  
+      if (
+        schedule.room === roomName &&
+        schedule.day === meetingDay
+      ) {
+        const isConflict = (
+          (newStartTimeInMinutes >= startTimeInMinutes && newStartTimeInMinutes < endTimeInMinutes) ||
+          (newEndTimeInMinutes > startTimeInMinutes && newEndTimeInMinutes <= endTimeInMinutes) ||
+          (newStartTimeInMinutes <= startTimeInMinutes && newEndTimeInMinutes >= endTimeInMinutes)
+        );
+  
+        if (isConflict) {
+          foundRoomCollisionTime = {
+            start: schedule.start_time,
+            end: schedule.end_time,
+          };
+          return true;
+        }
+      }
+      return false;
+    };
+  
+    const hasSectionConflict = schedules.some(timeConflict);
+    const hasInstructorConflict = schedules.some(instructorConflict);
+    const hasRoomConflict = schedules.some(roomConflict);
+  
+    setTimeError(hasSectionConflict);
+    setSectionCollisionTime(foundSectionCollisionTime);
+    setInstructorError(hasInstructorConflict);
+    setInstructorCollisionTime(foundInstructorCollisionTime);
+    setRoomError(hasRoomConflict);
+    setRoomCollisionTime(foundRoomCollisionTime);
 
     const startTimeInMinutes = parseInt(startTime.split(':')[0]) * 60 + parseInt(startTime.split(':')[1]);
     const endTimeInMinutes = parseInt(endTime.split(':')[0]) * 60 + parseInt(endTime.split(':')[1]);
@@ -464,7 +517,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
                 <div>
                   {instructorError && <p className="error-message">
                     <FontAwesomeIcon icon={faWarning} className='warning-icon' />
-                    Instructor is not available during this time slot.</p>}
+                    Instructor not available between {`${(parseInt(instructorCollisionTime.start.slice(0, 2)) % 12 || 12)}:${instructorCollisionTime.start.slice(3, 5)} ${parseInt(instructorCollisionTime.start.slice(0, 2)) >= 12 ? 'PM' : 'AM'}`} and {`${(parseInt(instructorCollisionTime.end.slice(0, 2)) % 12 || 12)}:${instructorCollisionTime.end.slice(3, 5)} ${parseInt(instructorCollisionTime.end.slice(0, 2)) >= 12 ? 'PM' : 'AM'}`}</p>}
                 </div>
               </div>
               <div className='form-content'>
@@ -521,7 +574,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
                 <div>
                   {roomError && <p className="error-message">
                     <FontAwesomeIcon icon={faWarning} className='warning-icon' />
-                    Room is not available during this time slot.</p>}
+                    Room is not available between {`${(parseInt(roomCollisionTime.start.slice(0, 2)) % 12 || 12)}:${roomCollisionTime.start.slice(3, 5)} ${parseInt(roomCollisionTime.start.slice(0, 2)) >= 12 ? 'PM' : 'AM'}`} and {`${(parseInt(roomCollisionTime.end.slice(0, 2)) % 12 || 12)}:${roomCollisionTime.end.slice(3, 5)} ${parseInt(roomCollisionTime.end.slice(0, 2)) >= 12 ? 'PM' : 'AM'}`}</p>}
                 </div>
               </div>
               <div className='form-content'>
@@ -561,7 +614,7 @@ function AddItemModal({ onClose, section, group, onItemAdded }) {
                 <div>
                   {timeError && <p className="error-message">
                     <FontAwesomeIcon icon={faWarning} className='warning-icon' />
-                    Time not available for this section</p>}
+                    Time conflict detected between {`${(parseInt(sectionCollisionTime.start.slice(0, 2)) % 12 || 12)}:${sectionCollisionTime.start.slice(3, 5)} ${parseInt(sectionCollisionTime.start.slice(0, 2)) >= 12 ? 'PM' : 'AM'}`} and {`${(parseInt(sectionCollisionTime.end.slice(0, 2)) % 12 || 12)}:${sectionCollisionTime.end.slice(3, 5)} ${parseInt(sectionCollisionTime.end.slice(0, 2)) >= 12 ? 'PM' : 'AM'}`}</p>}
                 </div>
               </div>
               <div className='form-content'>
