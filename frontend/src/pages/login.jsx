@@ -9,6 +9,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { RotatingLines } from 'react-loader-spinner';
 
 function Login() {
+    const url = "http://localhost:8082/";
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -23,7 +24,7 @@ function Login() {
     }, [navigate]);
 
     useEffect(() => {
-        axios.get("http://localhost:8082/api/auth/fetch")
+        axios.get(`${url}api/auth/fetch`)
             .then(res => {
                 setUsers(res.data);
             })

@@ -7,6 +7,8 @@ import { faSearch, faUser, faChalkboardTeacher, faBook, faDoorClosed, faCalendar
 import toast from 'react-hot-toast';
 
 function ActivityLog() {
+  const url = "http://localhost:8082/";
+
   const [activity, setActivity] = useState([]);
   const [selectedDate, setSelectedDate] = useState('');
 
@@ -19,7 +21,7 @@ function ActivityLog() {
 
   const fetchActivity = async () => {
     try {
-      const response = await axios.get(`http://localhost:8082/api/activity/fetch?user_id=${currentUser}`);
+      const response = await axios.get(`${url}api/activity/fetch?user_id=${currentUser}`);
       setActivity(response.data);
     } catch (err) {
       console.error("Error fetching activity logs:", err);

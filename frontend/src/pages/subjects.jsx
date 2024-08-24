@@ -9,6 +9,8 @@ import { faPenToSquare, faSearch } from '@fortawesome/free-solid-svg-icons';
 import '../css/subjects.css';
 
 function Subjects() {
+    const url = "http://localhost:8082/";
+
     const [user, setUser] = useState([]);
     const [isPasswordPromptOpen, setIsPasswordPromptOpen] = useState(false);
 
@@ -28,7 +30,7 @@ function Subjects() {
     const currentUser = JSON.parse(localStorage.getItem('userId'));
 
     useEffect(() => {
-        axios.get("http://localhost:8082/api/auth/fetch")
+        axios.get(`${url}api/auth/fetch`)
             .then(res => {
                 const foundUser = res.data.find(user => user.user_id === currentUser);
                 if (foundUser) {
@@ -50,7 +52,7 @@ function Subjects() {
 
     const fetchSubjects = async () => {
         try {
-            const response = await axios.get(`http://localhost:8082/api/subjects/fetch?creator_id=${currentUser}`);
+            const response = await axios.get(`${url}api/subjects/fetch?creator_id=${currentUser}`);
             setSubjects(response.data);
         } catch (error) {
             console.error('Error fetching subjects:', error);
@@ -72,10 +74,10 @@ function Subjects() {
         };
 
         if (isUpdating) {
-            axios.put(`http://localhost:8082/api/subjects/update/${subjectIdToUpdate}`, subjectData)
+            axios.put(`${url}api/subjects/update/${subjectIdToUpdate}`, subjectData)
                 .then(res => {
                     //FOR ACTIVITY HISTORY
-                    axios.post("http://localhost:8082/api/activity/adding",{
+                    axios.post(`${url}api/activity/adding`,{
                         user_id : currentUser,
                         action : 'Update',
                         details : `${subjectName}(${subjectCode})`,
@@ -103,10 +105,10 @@ function Subjects() {
                 return;
             }
 
-            axios.post("http://localhost:8082/api/subjects/adding", subjectData)
+            axios.post(`${url}api/subjects/adding`, subjectData)
                 .then(res => {
                     //FOR ACTIVITY HISTORY
-                    axios.post("http://localhost:8082/api/activity/adding",{
+                    axios.post("${url}api/activity/adding",{
                         user_id : currentUser,
                         action : 'Add',
                         details : `${subjectName}(${subjectCode})`,
@@ -151,13 +153,13 @@ function Subjects() {
     const handlePasswordSubmit = (password) => {
         if (password === user.password) {
             // Proceed with deletion
-            axios.delete("http://localhost:8082/api/subjects/delete", {
+            axios.delete(`${url}api/subjects/delete`, {
                 data: { subjectIds: selectedSubjectIds }
             })
             .then(res => {
                 //FOR ACTIVITY HISTORY
                 const number = selectedSubjectIds.length;
-                axios.post("http://localhost:8082/api/activity/adding",{
+                axios.post(`${url}api/activity/adding`,{
                     user_id : currentUser,
                     action : 'Delete',
                     details : `${number}`,

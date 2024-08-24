@@ -12,6 +12,8 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 
 function Scheduling() {
+  const url = "http://localhost:8082/";
+  
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const rowSpans = Array(daysOfWeek.length).fill(0);
   const timesOfDay = [
@@ -61,7 +63,7 @@ function Scheduling() {
 
   const fetchSections = async () => {
     try {
-      const response = await axios.get(`http://localhost:8082/api/sections/fetch?creator_id=${currentUser}`);
+      const response = await axios.get(`${url}api/sections/fetch?creator_id=${currentUser}`);
       setSections(response.data);
       if (response.data.length > 0) {
         setSelectedSection(response.data[0].section_name.toString());
@@ -77,7 +79,7 @@ function Scheduling() {
 
   const fetchSchedules = async () => {
     try {
-      const response = await axios.get(`http://localhost:8082/api/schedule/fetch?creator_id=${currentUser}`);
+      const response = await axios.get(`${url}api/schedule/fetch?creator_id=${currentUser}`);
       setSchedules(response.data);
     } catch (error) {
       console.error('Error fetching schedules:', error);
@@ -154,11 +156,11 @@ function Scheduling() {
   const handleDeleteItem = async (itemIds) => {
     try {
       for (const id of itemIds) {
-        await axios.delete(`http://localhost:8082/api/schedule/delete/${id}`);
+        await axios.delete(`${url}api/schedule/delete/${id}`);
       }
       //FOR ACTIVITY HISTORY
       const number = itemIds.length;
-      axios.post("http://localhost:8082/api/activity/adding",{
+      axios.post(`${url}api/activity/adding`,{
           user_id : currentUser,
           action : 'Delete',
           details : `${number}`,

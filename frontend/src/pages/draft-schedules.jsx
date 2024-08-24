@@ -7,6 +7,8 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 function Draft() {
+    const url = "http://localhost:8082/";
+
     const currentUser = JSON.parse(localStorage.getItem('userId'));
 
     const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -63,7 +65,7 @@ function Draft() {
 
     const fetchSchedules = async () => {
         try {
-            const response = await axios.get(`http://localhost:8082/api/schedule/fetch?creator_id=${currentUser}`);
+            const response = await axios.get(`${url}api/schedule/fetch?creator_id=${currentUser}`);
             setSchedules(response.data);
 
             if (response.data.length > 0) {
@@ -77,7 +79,7 @@ function Draft() {
 
     const fetchSections = async () => {
         try {
-            const response = await axios.get(`http://localhost:8082/api/sections/fetch?creator_id=${currentUser}`);
+            const response = await axios.get(`${url}api/sections/fetch?creator_id=${currentUser}`);
             setSections(response.data);
 
             if (response.data.length > 0) {
@@ -92,7 +94,7 @@ function Draft() {
 
     const fetchInstructors = async () => {
         try {
-            const response = await axios.get(`http://localhost:8082/api/instructors/fetch?creator_id=${currentUser}`);
+            const response = await axios.get(`${url}api/instructors/fetch?creator_id=${currentUser}`);
             setInstructors(response.data);
         } catch (error) {
             console.error('Error fetching instructors:', error);

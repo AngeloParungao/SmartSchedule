@@ -9,6 +9,8 @@ import { faPenToSquare, faSearch } from '@fortawesome/free-solid-svg-icons';
 import '../css/sections.css';
 
 function Sections(){
+    const url = "http://localhost:8082/";
+
     const [user, setUser] = useState([]);
     const [isPasswordPromptOpen, setIsPasswordPromptOpen] = useState(false);
 
@@ -27,7 +29,7 @@ function Sections(){
     const currentUser = JSON.parse(localStorage.getItem('userId'));
 
     useEffect(() => {
-        axios.get("http://localhost:8082/api/auth/fetch")
+        axios.get(`${url}api/auth/fetch`)
             .then(res => {
                 const foundUser = res.data.find(user => user.user_id === currentUser);
                 if (foundUser) {
@@ -49,7 +51,7 @@ function Sections(){
 
     const fetchSections = async () => {
         try {
-            const response = await axios.get(`http://localhost:8082/api/sections/fetch?creator_id=${currentUser}`);
+            const response = await axios.get(`${url}api/sections/fetch?creator_id=${currentUser}`);
             setSections(response.data);
         } catch (error) {
             console.error('Error fetching sections:', error);
@@ -82,10 +84,10 @@ function Sections(){
         }
 
         if (isUpdating) {
-            axios.put(`http://localhost:8082/api/sections/update/${sectionIdToUpdate}`, sectionData)
+            axios.put(`${url}api/sections/update/${sectionIdToUpdate}`, sectionData)
                 .then(res => {
                     //FOR ACTIVITY HISTORY
-                    axios.post("http://localhost:8082/api/activity/adding",{
+                    axios.post(`${url}api/activity/adding`,{
                         user_id : currentUser,
                         action : 'Update',
                         details : `${sectionName} - ${sectionGroup}`,
@@ -102,10 +104,10 @@ function Sections(){
                     toast.error("Error in updating");
                 });
         } else {
-            axios.post("http://localhost:8082/api/sections/adding", sectionData)
+            axios.post(`${url}api/sections/adding`, sectionData)
                 .then(res => {
                     //FOR ACTIVITY HISTORY
-                    axios.post("http://localhost:8082/api/activity/adding",{
+                    axios.post(`${url}api/activity/adding`,{
                         user_id : currentUser,
                         action : 'Add',
                         details : `${sectionName} - ${sectionGroup}`,
@@ -149,13 +151,13 @@ function Sections(){
 
     const handlePasswordSubmit = (password) => {
         if (password === user.password) {
-            axios.delete("http://localhost:8082/api/sections/delete", {
+            axios.delete(`${url}api/sections/delete`, {
                 data: { sectionIds: selectedSectionIds }
             })
             .then(res => {
                 //FOR ACTIVITY HISTORY
                 const number = selectedSectionIds.length;
-                axios.post("http://localhost:8082/api/activity/adding",{
+                axios.post(`${url}api/activity/adding`,{
                     user_id : currentUser,
                     action : 'Delete',
                     details : `${number}`,

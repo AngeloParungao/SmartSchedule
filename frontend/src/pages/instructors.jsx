@@ -9,6 +9,8 @@ import { faPenToSquare , faSearch} from '@fortawesome/free-solid-svg-icons';
 import '../css/instructors.css';
 
 function Instructors() {
+    const url = "http://localhost:8082/";
+
     const [user, setUser] = useState([]);
     const [isPasswordPromptOpen, setIsPasswordPromptOpen] = useState(false);
 
@@ -18,7 +20,7 @@ function Instructors() {
     const [lastName, setLastName] = useState('');
     const [workType, setWorkType] = useState('Regular');
     const [tags, setTags] = useState('');
-    const [instructors, setInstructors] = useState([]);
+    const [instructors, setInstructors] = useState([]); 
     const [selectedInstructorIds, setSelectedInstructorIds] = useState([]);
     const [isUpdating, setIsUpdating] = useState(false);
     const [instructorIdToUpdate, setInstructorIdToUpdate] = useState(null);
@@ -28,7 +30,7 @@ function Instructors() {
 
     //VALIDATION OF USER
     useEffect(() => {
-        axios.get("http://localhost:8082/api/auth/fetch")
+        axios.get(`${url}api/auth/fetch`)
             .then(res => {
                 const foundUser = res.data.find(user => user.user_id === currentUser);
                 if (foundUser) {
@@ -51,7 +53,7 @@ function Instructors() {
 
     const fetchInstructors = async () => {
         try {
-            const response = await axios.get(`http://localhost:8082/api/instructors/fetch?creator_id=${currentUser}`);
+            const response = await axios.get(`${url}api/instructors/fetch?creator_id=${currentUser}`);
             setInstructors(response.data);
         } catch (error) {
             console.error('Error fetching instructors:', error);
@@ -76,10 +78,10 @@ function Instructors() {
 
         //FOR UPDATING
         if (isUpdating) {
-            axios.put(`http://localhost:8082/api/instructors/update/${instructorIdToUpdate}`, instructorData)
+            axios.put(`${url}api/instructors/update/${instructorIdToUpdate}`, instructorData)
                 .then(res => {
                     //FOR ACTIVITY HISTORY
-                    axios.post("http://localhost:8082/api/activity/adding",{
+                    axios.post("${url}api/activity/adding",{
                         user_id : currentUser,
                         action : 'Update',
                         details : `${lastName}, ${firstName} ${middleName}`,
@@ -105,10 +107,10 @@ function Instructors() {
                 return;
             }
             //FOR ADDING
-            axios.post("http://localhost:8082/api/instructors/adding", instructorData)
+            axios.post(`${url}api/instructors/adding`, instructorData)
                 .then(res => {
                      //FOR ACTIVITY HISTORY
-                     axios.post("http://localhost:8082/api/activity/adding",{
+                     axios.post(`${url}api/activity/adding`,{
                         user_id : currentUser,
                         action : 'Add',
                         details : `${lastName}, ${firstName} ${middleName}`,
@@ -155,13 +157,13 @@ function Instructors() {
 
     const handlePasswordSubmit = (password) => {
         if (password === user.password) {
-            axios.delete("http://localhost:8082/api/instructors/delete", {
+            axios.delete(`${url}api/instructors/delete`, {
                 data: { instructorIds: selectedInstructorIds }
             })
             .then(res => {
                 //FOR ACTIVITY HISTORY
                 const number = selectedInstructorIds.length;
-                axios.post("http://localhost:8082/api/activity/adding",{
+                axios.post(`${url}api/activity/adding`,{
                     user_id : currentUser,
                     action : 'Delete',
                     details : `${number}`,
