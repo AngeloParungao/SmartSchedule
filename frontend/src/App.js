@@ -27,7 +27,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
-        {/*<Route element={<PrivateRoute />}>*/}
+        <Route element={<PrivateRoute />}>
           <Route path="/home" element={<Home />} />
           <Route path="/draft" element={<Draft />} />
           <Route path="/scheduling" element={<Scheduling />} />
@@ -37,7 +37,7 @@ function App() {
           <Route path="/rooms" element={<Rooms />} />
           <Route path="/setting" element={<Settings />} />
           <Route path="/history" element={<ActivityLog />} />
-        {/*</Route>*/}
+        </Route>
       </Routes>
     </Router>
   );
