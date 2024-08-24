@@ -9,7 +9,7 @@ import { faPenToSquare, faSearch } from '@fortawesome/free-solid-svg-icons';
 import '../css/rooms.css';
 
 function Rooms() {
-    const url = "http://localhost:8082/";
+    const url = "https://smartschedule.onrender.com/";
 
     const [user, setUser] = useState([]);
     const [isPasswordPromptOpen, setIsPasswordPromptOpen] = useState(false);
