@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faXmark, faHome , faNoteSticky, faCalendar , faBell, faGear, faRightFromBracket} from '@fortawesome/free-solid-svg-icons';
 
 function Sidebar(){
-    const url = "http://localhost:8082/";
+    const url = "https://smartschedule.onrender.com/";
 
     const [user, setUsers] = useState([]);
     const currentUser = JSON.parse(localStorage.getItem('userId'));
