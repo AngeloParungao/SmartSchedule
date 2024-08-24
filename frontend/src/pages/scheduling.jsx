@@ -12,7 +12,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 
 function Scheduling() {
-  const url = "http://localhost:8082/";
+  const url = "https://smartschedule.onrender.com/";
   
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const rowSpans = Array(daysOfWeek.length).fill(0);
