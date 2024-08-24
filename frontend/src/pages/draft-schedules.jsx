@@ -7,7 +7,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 function Draft() {
-    const url = "https://smartschedule.onrender.com/";
+    const url = "https://smartschedule-backend.onrender.com/";
 
     const currentUser = JSON.parse(localStorage.getItem('userId'));
 
