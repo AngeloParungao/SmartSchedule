@@ -1,4 +1,3 @@
-//server.js
 const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
@@ -7,7 +6,7 @@ const instructorsRoutes = require('./routes/instructorsRoutes');
 const sectionsRoutes = require('./routes/sectionsRoutes');
 const subjectsRoutes = require('./routes/subjectsRoutes');
 const roomsRoutes = require('./routes/roomsRoutes');
-const activityRoutes = require("./routes/activityRoutes")
+const activityRoutes = require("./routes/activityRoutes");
 
 const app = express();
 
@@ -22,6 +21,8 @@ app.use('/api/subjects', subjectsRoutes);
 app.use('/api/rooms', roomsRoutes);
 app.use('/api/activity', activityRoutes);
 
-app.listen(8082, () => {
-    console.log("Server is listening on port 8082");
+// Use process.env.PORT or default to 8082
+const PORT = process.env.PORT || 8082;
+app.listen(PORT, () => {
+    console.log(`Server is listening on port ${PORT}`);
 });
