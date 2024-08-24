@@ -7,7 +7,7 @@ import { faSearch, faUser, faChalkboardTeacher, faBook, faDoorClosed, faCalendar
 import toast from 'react-hot-toast';
 
 function ActivityLog() {
-  const url = "http://localhost:8082/";
+  const url = "https://smartschedule.onrender.com/";
 
   const [activity, setActivity] = useState([]);
   const [selectedDate, setSelectedDate] = useState('');
