@@ -8,12 +8,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faXmark, faHome , faNoteSticky, faCalendar , faBell, faGear, faRightFromBracket} from '@fortawesome/free-solid-svg-icons';
 
 function Sidebar(){
+    const url = "http://localhost:8082/";
+
     const [user, setUsers] = useState([]);
     const currentUser = JSON.parse(localStorage.getItem('userId'));
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get("http://localhost:8082/api/auth/fetch")
+        axios.get(`${url}api/auth/fetch`)
             .then(res => {
                 setUsers(res.data);
             })
