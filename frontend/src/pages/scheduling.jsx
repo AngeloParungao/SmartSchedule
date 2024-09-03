@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
 function Scheduling() {
-  const url = "https://smartschedule-backend.onrender.com/";
+  const url = "http://localhost:8082/";
 
   const daysOfWeek = [
     "Monday",

@@ -9,7 +9,7 @@ import { faPenToSquare, faSearch } from "@fortawesome/free-solid-svg-icons";
 import "../css/sections.css";
 
 function Sections() {
-  const url = "https://smartschedule-backend.onrender.com/";
+  const url = "http://localhost:8082/";
 
   const [user, setUser] = useState([]);
   const [isPasswordPromptOpen, setIsPasswordPromptOpen] = useState(false);

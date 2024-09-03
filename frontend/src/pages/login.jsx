@@ -9,7 +9,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { RotatingLines } from "react-loader-spinner";
 
 function Login() {
-  const url = "https://smartschedule-backend.onrender.com/";
+  const url = "http://localhost:8082/";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

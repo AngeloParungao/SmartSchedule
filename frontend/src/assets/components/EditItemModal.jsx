@@ -48,7 +48,7 @@ function EditItemModal({ onClose, item, onItemUpdated }) {
   const [recommendations, setRecommendations] = useState([]);
 
   // Fetch the current user ID from local storage
-  const url = "https://smartschedule-backend.onrender.com/";
+  const url = "http://localhost:8082/";
   const currentUser = JSON.parse(localStorage.getItem("userId"));
 
   // Fetch data when the component mounts

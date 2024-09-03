@@ -9,7 +9,7 @@ import { faPenToSquare, faSearch } from "@fortawesome/free-solid-svg-icons";
 import "../css/instructors.css";
 
 function Instructors() {
-  const url = "https://smartschedule-backend.onrender.com/";
+  const url = "http://localhost:8082/";
 
   const [user, setUser] = useState([]);
   const [isPasswordPromptOpen, setIsPasswordPromptOpen] = useState(false);
@@ -30,18 +30,23 @@ function Instructors() {
 
   //VALIDATION OF USER
   useEffect(() => {
-    axios
-      .get(`${url}api/auth/fetch`)
-      .then((res) => {
-        const foundUser = res.data.find((user) => user.user_id === currentUser);
-        if (foundUser) {
-          setUser(foundUser);
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to fetch users:", err);
-        toast.error("Failed to fetch users");
-      });
+    try {
+      axios
+        .get(`${url}api/auth/fetch`)
+        .then((res) => {
+          const foundUser = res.data.find((user) => user.user_id === currentUser);
+          if (foundUser) {
+            setUser(foundUser);
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to fetch users:", err);
+          toast.error("Failed to fetch users");
+        });
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      toast.error("Failed to fetch users");
+    }
   }, []);
 
   //FETCHING OF INSTRUCTORS DATA
@@ -78,28 +83,34 @@ function Instructors() {
 
     //FOR UPDATING
     if (isUpdating) {
-      axios
-        .put(
-          `${url}api/instructors/update/${instructorIdToUpdate}`,
-          instructorData
-        )
-        .then((res) => {
-          //FOR ACTIVITY HISTORY
-          axios.post("${url}api/activity/adding", {
-            user_id: currentUser,
-            action: "Update",
-            details: `${lastName}, ${firstName} ${middleName}`,
-            type: "instructor",
+      try{
+        axios
+          .put(
+            `${url}api/instructors/update/${instructorIdToUpdate}`,
+            instructorData
+          )
+          .then((res) => {
+            //FOR ACTIVITY HISTORY
+            axios.post(`${url}api/activity/adding`, {
+              user_id: currentUser,
+              action: "Update",
+              details: `${lastName}, ${firstName} ${middleName}`,
+              type: "instructor",
+            });
+  
+            toast.success("Updated Successfully!");
+            fetchInstructors(); // Refresh instructors list after updating
+            resetForm(); // Reset form fields
+          })
+          .catch((err) => {
+            console.error("Error updating instructor:", err);
+            toast.error("Error in updating");
           });
-
-          toast.success("Updated Successfully!");
-          fetchInstructors(); // Refresh instructors list after updating
-          resetForm(); // Reset form fields
-        })
-        .catch((err) => {
-          console.error("Error updating instructor:", err);
-          toast.error("Error in updating");
-        });
+      }
+      catch(error){
+        console.error("Error updating instructor:", error);
+        toast.error("Error in updating");
+      }
     } else {
       // Check if the email already exists
       const emailExists = instructors.some(
@@ -110,25 +121,31 @@ function Instructors() {
         return;
       }
       //FOR ADDING
-      axios
-        .post(`${url}api/instructors/adding`, instructorData)
-        .then((res) => {
-          //FOR ACTIVITY HISTORY
-          axios.post(`${url}api/activity/adding`, {
-            user_id: currentUser,
-            action: "Add",
-            details: `${lastName}, ${firstName} ${middleName}`,
-            type: "instructor",
+      try{
+        axios
+          .post(`${url}api/instructors/adding`, instructorData)
+          .then((res) => {
+            //FOR ACTIVITY HISTORY
+            axios.post(`${url}api/activity/adding`, {
+              user_id: currentUser,
+              action: "Add",
+              details: `${lastName}, ${firstName} ${middleName}`,
+              type: "instructor",
+            });
+  
+            toast.success("Added Successfully!");
+            fetchInstructors(); // Refresh instructors list after adding
+            resetForm(); // Reset form fields
+          })
+          .catch((err) => {
+            console.error("Error in Adding Instructor:", err);
+            toast.error("Error in Adding");
           });
-
-          toast.success("Added Successfully!");
-          fetchInstructors(); // Refresh instructors list after adding
-          resetForm(); // Reset form fields
-        })
-        .catch((err) => {
-          console.error("Error in Adding Instructor:", err);
-          toast.error("Error in Adding");
-        });
+      }
+      catch(error){
+        console.error("Error in Adding Instructor:", error);
+        toast.error("Error in Adding");
+      }
     }
   };
 

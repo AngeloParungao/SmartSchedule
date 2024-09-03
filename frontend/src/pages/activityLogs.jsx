@@ -14,7 +14,7 @@ import {
 import toast from "react-hot-toast";
 
 function ActivityLog() {
-  const url = "https://smartschedule-backend.onrender.com/";
+  const url = "http://localhost:8082/";
 
   const [activity, setActivity] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");

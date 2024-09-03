@@ -9,7 +9,7 @@ import { faPenToSquare, faSearch } from "@fortawesome/free-solid-svg-icons";
 import "../css/subjects.css";
 
 function Subjects() {
-  const url = "https://smartschedule-backend.onrender.com/";
+  const url = "http://localhost:8082/";
 
   const [user, setUser] = useState([]);
   const [isPasswordPromptOpen, setIsPasswordPromptOpen] = useState(false);
@@ -115,7 +115,7 @@ function Subjects() {
         .post(`${url}api/subjects/adding`, subjectData)
         .then((res) => {
           //FOR ACTIVITY HISTORY
-          axios.post("${url}api/activity/adding", {
+          axios.post(`${url}api/activity/adding`, {
             user_id: currentUser,
             action: "Add",
             details: `${subjectName}(${subjectCode})`,

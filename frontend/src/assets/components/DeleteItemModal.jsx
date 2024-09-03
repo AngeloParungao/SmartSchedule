@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
 function DeleteItemModal({ onClose, schedule, onDeleteItem }) {
-  const url = "https://smartschedule-backend.onrender.com/";
+  const url = "http://localhost:8082/";
 
   const [user, setUser] = useState([]);
   const [isPasswordPromptOpen, setIsPasswordPromptOpen] = useState(false);

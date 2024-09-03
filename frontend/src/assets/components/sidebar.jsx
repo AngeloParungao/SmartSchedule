@@ -17,7 +17,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 function Sidebar() {
-  const url = "https://smartschedule-backend.onrender.com/";
+  const url = "http://localhost:8082/";
 
   const [user, setUsers] = useState([]);
   const currentUser = JSON.parse(localStorage.getItem("userId"));
